@@ -26,3 +26,6 @@ Things you may want to cover:
 Suzuki Fumihisa changed.
 
 Suzuki Fumihisa changed at "fumihisa-test" branch, and to pull request.
+
+
+*****koh.s sample change!*******
