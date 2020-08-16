@@ -28,4 +28,4 @@ Suzuki Fumihisa changed.
 Suzuki Fumihisa changed at "fumihisa-test" branch, and to pull request.
 
 
-*****koh.s sample change!*******
+****koh.s sample change!******
