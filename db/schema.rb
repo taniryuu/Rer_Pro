@@ -14,8 +14,8 @@ ActiveRecord::Schema.define(version: 2020_08_17_121132) do
 
   create_table "companies", force: :cascade do |t|
     t.string "name"
-    t.boolean "admin"
-    t.integer "status"
+    t.boolean "admin", default: false
+    t.integer "status", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
