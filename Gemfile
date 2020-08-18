@@ -43,6 +43,7 @@ gem 'devise'
 # bootstrap
 gem 'bootstrap','~> 4.0.0'
 gem 'mini_racer'
+gem 'jquery-rails'
 # enum
 gem 'enum'
 gem 'enum_help'
