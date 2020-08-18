@@ -1,4 +1,6 @@
 class Company < ApplicationRecord
+  enum status: %i(active, inactive)
+  
   validates :name, presence: true, 
                    uniqueness: true
   validates :admin, inclusion: { in: [true, false] }
