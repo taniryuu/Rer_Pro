@@ -1,0 +1,7 @@
+ja:
+  enums:
+    company:
+      status:
+        active: "使用中"
+        inactive: "凍結中"
+        
