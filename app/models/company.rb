@@ -6,5 +6,5 @@ class Company < ApplicationRecord
   validates :name, presence: true, 
                    uniqueness: true
   validates :admin, inclusion: { in: [true, false] }
-  validates :status, presence: true,
+  validates :status, presence: true
 end
