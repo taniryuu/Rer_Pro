@@ -4,9 +4,9 @@ Company.create!(
   status: 0
 )
 puts "システム管理者作成完了"
-
+# ペルソナ用
 # Company.create!(
-#   name: "システム管理",
-#   admin: true,
+#   name: "",
+#   admin: false,
 #   status: 0
 # )
