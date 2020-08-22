@@ -1,0 +1,97 @@
+<%= form_with(model: lead, local: true) do |form| %>
+  <% if lead.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(lead.errors.count, "error") %> prohibited this lead from being saved:</h2>
+
+      <ul>
+      <% lead.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :user_id %>
+    <%= form.number_field :user_id %>
+  </div>
+
+  <div class="field">
+    <%= form.label :created_date %>
+    <%= form.datetime_select :created_date %>
+  </div>
+
+  <div class="field">
+    <%= form.label :completed_date %>
+    <%= form.date_select :completed_date %>
+  </div>
+
+  <div class="field">
+    <%= form.label :customer_name %>
+    <%= form.text_field :customer_name %>
+  </div>
+
+  <div class="field">
+    <%= form.label :room_name %>
+    <%= form.text_field :room_name %>
+  </div>
+
+  <div class="field">
+    <%= form.label :room_num %>
+    <%= form.text_field :room_num %>
+  </div>
+
+  <div class="field">
+    <%= form.label :template %>
+    <%= form.check_box :template %>
+  </div>
+
+  <div class="field">
+    <%= form.label :template_name %>
+    <%= form.text_field :template_name %>
+  </div>
+
+  <div class="field">
+    <%= form.label :memo %>
+    <%= form.text_field :memo %>
+  </div>
+
+  <div class="field">
+    <%= form.label :status %>
+    <%= form.number_field :status %>
+  </div>
+
+  <div class="field">
+    <%= form.label :notice_created %>
+    <%= form.check_box :notice_created %>
+  </div>
+
+  <div class="field">
+    <%= form.label :notice_change_limit %>
+    <%= form.check_box :notice_change_limit %>
+  </div>
+
+  <div class="field">
+    <%= form.label :scheduled_resident_date %>
+    <%= form.date_select :scheduled_resident_date %>
+  </div>
+
+  <div class="field">
+    <%= form.label :scheduled_payment_date %>
+    <%= form.date_select :scheduled_payment_date %>
+  </div>
+
+  <div class="field">
+    <%= form.label :scheduled_contract_date %>
+    <%= form.date_select :scheduled_contract_date %>
+  </div>
+
+  <div class="field">
+    <%= form.label :steps_rate %>
+    <%= form.number_field :steps_rate %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit %>
+  </div>
+<% end %>

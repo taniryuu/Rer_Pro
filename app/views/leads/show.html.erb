@@ -1,0 +1,84 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>User:</strong>
+  <%= @lead.user_id %>
+</p>
+
+<p>
+  <strong>Created date:</strong>
+  <%= @lead.created_date %>
+</p>
+
+<p>
+  <strong>Completed date:</strong>
+  <%= @lead.completed_date %>
+</p>
+
+<p>
+  <strong>Customer name:</strong>
+  <%= @lead.customer_name %>
+</p>
+
+<p>
+  <strong>Room name:</strong>
+  <%= @lead.room_name %>
+</p>
+
+<p>
+  <strong>Room num:</strong>
+  <%= @lead.room_num %>
+</p>
+
+<p>
+  <strong>Template:</strong>
+  <%= @lead.template %>
+</p>
+
+<p>
+  <strong>Template name:</strong>
+  <%= @lead.template_name %>
+</p>
+
+<p>
+  <strong>Memo:</strong>
+  <%= @lead.memo %>
+</p>
+
+<p>
+  <strong>Status:</strong>
+  <%= @lead.status %>
+</p>
+
+<p>
+  <strong>Notice created:</strong>
+  <%= @lead.notice_created %>
+</p>
+
+<p>
+  <strong>Notice change limit:</strong>
+  <%= @lead.notice_change_limit %>
+</p>
+
+<p>
+  <strong>Scheduled resident date:</strong>
+  <%= @lead.scheduled_resident_date %>
+</p>
+
+<p>
+  <strong>Scheduled payment date:</strong>
+  <%= @lead.scheduled_payment_date %>
+</p>
+
+<p>
+  <strong>Scheduled contract date:</strong>
+  <%= @lead.scheduled_contract_date %>
+</p>
+
+<p>
+  <strong>Steps rate:</strong>
+  <%= @lead.steps_rate %>
+</p>
+
+<%= link_to 'Edit', edit_lead_path(@lead) %> |
+<%= link_to 'Back', leads_path %>
