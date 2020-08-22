@@ -2,9 +2,38 @@
 
 <%= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
   <%= render "devise/shared/error_messages", resource: resource %>
+  <div class="field">
+    <%= f.label :name %><br/>
+    <%= f.text_field :name, autofocus: true, autocomplete: "name" %>
+  </div>
+  
+  <div class="field">
+    <%= f.label :login_id %><br/>
+    <%= f.text_field :login_id, autofocus: true, autocomplete: "login_id" %>
+  </div>
+  
+  <div class="field">
+    <%= f.label :company_id %><br/>
+    <%= f.text_field :company_id, autofocus: true, placeholder: 1, autocomplete: "company_id" %>
+  </div>
 
   <div class="field">
-    <%= f.label :email %><br />
+    <%= f.label :superior %><br/>
+    <%= f.check_box :superior, autofocus: true, autocomplete: "superior" %>
+  </div>
+  
+  <div class="field">
+    <%= f.label :admin %><br/>
+    <%= f.check_box :admin, autofocus: true, autocomplete: "admin" %>
+  </div>
+
+  <div class="field">
+    <%= f.label :superior_id %><br/>
+    <%= f.text_field :superior_id, autofocus: true, autocomplete: "superior_id" %>
+  </div>
+
+  <div class="field">
+    <%= f.label :email %><br/>
     <%= f.email_field :email, autofocus: true, autocomplete: "email" %>
   </div>
 
@@ -17,7 +46,7 @@
   </div>
 
   <div class="field">
-    <%= f.label :password_confirmation %><br />
+    <%= f.label :password_confirmation %><br/>
     <%= f.password_field :password_confirmation, autocomplete: "new-password" %>
   </div>
 
