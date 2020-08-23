@@ -41,15 +41,16 @@ ActiveRecord::Schema.define(version: 2020_08_19_222355) do
   end
 
   create_table "users", force: :cascade do |t|
-    t.string "name", null: false
-    t.string "login_id", null: false
-    t.boolean "superior", null: false
-    t.boolean "admin", null: false
-    t.integer "superior_id", null: false
-    t.integer "lead_count", null: false
-    t.integer "lead_count_delay", null: false
-    t.integer "notified_num", default: 3, null: false
-    t.integer "status", default: 0, null: false
+    t.string "name"
+    t.string "login_id"
+    t.boolean "superior"
+    t.boolean "admin"
+    t.integer "superior_id"
+    t.integer "lead_count"
+    t.integer "lead_count_delay"
+    t.integer "notified_num", default: 3
+    t.integer "status", default: 0
+    t.integer "company_id"
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
     t.string "reset_password_token"
@@ -57,6 +58,7 @@ ActiveRecord::Schema.define(version: 2020_08_19_222355) do
     t.datetime "remember_created_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_users_on_company_id"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end

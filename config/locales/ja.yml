@@ -216,6 +216,11 @@ ja:
       status:
         active: "使用中"
         inactive: "凍結中"
+    user:
+      status:
+        active: "在職中"
+        inactive: "休職中"
+        retirement: "退職済"
     lead:
       status:
         in_progress: "進捗中"
