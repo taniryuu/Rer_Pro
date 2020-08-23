@@ -1,0 +1,57 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Leads</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>User</th>
+      <th>Created date</th>
+      <th>Completed date</th>
+      <th>Customer name</th>
+      <th>Room name</th>
+      <th>Room num</th>
+      <th>Template</th>
+      <th>Template name</th>
+      <th>Memo</th>
+      <th>Status</th>
+      <th>Notice created</th>
+      <th>Notice change limit</th>
+      <th>Scheduled resident date</th>
+      <th>Scheduled payment date</th>
+      <th>Scheduled contract date</th>
+      <th>Steps rate</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @leads.each do |lead| %>
+      <tr>
+        <td><%#= lead.user_id %></td>
+        <td><%= lead.created_date %></td>
+        <td><%= lead.completed_date %></td>
+        <td><%= lead.customer_name %></td>
+        <td><%= lead.room_name %></td>
+        <td><%= lead.room_num %></td>
+        <td><%= lead.template %></td>
+        <td><%= lead.template_name %></td>
+        <td><%= lead.memo %></td>
+        <td><%= lead.status %></td>
+        <td><%= lead.notice_created %></td>
+        <td><%= lead.notice_change_limit %></td>
+        <td><%= lead.scheduled_resident_date %></td>
+        <td><%= lead.scheduled_payment_date %></td>
+        <td><%= lead.scheduled_contract_date %></td>
+        <td><%= lead.steps_rate %></td>
+        <td><%= link_to 'Show', lead %></td>
+        <td><%= link_to 'Edit', edit_lead_path(lead) %></td>
+        <td><%= link_to 'Destroy', lead, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Lead', new_lead_path %>
