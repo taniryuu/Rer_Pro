@@ -1,0 +1,44 @@
+ja:
+  activerecord:
+    models:
+      company: 会社
+      user: ユーザー
+      lead: 案件
+      step: 進捗
+      task: タスク
+    attributes:
+      company:
+        id: ID
+      user:
+        id: ID
+      lead:
+        id: ID
+#        user_id: 担当者ユーザーID
+        created_date: 申込日
+        completed_date:	完了日
+        customer_name: お客様名
+        room_name: 物件名
+        room_num:	部屋番号
+        template: テンプレート
+        template_name: テンプレート名
+        memo: メモ
+        status: ステータス
+        notice_created: 新規申込時通知
+        notice_change_limit: 期限変更時通知
+        scheduled_resident_date: 入居予定日
+        scheduled_payment_date: 入金予定日
+        scheduled_contract_date: 契約予定日
+        steps_rate: 進捗率
+      step:
+        id: ID
+        lead_id: 案件ID
+        name: 進捗名
+        memo: メモ
+        status: 進捗ステータス
+        order: 順番
+        scheduled_complete_date: 完了予定日
+        completed_date: 完了日
+        completed_tasks_rate: タスク達成率
+      task:
+        id: ID
+        

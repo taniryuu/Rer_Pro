@@ -10,12 +10,32 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_19_030301) do
+ActiveRecord::Schema.define(version: 2020_08_19_222355) do
 
   create_table "companies", force: :cascade do |t|
     t.string "name", null: false
     t.boolean "admin", default: false, null: false
     t.integer "status", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "leads", force: :cascade do |t|
+    t.string "created_date", default: "", null: false
+    t.string "completed_date", default: "", null: false
+    t.string "customer_name", default: "", null: false
+    t.string "room_name", default: "", null: false
+    t.string "room_num", default: "", null: false
+    t.boolean "template", default: false, null: false
+    t.string "template_name", default: "", null: false
+    t.string "memo", default: "", null: false
+    t.integer "status", default: 0, null: false
+    t.boolean "notice_created", default: true, null: false
+    t.boolean "notice_change_limit", default: false, null: false
+    t.string "scheduled_resident_date", default: "", null: false
+    t.string "scheduled_payment_date", default: "", null: false
+    t.string "scheduled_contract_date", default: "", null: false
+    t.integer "steps_rate", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
