@@ -40,6 +40,7 @@ gem 'bootsnap', '>= 1.1.0', require: false
 gem 'bcrypt', '~> 3.1.7'
 # devise
 gem 'devise'
+gem 'devise-i18n'
 # bootstrap
 gem 'bootstrap','~> 4.0.0'
 gem 'mini_racer'
