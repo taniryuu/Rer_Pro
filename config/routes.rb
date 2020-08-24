@@ -1,9 +1,12 @@
 Rails.application.routes.draw do
-  devise_for :users
-  resources :companies do
-    resources :users
+  devise_scope :user do
+    root :to => "devise/sessions#new"
+    post 'login' => 'devise/sessions#create', as: :user_session
+    delete 'logout' => 'devise/sessions#destroy', as: :destroy_user_session
   end
-  
-  resources :leads
-  
+  devise_for :users, skip: [:sessions]
+  resources :users, only: [:index, :show] do
+    resources :leads
+  end
+  resources :companies
 end
