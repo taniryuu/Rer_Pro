@@ -22,9 +22,9 @@ class User < ApplicationRecord
   validates :notified_num, numericality: { greater_than_or_equal_to: 0 }
   validates :status, presence: true
 
-  def superior_in_the_company
-    if User.find(superior_id).company_id != User.find(id).company_id ||
-       User.find(superior_id).status != "active"
+  def active_superior_in_the_same_company
+    unless User.find(superior_id).company_id == User.find(id).company_id ||
+       User.find(superior_id).status == "active"
       errors.add(:superior_id, "に無効な人物が入力されています。")
     end
   end
