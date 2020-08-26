@@ -17,8 +17,8 @@ class CreateLeads < ActiveRecord::Migration[5.2]
       t.string :scheduled_contract_date, null: false, default: ""
       t.integer :steps_rate, null: false, default: 0
       
-      # Userモデルが完成したら紐づけ
-      # t.references :user, foreign_key: true
+      # Userモデルと紐づけ
+      t.references :user, foreign_key: true
       
       t.timestamps null: false
     end
