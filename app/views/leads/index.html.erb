@@ -28,7 +28,7 @@
   <tbody>
     <% @leads.each do |lead| %>
       <tr>
-        <td><%#= lead.user_id %></td>
+        <td><%= lead.user_id %></td>
         <td><%= lead.created_date %></td>
         <td><%= lead.completed_date %></td>
         <td><%= lead.customer_name %></td>
