@@ -43,11 +43,11 @@ ActiveRecord::Schema.define(version: 2020_08_19_222355) do
   create_table "users", force: :cascade do |t|
     t.string "name"
     t.string "login_id"
-    t.boolean "superior"
-    t.boolean "admin"
+    t.boolean "superior", default: false
+    t.boolean "admin", default: false
     t.integer "superior_id"
-    t.integer "lead_count"
-    t.integer "lead_count_delay"
+    t.integer "lead_count", default: 0
+    t.integer "lead_count_delay", default: 0
     t.integer "notified_num", default: 3
     t.integer "status", default: 0
     t.integer "company_id"

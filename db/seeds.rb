@@ -3,6 +3,7 @@ Company.create!(
   admin: true,
   status: 0
 )
+
 3.times do |i|
   User.create!(
     name: "SampleUser#{i}",
@@ -11,10 +12,13 @@ Company.create!(
     company_id: 1,
     admin: true,
     superior: true,
+    superior_id: 1,
     password: "password",
   )
 end
+
 puts "システム管理者作成完了"
+
 # ペルソナ用
 # Company.create!(
 #   name: "",
@@ -22,23 +26,50 @@ puts "システム管理者作成完了"
 #   status: 0
 # )
 
+#テスト用サンプルレコード
+3.times do |i|
+  Company.create!(
+    name: "サンプル企業(#{i})",
+    admin: false,
+    status: 0
+  )
+end
 
-# #テスト用サンプルレコード
-# User.create!(
-#   name: "サンプル太郎",
-# #  company_id: 0,
-#   password: "password",
-#   login_id: "XXXXXX",
-#   superior: false,
-#   admin: false,
-#   superior_id: 0,
-#   lead_count: 0,
-#   lead_count_delay: 0,
-#   notified_num: 3,
-#   email: "sample_taro@email.com",
-#   status: 0
-# )
-# puts "サンプル太郎(Userテスト用サンプルレコード)作成完了"
+puts "企業サンプル作成完了"
+
+User.create!(
+  name: "サンプル上長",
+  company_id: 2,
+  password: "password",
+  login_id: "000020",
+  superior: true,
+  admin: true,
+  superior_id: 4,
+  lead_count: 0,
+  lead_count_delay: 0,
+  notified_num: 3,
+  email: "joutyou@email.com",
+  status: 0
+)
+
+10.times do |i|
+  User.create!(
+    name: "サンプル太郎(#{i})",
+    company_id: 2,
+    password: "password",
+    login_id: "0000#{i}",
+    superior: false,
+    admin: false,
+    superior_id: 4,
+    lead_count: 0,
+    lead_count_delay: 0,
+    notified_num: 3,
+    email: "sample-#{i}@email.com",
+    status: 0
+  )
+end
+
+puts "サンプル太郎(Userテスト用サンプルレコード)作成完了"
 
 #テスト用サンプルレコード
 Lead.create!(
