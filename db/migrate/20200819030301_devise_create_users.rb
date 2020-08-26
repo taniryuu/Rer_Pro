@@ -3,16 +3,16 @@
 class DeviseCreateUsers < ActiveRecord::Migration[5.2]
   def change
     create_table :users do |t|
-      t.string :name
-      t.string :login_id
-      t.boolean :superior
-      t.boolean :admin
-      t.integer :superior_id
-      t.integer :lead_count
-      t.integer :lead_count_delay
+      t.string :name, null: false
+      t.string :login_id, null: false
+      t.boolean :superior, default: false
+      t.boolean :admin, default: false
+      t.integer :superior_id, null: false
+      t.integer :lead_count, default: 0
+      t.integer :lead_count_delay, default: 0
       t.integer :notified_num, default: 3
       t.integer :status, default: 0
-      t.references :company, foreign_key: true
+      t.references :company, foreign_key: true, null: false
       ## Database authenticatable
       t.string :email,              null: false, default: ""
       t.string :encrypted_password, null: false, default: ""
