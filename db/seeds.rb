@@ -69,7 +69,7 @@ User.create!(
     status: 0
   )
 end
-puts "サンプル太郎(Userテスト用サンプルレコード)作成完了"
+puts "Userテスト用サンプルレコード作成完了"
 
 # Leadレコード作成
 3.times do |i|
