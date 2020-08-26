@@ -10,7 +10,7 @@ class User < ApplicationRecord
                  retirement: 2
                }
 
-  validate :superior_in_the_company, on: :update
+  validate :active_superior_in_the_same_company, on: :update
 
   validates :name, length: { in: 6..50 }
   validates :login_id, uniqueness: true, length: { in: 4..20 }
