@@ -25,8 +25,8 @@ RSpec.describe Lead, type: :model do
       status: 0
     )
   end
-  # 姓、名、メール、パスワードがあれば有効な状態であること
-  it "はis valid with a created_date, customer_name, room_name, room_num, scheduled_resident_date, and scheduled_payment_date" do
+  
+  it "はcreated_date, customer_name, room_name, room_num, scheduled_resident_date, scheduled_payment_dateカラムがあれば有効。" do
     lead = Lead.create!(
       user_id: 1,
       created_date: Date.current.to_s,
@@ -47,15 +47,51 @@ RSpec.describe Lead, type: :model do
     )
     expect(lead).to be_valid
   end
+  
+  it "はcreated_dateがnilだと無効。" do
+    lead = Lead.new(created_date: nil)
+    lead.valid?
+    expect(lead.errors[:created_date]).to include("を入力してください")
+  end
 
-  # 名がなければ無効な状態であること
-  it "is invalid without a event_name"
-  # 姓がなければ無効な状態であること
-  it "is invalid without a event_status"
-  # メールアドレスがなければ無効な状態であること
-  it "is invalid without an chouseisan_check"
-  # 重複したメールアドレスなら無効な状態であること
-  it "is invalid with a duplicate chouseisan_url"
-  # ユーザーのフルネームを文字列として返すこと
-  it "returns a event_name as a string"
+  it "はcustomer_nameがnilだと無効。" do
+    lead = Lead.new(customer_name: nil)
+    lead.valid?
+    expect(lead.errors[:customer_name]).to include("を入力してください")
+  end
+
+  it "はroom_nameがnilだと無効。" do
+    lead = Lead.new(room_name: nil)
+    lead.valid?
+    expect(lead.errors[:room_name]).to include("を入力してください")
+  end
+
+  it "はroom_numがnilだと無効。" do
+    lead = Lead.new(room_num: nil)
+    lead.valid?
+    expect(lead.errors[:room_num]).to include("を入力してください")
+  end
+
+  it "はscheduled_resident_dateがnilだと無効。" do
+    lead = Lead.new(scheduled_resident_date: nil)
+    lead.valid?
+    expect(lead.errors[:scheduled_resident_date]).to include("を入力してください")
+  end
+
+  it "はscheduled_payment_dateがnilだと無効。" do
+    lead = Lead.new(scheduled_payment_date: nil)
+    lead.valid?
+    expect(lead.errors[:scheduled_payment_date]).to include("を入力してください")
+  end
+  
+  # boolean型のカラムにtrueかfalseを許可し、nilは許可しないテストが未実装。
+  # gem "shoulda-matchers" を導入して、allow_valueを使うのが簡単そう。
+  # 参考サイト：https://note.com/ishibai/n/n2c27ff7288e3
+
+  it "はtemplateがtrueのときにtemplate_nameがnilだと無効。" do
+    lead = Lead.new(template: true, template_name: nil)
+    lead.valid?
+    expect(lead.errors[:template_name]).to include("を入力してください")
+  end
+  
 end
