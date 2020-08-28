@@ -48,41 +48,13 @@ RSpec.describe Lead, type: :model do
     expect(lead).to be_valid
   end
   
-  it "はcreated_dateがnilだと無効。" do
-    lead = Lead.new(created_date: nil)
-    lead.valid?
-    expect(lead.errors[:created_date]).to include("を入力してください")
+  presense_columns = [:created_date, :customer_name, :room_name, :room_num, :scheduled_resident_date, :scheduled_payment_date]
+  presense_columns. each do |column_name|
+    describe "の#{column_name}がnilだと無効。" do
+      it { should validate_presence_of(column_name) }
+    end
   end
 
-  it "はcustomer_nameがnilだと無効。" do
-    lead = Lead.new(customer_name: nil)
-    lead.valid?
-    expect(lead.errors[:customer_name]).to include("を入力してください")
-  end
-
-  it "はroom_nameがnilだと無効。" do
-    lead = Lead.new(room_name: nil)
-    lead.valid?
-    expect(lead.errors[:room_name]).to include("を入力してください")
-  end
-
-  it "はroom_numがnilだと無効。" do
-    lead = Lead.new(room_num: nil)
-    lead.valid?
-    expect(lead.errors[:room_num]).to include("を入力してください")
-  end
-
-  it "はscheduled_resident_dateがnilだと無効。" do
-    lead = Lead.new(scheduled_resident_date: nil)
-    lead.valid?
-    expect(lead.errors[:scheduled_resident_date]).to include("を入力してください")
-  end
-
-  it "はscheduled_payment_dateがnilだと無効。" do
-    lead = Lead.new(scheduled_payment_date: nil)
-    lead.valid?
-    expect(lead.errors[:scheduled_payment_date]).to include("を入力してください")
-  end
   
   # boolean型のカラムにtrueかfalseを許可し、nilは許可しないテストが未実装。
   # gem "shoulda-matchers" を導入して、allow_valueを使うのが簡単そう。
