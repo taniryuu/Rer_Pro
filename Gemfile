@@ -78,6 +78,7 @@ group :test do
   gem 'selenium-webdriver'
   # Easy installation and use of chromedriver to run system tests with Chrome
   gem 'chromedriver-helper'
+  gem 'shoulda-matchers', '~> 4.0' # 手書きだと長くて複雑でエラーが起きやすいRailsのテストを、1行で書けるようになる。(RspecとMinitestに対応)
 end
 
 group :production do
