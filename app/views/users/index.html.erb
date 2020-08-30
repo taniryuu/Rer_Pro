@@ -1,1 +1,9 @@
 <h1>ユーザー一覧</h1>
+<% @users.each do |user| %>
+  <p>
+    <%= user.name %>
+    <%= link_to "変更", edit_user_path(user) %>
+    <%# deleteは単語入力で条件クリア %>
+    <%= link_to "削除", user_path(user), method: :delete, data: { confirm: "「#{user.name}」を削除してもよろしいですか？" } %>
+  </p>
+<% end %>

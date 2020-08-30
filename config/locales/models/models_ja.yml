@@ -11,6 +11,7 @@ ja:
         id: ID
       user:
         id: ID
+        status: ステータス
       lead:
         id: ID
 #        user_id: 担当者ユーザーID

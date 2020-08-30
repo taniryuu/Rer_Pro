@@ -3,6 +3,13 @@ class ApplicationController < ActionController::Base
   before_action :configure_permitted_parameters, if: :devise_controller?
   before_action :authenticate_user!
 
+  # ログインしているユーザーがいる企業の社員全員取得
+  def set_members
+    @users = current_user.company_of_user
+  end
+
+  # devise関連
+  # ログイン時のリダイレクト先
   def after_sign_in_path_for(resource)
     if current_user
       user_path(resource)
@@ -11,6 +18,7 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  # ログアウト時のリダイレクト先
   def after_sign_out_path_for(resource)
     root_path
   end
@@ -20,6 +28,5 @@ class ApplicationController < ActionController::Base
     def configure_permitted_parameters
       devise_parameter_sanitizer.permit(:sign_up, keys: [:name, :email, :login_id, :superior, :admin, :superior_id, :company_id])
       devise_parameter_sanitizer.permit(:sign_in, keys: [:login_id])
-      devise_parameter_sanitizer.permit(:account_update, keys: [:name, :superior, :admin, :superior_id])
     end
 end
