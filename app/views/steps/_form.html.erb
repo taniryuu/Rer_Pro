@@ -1,0 +1,59 @@
+<%= form_with(model: step, local: true) do |form| %>
+  <% if step.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(step.errors.count, "error") %> prohibited this step from being saved:</h2>
+
+      <ul>
+      <% step.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :lead_id %>
+    <%= form.number_field :lead_id %>
+  </div>
+
+  <div class="field">
+    <%= form.label :name %>
+    <%= form.text_field :name %>
+  </div>
+
+  <div class="field">
+    <%= form.label :memo %>
+    <%= form.text_area :memo %>
+  </div>
+
+  <div class="field">
+    <%= form.label :status %>
+    <%= form.select :status, Step.statuses.keys.map { |k| [I18n.t("enums.step.status.#{k}"), k]} %>
+  </div>
+
+  <div class="field">
+    <%= form.label :order %>
+    <%= form.number_field :order %>
+  </div>
+
+  <%#date_selectを使うと「undefined method `day' for "":String」エラーになるため、datetime_local_fieldを使用中 %>
+  <%#エラー解消したら本コメントも削除すること %>
+  <div class="field">
+    <%= form.label :scheduled_complete_date %>
+    <%= form.datetime_local_field :scheduled_complete_date %>
+  </div>
+
+  <div class="field">
+    <%= form.label :completed_date %>
+    <%= form.datetime_local_field :completed_date %>
+  </div>
+
+  <div class="field">
+    <%= form.label :completed_tasks_rate %>
+    <%= form.number_field :completed_tasks_rate %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit %>
+  </div>
+<% end %>
