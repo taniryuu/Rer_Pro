@@ -1,5 +1,6 @@
 class Lead < ApplicationRecord
   belongs_to :user
+  has_many :steps, dependent: :destroy
   validates :created_date, presence: true
   validates :customer_name, presence: true
   validates :room_name, presence: true
