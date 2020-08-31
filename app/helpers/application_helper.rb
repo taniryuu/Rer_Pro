@@ -10,7 +10,7 @@ module ApplicationHelper
       end
     else
       users.each do |user|
-        superior_id.push(["#{user.name}", user.id]) if user != login_user && user.superior?
+        superior_id.push(["#{user.name}", user.id]) if user != login_user || user.superior?
       end
     end
     return superior_id

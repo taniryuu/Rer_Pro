@@ -1,7 +1,9 @@
 Rails.application.routes.draw do
 
-  resources :companies
-  
+  resources :companies do
+    resources :users, :only => [:new, :create, :index, :show, :destroy]
+  end
+
   devise_scope :user do
     root :to => "devise/sessions#new"
     post 'login' => 'devise/sessions#create', as: :user_session
@@ -9,14 +11,12 @@ Rails.application.routes.draw do
     get 'users/sign_up' => 'users/registrations#new', as: :new_user_registration
     post 'users' => 'users/registrations#create', as: :user_registration
   end
-  resources :companies
   devise_for :users, skip: [:sessions, :registrations], controllers: {
     registrations: "users/registrations"
   }
-  resources :users, :only => [:index, :show, :destroy]
   devise_scope :user do
-    get 'users/:id/edit' => 'users/registrations#edit', as: :edit_user
-    patch 'users/:id/edit' => 'users/registrations#update'
+    get 'users/:id/edit' => 'users/registrations#edit', as: :edit_other_user_registration
+    match 'users/:id', to: 'users/registrations#update', via: [:patch, :put], as: :other_user_registration
   end
   
   resources :leads do

@@ -5,6 +5,14 @@ class UsersController < ApplicationController
   def index
   end
 
+  def new
+    
+  end
+
+  def create
+    
+  end
+
   def show
   end
 
@@ -13,13 +21,7 @@ class UsersController < ApplicationController
 
   def destroy
 # 削除には@userが未完了の案件を持っていないこと
-    @user.destroy ? flash[success] : flash[:danger]
+    @user.destroy ? flash[:success] : flash[:danger]
     redirect_to users_url
-  end
-
-  private
-
-  def user_params
-    params.require(:user).permit(:login_id, :name, :superior, :admin, :status, :superior_id, :email)
   end
 end
