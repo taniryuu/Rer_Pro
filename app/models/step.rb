@@ -1,5 +1,6 @@
 class Step < ApplicationRecord
   belongs_to :lead
+  has_many :tasks, dependent: :destroy
   validates :name, presence: true, length: { in: 2..50 }
   validates :memo, length: { in: 0..400 }
   validates :order, presence: true, uniqueness: { scope: :lead_id }, 
