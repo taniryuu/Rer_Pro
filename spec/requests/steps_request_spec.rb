@@ -12,8 +12,8 @@
 # of tools you can use to make these specs even more expressive, but we're
 # sticking to rails and rspec-rails APIs to keep things simple and stable.
 
-RSpec.describe "/leads", type: :request do
-  # Lead. As you add validations to Lead, be sure to
+RSpec.describe "/steps", type: :request do
+  # Step. As you add validations to Step, be sure to
   # adjust the attributes here as well.
   let(:valid_attributes) {
     skip("Add a hash of attributes valid for your model")
@@ -25,58 +25,58 @@ RSpec.describe "/leads", type: :request do
 
   describe "GET /index" do
     it "renders a successful response" do
-      Lead.create! valid_attributes
-      get leads_url
+      Step.create! valid_attributes
+      get steps_url
       expect(response).to be_successful
     end
   end
 
   describe "GET /show" do
     it "renders a successful response" do
-      lead = Lead.create! valid_attributes
-      get lead_url(lead)
+      step = Step.create! valid_attributes
+      get step_url(step)
       expect(response).to be_successful
     end
   end
 
   describe "GET /new" do
     it "renders a successful response" do
-      get new_lead_url
-      expect(response).to be_successful
+      # get new_step_url
+      # expect(response).to be_successful
     end
   end
 
   describe "GET /edit" do
     it "render a successful response" do
-      lead = Lead.create! valid_attributes
-      get edit_lead_url(lead)
+      step = Step.create! valid_attributes
+      get edit_step_url(step)
       expect(response).to be_successful
     end
   end
 
   describe "POST /create" do
     context "with valid parameters" do
-      it "creates a new Lead" do
+      it "creates a new Step" do
         expect {
-          post leads_url, params: { lead: valid_attributes }
-        }.to change(Lead, :count).by(1)
+          post steps_url, params: { step: valid_attributes }
+        }.to change(Step, :count).by(1)
       end
 
-      it "redirects to the created lead" do
-        post leads_url, params: { lead: valid_attributes }
-        expect(response).to redirect_to(lead_url(Lead.last))
+      it "redirects to the created step" do
+        post steps_url, params: { step: valid_attributes }
+        expect(response).to redirect_to(step_url(Step.last))
       end
     end
 
     context "with invalid parameters" do
-      it "does not create a new Lead" do
+      it "does not create a new Step" do
         expect {
-          post leads_url, params: { lead: invalid_attributes }
-        }.to change(Lead, :count).by(0)
+          post steps_url, params: { step: invalid_attributes }
+        }.to change(Step, :count).by(0)
       end
 
       it "renders a successful response (i.e. to display the 'new' template)" do
-        post leads_url, params: { lead: invalid_attributes }
+        post steps_url, params: { step: invalid_attributes }
         expect(response).to be_successful
       end
     end
@@ -88,42 +88,42 @@ RSpec.describe "/leads", type: :request do
         skip("Add a hash of attributes valid for your model")
       }
 
-      it "updates the requested lead" do
-        lead = Lead.create! valid_attributes
-        patch lead_url(lead), params: { lead: new_attributes }
-        lead.reload
+      it "updates the requested step" do
+        step = Step.create! valid_attributes
+        patch step_url(step), params: { step: new_attributes }
+        step.reload
         skip("Add assertions for updated state")
       end
 
-      it "redirects to the lead" do
-        lead = Lead.create! valid_attributes
-        patch lead_url(lead), params: { lead: new_attributes }
-        lead.reload
-        expect(response).to redirect_to(lead_url(lead))
+      it "redirects to the step" do
+        step = Step.create! valid_attributes
+        patch step_url(step), params: { step: new_attributes }
+        step.reload
+        expect(response).to redirect_to(step_url(step))
       end
     end
 
     context "with invalid parameters" do
       it "renders a successful response (i.e. to display the 'edit' template)" do
-        lead = Lead.create! valid_attributes
-        patch lead_url(lead), params: { lead: invalid_attributes }
+        step = Step.create! valid_attributes
+        patch step_url(step), params: { step: invalid_attributes }
         expect(response).to be_successful
       end
     end
   end
 
   describe "DELETE /destroy" do
-    it "destroys the requested lead" do
-      lead = Lead.create! valid_attributes
+    it "destroys the requested step" do
+      step = Step.create! valid_attributes
       expect {
-        delete lead_url(lead)
-      }.to change(Lead, :count).by(-1)
+        delete step_url(step)
+      }.to change(Step, :count).by(-1)
     end
 
-    it "redirects to the leads list" do
-      lead = Lead.create! valid_attributes
-      delete lead_url(lead)
-      expect(response).to redirect_to(leads_url)
+    it "redirects to the steps list" do
+      step = Step.create! valid_attributes
+      delete step_url(step)
+      expect(response).to redirect_to(steps_url)
     end
   end
 end

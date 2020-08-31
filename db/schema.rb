@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_19_222355) do
+ActiveRecord::Schema.define(version: 2020_08_30_064219) do
 
   create_table "companies", force: :cascade do |t|
     t.string "name", null: false
@@ -40,6 +40,20 @@ ActiveRecord::Schema.define(version: 2020_08_19_222355) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_leads_on_user_id"
+  end
+
+  create_table "steps", force: :cascade do |t|
+    t.string "name", default: "", null: false
+    t.text "memo", default: "", null: false
+    t.integer "status", default: 0, null: false
+    t.integer "order", null: false
+    t.string "scheduled_complete_date", default: "", null: false
+    t.string "completed_date", default: "", null: false
+    t.integer "completed_tasks_rate", default: 0, null: false
+    t.integer "lead_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["lead_id"], name: "index_steps_on_lead_id"
   end
 
   create_table "users", force: :cascade do |t|

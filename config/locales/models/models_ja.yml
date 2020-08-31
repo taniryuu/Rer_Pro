@@ -14,7 +14,7 @@ ja:
         status: ステータス
       lead:
         id: ID
-#        user_id: 担当者ユーザーID
+        user_id: 担当者ユーザーID
         created_date: 申込日
         completed_date:	完了日
         customer_name: お客様名

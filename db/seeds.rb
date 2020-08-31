@@ -72,24 +72,40 @@ end
 puts "Userテスト用サンプルレコード作成完了"
 
 # Leadレコード作成
+user_id = User.find_by(name: "サンプル太郎(0)").id
 3.times do |i|
   Lead.create!(
-    user_id: 1,
-  #  created_date: "",
+    user_id: user_id,
+    created_date: (Date.current - i).to_s,
   #  completed_date:	"",
-    customer_name: "お客様#{i}",
-    room_name: "物件#{i}",
-    room_num:	"部屋#{i}",
+    customer_name: "お客様#{i+1}",
+    room_name: "物件#{i+1}",
+    room_num:	"部屋#{i+1}",
   #  template: "",
   #  template_name: "",
   #  memo: "",
   #  status: "進捗中"
   #  notice_created: 新規申込時通知
   #  notice_change_limit: 期限変更時通知
-  #  scheduled_resident_date: 入居予定日
-  #  scheduled_payment_date: 入金予定日
+    scheduled_resident_date: (Date.current + 21 - i).to_s,
+    scheduled_payment_date: (Date.current + 14 - i).to_s,
   #  scheduled_contract_date: 契約予定日
   #  steps_rate: 進捗率
   )
 end
 puts "「SampleUser0」の案件作成完了"
+
+# Stepレコード作成
+7.times do |i|
+  Step.create!(
+    lead_id: 1,
+    name: "進捗#{i+1}",
+    memo: "進捗#{i+1}のメモ",
+    status: 0,
+    order: i+1,
+    scheduled_complete_date: "#{Date.current + 3}",
+    # completed_date: "",
+    # completed_tasks_rate: 0
+  )
+end
+puts "「SampleUser0」の案件「お客様1」の進捗作成完了"

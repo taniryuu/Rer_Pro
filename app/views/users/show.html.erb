@@ -1,4 +1,8 @@
 <h1>Users#show</h1>
 <%= current_user.name %>
+
 <%= link_to "編集", edit_user_path(current_user) %>
+
+<%= link_to "案件一覧", leads_path %>
+
 <%= link_to "ログアウト", destroy_user_session_path(params[:user_id]), method: :delete %>

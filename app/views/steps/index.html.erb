@@ -1,0 +1,41 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Steps</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Lead</th>
+      <th>Name</th>
+      <th>Memo</th>
+      <th>Status</th>
+      <th>Order</th>
+      <th>Scheduled complete date</th>
+      <th>Completed date</th>
+      <th>Completed tasks rate</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @steps.each do |step| %>
+      <tr>
+        <td><%= step.lead_id %></td>
+        <td><%= step.name %></td>
+        <td><%= step.memo %></td>
+        <td><%= step.status %></td>
+        <td><%= step.order %></td>
+        <td><%= step.scheduled_complete_date %></td>
+        <td><%= step.completed_date %></td>
+        <td><%= step.completed_tasks_rate %></td>
+        <td><%= link_to 'Show', step %></td>
+        <td><%= link_to 'Edit', edit_step_path(step) %></td>
+        <td><%= link_to 'Destroy', step, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Step', new_step_path %>

@@ -1,4 +1,7 @@
 Rails.application.routes.draw do
+
+  resources :companies
+  
   devise_scope :user do
     root :to => "devise/sessions#new"
     post 'login' => 'devise/sessions#create', as: :user_session
@@ -15,5 +18,9 @@ Rails.application.routes.draw do
     get 'users/:id/edit' => 'users/registrations#edit', as: :edit_user
     patch 'users/:id/edit' => 'users/registrations#update'
   end
-  resources :leads
+  
+  resources :leads do
+    resources :steps
+  end
+  
 end
