@@ -3,6 +3,11 @@ class ApplicationController < ActionController::Base
   before_action :configure_permitted_parameters, if: :devise_controller?
   before_action :authenticate_user!
 
+  # ユーザーIDを取得し識別
+  def set_user
+    @user = User.find(params[:id])
+  end
+
   # ログインしているユーザーがいる企業の社員全員取得
   def set_members
     @users = current_user.company_of_user

@@ -1,10 +1,12 @@
 <h2><%= t('.title', resource: resource.model_name.human) %></h2>
 
-<%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put }) do |f| %>
+<%= form_for(resource, as: resource_name, url: edit_user_path(@user), html: { method: :patch }) do |f| %>
   <%= render "devise/shared/error_messages", resource: resource %>
   
-  <%= f.label :login_id %><br/>
-  <p><%= current_user.login_id %></p>
+  <div class="field">
+    <%= f.label :login_id %><br/>
+    <%# <%= f.text_field :login_id, autofocus: true, autocomplete: "login_id" %>
+  </div>
 
   <div class="field">
     <%= f.label :name %><br/>
@@ -23,12 +25,17 @@
 
   <div class="field">
     <%= f.label :superior_id %><br/>
-    <%= f.text_field :superior_id, autofocus: true, autocomplete: "superior_id" %>
+    <%= f.select :superior_id, superior_list(@users, @user), autofocus: true, autocomplete: "superior_id" %>
+  </div>
+
+  <div class="field">
+    <%= f.label :notified_num %><br/>
+    <%= f.number_field :notified_num, autofocus: true, in: 0..21, autocomplete: "notified_num" %>
   </div>
 
   <div class="field">
     <%= f.label :email %><br />
-    <%= f.email_field :email, autofocus: true, autocomplete: "email" %>
+    <%# <%= f.email_field :email, autofocus: true, autocomplete: "email" %>
   </div>
 
   <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
