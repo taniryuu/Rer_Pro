@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :steps
   resources :companies
   
   devise_scope :user do
@@ -9,5 +10,8 @@ Rails.application.routes.draw do
   devise_for :users, skip: [:sessions]
   resources :users, only: [:index, :show]
   
-  resources :leads
+  resources :leads do
+    resources :steps
+  end
+  
 end

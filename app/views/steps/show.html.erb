@@ -1,0 +1,44 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Lead:</strong>
+  <%= @step.lead_id %>
+</p>
+
+<p>
+  <strong>Name:</strong>
+  <%= @step.name %>
+</p>
+
+<p>
+  <strong>Memo:</strong>
+  <%= @step.memo %>
+</p>
+
+<p>
+  <strong>Status:</strong>
+  <%= @step.status %>
+</p>
+
+<p>
+  <strong>Order:</strong>
+  <%= @step.order %>
+</p>
+
+<p>
+  <strong>Scheduled complete date:</strong>
+  <%= @step.scheduled_complete_date %>
+</p>
+
+<p>
+  <strong>Completed date:</strong>
+  <%= @step.completed_date %>
+</p>
+
+<p>
+  <strong>Completed tasks rate:</strong>
+  <%= @step.completed_tasks_rate %>
+</p>
+
+<%= link_to 'Edit', edit_step_path(@step) %> |
+<%= link_to 'Back', steps_path %>

@@ -1,9 +1,11 @@
 class Lead < ApplicationRecord
   belongs_to :user
+  has_many :steps, dependent: :destroy
   validates :created_date, presence: true
   validates :customer_name, presence: true
   validates :room_name, presence: true
   validates :room_num, presence: true
+  validates :status, presence: true
   validates :scheduled_resident_date, presence: true
   validates :scheduled_payment_date, presence: true
   validates :notice_created, inclusion: { in: [true, false] }
