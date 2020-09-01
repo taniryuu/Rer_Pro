@@ -12,8 +12,8 @@ class User < ApplicationRecord
 
   validate :active_superior_in_the_same_company, on: :update
 
-  validates :name, length: { in: 6..50 }
-  validates :login_id, uniqueness: true, length: { in: 4..20 }
+  validates :name, length: { in: 3..50 }
+  validates :login_id, uniqueness: true, length: { in: 2..20 }
   validates :superior, inclusion: { in: [true, false] }
   validates :admin, inclusion: { in: [true, false] }
   validates :superior_id, presence: true
@@ -22,10 +22,16 @@ class User < ApplicationRecord
   validates :notified_num, numericality: { greater_than_or_equal_to: 0 }, presence: true
   validates :status, presence: true
 
+  # 同じ会社のユーザー&&アクティブなstatusを持っていない時にエラー
   def active_superior_in_the_same_company
     unless User.find(superior_id).company_id == User.find(id).company_id &&
-       User.find(superior_id).status == "active"
+           User.find(superior_id).status == "active"
       errors.add(:superior_id, "に無効な人物が入力されています。")
     end
+  end
+
+  # 同じ会社内の全ユーザー一覧
+  def company_of_user
+    User.where(company_id: self.company_id).order(id)
   end
 end

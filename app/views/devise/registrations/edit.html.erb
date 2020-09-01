@@ -1,10 +1,15 @@
-<h2><%= t('.title', resource: resource.model_name.human) %></h2>
+<% form_url = (request.path_info.to_s == edit_other_user_registration_path(resource)) ? other_user_registration_path(resource): user_registration_path %>
+<%
+  options = { url: form_url }
+  options[:as] = resource_name if defined?(resource_name) && resource_name.present?
+%>
 
-<%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put }) do |f| %>
-  <%= render "devise/shared/error_messages", resource: resource %>
-  
-  <%= f.label :login_id %><br/>
-  <p><%= current_user.login_id %></p>
+<%= form_for(resource, options) do |f| %>
+
+  <div class="field">
+    <%= f.label :login_id %><br/>
+    <%= f.text_field :login_id, autofocus: true, autocomplete: "login_id" %>
+  </div>
 
   <div class="field">
     <%= f.label :name %><br/>
@@ -15,25 +20,23 @@
     <%= f.label :superior %><br/>
     <%= f.check_box :superior, autofocus: true, autocomplete: "superior" %>
   </div>
-  
-  <div class="field">
-    <%= f.label :admin %><br/>
-    <%= f.check_box :admin, autofocus: true, autocomplete: "admin" %>
-  </div>
 
   <div class="field">
     <%= f.label :superior_id %><br/>
-    <%= f.text_field :superior_id, autofocus: true, autocomplete: "superior_id" %>
+    <%= f.select :superior_id, superior_list(@users, @user), autofocus: true, autocomplete: "superior_id" %>
+  </div>
+
+  <div class="field">
+    <%= f.label :notified_num %><br/>
+    <%= f.number_field :notified_num, autofocus: true, in: 0..21, autocomplete: "notified_num" %>
   </div>
 
   <div class="field">
     <%= f.label :email %><br />
-    <%= f.email_field :email, autofocus: true, autocomplete: "email" %>
+    <% if !defined?(password_only) || !password_only %>
+      <%= f.email_field :email, autofocus: true, autocomplete: "email" %>
+    <% end %>
   </div>
-
-  <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
-    <div><%= t('.currently_waiting_confirmation_for_email', email: resource.unconfirmed_email) %></div>
-  <% end %>
 
   <div class="field">
     <%= f.label :password %> <i>(<%= t('.leave_blank_if_you_don_t_want_to_change_it') %>)</i><br />
@@ -44,23 +47,19 @@
     <% end %>
   </div>
 
+  <% resource.new_record? ? required = true : required = false %>
+
   <div class="field">
     <%= f.label :password_confirmation %><br />
-    <%= f.password_field :password_confirmation, autocomplete: "new-password" %>
+    <%= f.password_field :password_confirmation, autocomplete: "off" %>
   </div>
+  
+  <% if resource.persisted? && !current_user.admin? %>
+    <div class="field">
+      <%= f.label :current_password %> <i>(<%= t('.we_need_your_current_password_to_confirm_your_changes') %>)</i><br/>
+      <%= f.password_field :current_password, autocomplete: "off" %>
+    </div>
+  <% end %>
 
-  <div class="field">
-    <%= f.label :current_password %> <i>(<%= t('.we_need_your_current_password_to_confirm_your_changes') %>)</i><br />
-    <%= f.password_field :current_password, autocomplete: "current-password" %>
-  </div>
-
-  <div class="actions">
-    <%= f.submit t('.update') %>
-  </div>
+  <%= f.submit %>
 <% end %>
-
-<h3><%= t('.cancel_my_account') %></h3>
-
-<p><%= t('.unhappy') %> <%= button_to t('.cancel_my_account'), registration_path(resource_name), data: { confirm: t('.are_you_sure') }, method: :delete %></p>
-
-<%= link_to t('devise.shared.links.back'), :back %>
