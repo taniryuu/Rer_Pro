@@ -2,6 +2,8 @@
 <%= current_user.name %>
 
 <%= link_to "ユーザー一覧", users_path %>
+
+<%= link_to "ユーザー新規登録", new_user_registration_path %>
 <%= link_to "編集", edit_other_user_registration_path(current_user) %>
 
 <%= link_to "案件一覧", leads_path %>

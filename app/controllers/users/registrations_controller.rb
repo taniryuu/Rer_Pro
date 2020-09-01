@@ -4,20 +4,21 @@ class Users::RegistrationsController < Devise::RegistrationsController
   prepend_before_action :require_no_authentication, only: [:cancel]
   prepend_before_action :authenticate_scope!, only: [:update, :destroy]
   prepend_before_action :set_minimum_password_length, only: [:new, :edit]
+  before_action :current_user_admin?, only: %i(new create cancel)
   before_action :configure_sign_up_params, only: [:create]
   before_action :configure_account_update_params, only: [:update]
   before_action :set_user, only: [:edit, :update]
   before_action :set_members, only: [:edit, :update]
 
   # GET /resource/sign_up
-  # def new
-  #   super
-  # end
+  def new
+    super
+  end
 
   # POST /resource
-  # def create 
-  #   super
-  # end
+  def create
+    super
+  end
 
   # GET /resource/edit
   def edit
@@ -80,13 +81,13 @@ class Users::RegistrationsController < Devise::RegistrationsController
   protected
 
   # If you have extra params to permit, append them to the sanitizer.
-  # def configure_sign_up_params
-  #   devise_parameter_sanitizer.permit(:sign_up, keys: [:attribute])
-  # end
+  def configure_sign_up_params
+    devise_parameter_sanitizer.permit(:sign_up, keys: [:attribute])
+  end
 
   # If you have extra params to permit, append them to the sanitizer.
   def configure_account_update_params
-    devise_parameter_sanitizer.permit(:account_update, keys: [:name, :superior, :superior_id, :email, :notified_num, :password, :password_confirmation, :current_password])
+    devise_parameter_sanitizer.permit(:account_update, keys: [:attribute])
   end
 
   # The path used after sign up.
