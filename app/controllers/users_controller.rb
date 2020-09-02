@@ -1,7 +1,6 @@
 class UsersController < Users::ApplicationController
   before_action :set_user, only: %i(show edit destroy)
   before_action :set_members, only: %i(index edit)
-  before_action :set_company_id, only: :new
 
   def index
   end
@@ -11,12 +10,13 @@ class UsersController < Users::ApplicationController
   end
 
   def create
-    if @user.create!(user_params)
+    @user = User.new(user_params)
+    if @user.save
       flash[:success] = "登録に成功しました"
-      log_in @user
-      redirect_to user_url
+      redirect_to users_url
     else
       flash[:danger] = "登録に失敗しました"
+      render :new
     end
   end
 
