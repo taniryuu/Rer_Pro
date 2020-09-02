@@ -20,7 +20,10 @@
 </p>
 
 
-//////////////////////////////////////////////////////////////////////<br>
+<%= link_to "担当者を変更する", edit_user_id_lead_path(@lead) if current_user.superior? %>
+
+
+<br>//////////////////////////////////////////////////////////////////////<br>
 Current_userの情報：<br>
   <%= current_user.id %>-
   <%= current_user.login_id %><br>
