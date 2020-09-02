@@ -13,6 +13,14 @@ class ApplicationController < ActionController::Base
     @users = current_user.company_of_user
   end
 
+  # @userが現在ログインしているユーザーである場合のみアクセス可
+  def correct_user
+    unless @user == current_user
+      flash[:notice] = "他ユーザーの案件を操作しようとしています。それは不可の設定です"
+      redirect_to current_user
+    end
+  end
+
   # devise関連
   # ログイン時のリダイレクト先
   def after_sign_in_path_for(resource)
