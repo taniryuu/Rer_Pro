@@ -16,7 +16,7 @@ class User < ApplicationRecord
   validates :login_id, uniqueness: true, length: { in: 2..20 }
   validates :superior, inclusion: { in: [true, false] }
   validates :admin, inclusion: { in: [true, false] }
-  validates :superior_id, presence: true
+  validates :superior_id, presence: true, if: :start_up_create_user?
   validates :lead_count, numericality: { greater_than_or_equal_to: 0 }
   validates :lead_count_delay, numericality: { greater_than_or_equal_to: 0 }
   validates :notified_num, numericality: { greater_than_or_equal_to: 0 }, presence: true
@@ -28,6 +28,11 @@ class User < ApplicationRecord
            User.find(superior_id).status == "active"
       errors.add(:superior_id, "に無効な人物が入力されています。")
     end
+  end
+
+  # 所属している企業内に他のユーザーが存在するか検証
+  def start_up_create_user?
+    User.where(company_id: self.company_id) == nil?
   end
 
   # 同じ会社内の全ユーザー一覧
