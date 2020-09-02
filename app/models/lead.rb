@@ -15,8 +15,7 @@ class Lead < ApplicationRecord
   validates :template, inclusion: { in: [true, false] }
   validates :template_name, length: { maximum: 50 }
   with_options if: proc { |s| s.template? } do |model|
-    model.validates :template_name, presence: true
-    model.validates :template_name, length: { minimum: 2 }
+    model.validates :template_name, presence: true, length: { minimum: 2 }
   end
   enum status:[:in_progress, :completed, :inactive] # 案件ステータス
 end
