@@ -1,7 +1,6 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
   before_action :configure_permitted_parameters, if: :devise_controller?
-  before_action :authenticate_user!
 
   # ユーザーIDを取得し識別
   def set_user
@@ -28,9 +27,9 @@ class ApplicationController < ActionController::Base
     root_path
   end
 
-  # 管理者かどうか識別し管理者以外ならtopに戻しflash表示
+  # ログインユーザーを管理者かどうか識別し管理者以外ならtopに戻しflash表示
   def current_user_admin?
-    unless current_user.admin? || user_signed_in?
+    if user_signed_in? && current_user.admin?
       redirect_to root
       flash[:danger] = "アクセスが無効です。"
     end
@@ -38,8 +37,8 @@ class ApplicationController < ActionController::Base
   protected
 
     def configure_permitted_parameters
-      devise_parameter_sanitizer.permit(:sign_up, keys: [:name, :email, :login_id, :superior, :admin, :superior_id, :company_id])
+      devise_parameter_sanitizer.permit(:sign_up, keys: [:name, :email, :login_id, :status, :superior, :admin, :superior_id, :company_id])
       devise_parameter_sanitizer.permit(:sign_in, keys: [:login_id])
-      devise_parameter_sanitizer.permit(:account_update, keys: [:name, :superior, :superior_id, :email, :notified_num, :password, :password_confirmation, :current_password])
+      devise_parameter_sanitizer.permit(:account_update, keys: [:name, :superior, :status, :superior_id, :email, :notified_num, :password, :password_confirmation, :current_password])
     end
 end
