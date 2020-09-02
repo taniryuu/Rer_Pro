@@ -1,5 +1,8 @@
 class LeadsController < ApplicationController
+  # オブジェクトの準備
   before_action :set_lead_and_user, only: %i(show edit update destroy)
+  # フィルター（アクセス権限）
+  before_action :correct_user, only: %i(edit update destroy)
 
   # GET /leads
   # GET /leads.json

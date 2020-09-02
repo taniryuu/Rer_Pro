@@ -13,12 +13,7 @@
     </div>
   <% end %>
 
-  <div class="field">
-    <%= form.label :user_id %>
-    <%= lead.user_id %>
-    <%= current_user.name %>
-    <%#= form.number_field :user_id %>
-  </div>
+  担当者：<%= current_user.name %>
 
   <div class="field">
     <%= form.label :customer_name %><%= must %>
@@ -51,24 +46,24 @@
     <%# date_selectを使うと「undefined method `day' for "":String」エラーになるため、date_fieldを使用中 %>
     <div class="field">
       <%= form.label :completed_date %>
-      <%= form.date_field :completed_date %><br>
-       ※終了済の案件の場合、入力必須
+      <%= form.date_field :completed_date, value: @lead.completed_date %><br>
+       ↑ 終了済の案件の場合、入力必須
     </div>
   <% end %>
 
   <div class="field">
     <%= form.label :scheduled_resident_date %><%= must %>
-    <%= form.date_field :scheduled_resident_date %>
+    <%= form.date_field :scheduled_resident_date, value: @lead.scheduled_resident_date %>
   </div>
 
   <div class="field">
     <%= form.label :scheduled_payment_date %><%= must %>
-    <%= form.date_field :scheduled_payment_date %>
+    <%= form.date_field :scheduled_payment_date, value: @lead.scheduled_payment_date %>
   </div>
 
   <div class="field">
     <%= form.label :scheduled_contract_date %>
-    <%= form.date_field :scheduled_contract_date %>
+    <%= form.date_field :scheduled_contract_date, value: @lead.scheduled_contract_date %>
   </div>
 
   <div class="field">
@@ -76,7 +71,7 @@
     <% if @lead.new_record? %>
       <%= form.date_field :created_date, value: Date.current %>
     <% else %>
-      <%= form.date_field :created_date %>
+      <%= form.date_field :created_date, value: @lead.created_date %>
     <% end %>
   </div>
 
