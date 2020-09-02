@@ -19,6 +19,10 @@ Rails.application.routes.draw do
   end
   
   resources :leads do
+    member do
+      get 'edit_user_id'
+      patch 'update_user_id'
+    end
     resources :steps
   end
   

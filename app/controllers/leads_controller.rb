@@ -1,8 +1,10 @@
 class LeadsController < ApplicationController
   # オブジェクトの準備
-  before_action :set_lead_and_user, only: %i(show edit update destroy)
+  before_action :set_lead_and_user, except: %i(index new create)
   # フィルター（アクセス権限）
-  before_action :correct_user, only: %i(edit update destroy)
+  before_action :correct_user, only: %i(edit update)
+  before_action :only_superior_user, only: %i(edit_user_id update_user_id)
+  before_action :correct_or_admin_user, only: %i(destroy)
 
   # GET /leads
   # GET /leads.json
@@ -22,6 +24,10 @@ class LeadsController < ApplicationController
 
   # GET /leads/1/edit
   def edit
+  end
+
+  # GET /leads/1/edit_user_id
+  def edit_user_id
   end
 
   # POST /leads
@@ -54,6 +60,19 @@ class LeadsController < ApplicationController
     end
   end
 
+  # PATCH/PUT /leads/1/update_user_id
+  def update_user_id
+    respond_to do |format|
+      if @lead.update(lead_params_only_user_id)
+        format.html { redirect_to @lead, notice: 'User of Lead was successfully updated.' }
+        format.json { render :show, status: :ok, location: @lead }
+      else
+        format.html { render :edit }
+        format.json { render json: @lead.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+  
   # DELETE /leads/1
   # DELETE /leads/1.json
   def destroy
@@ -73,6 +92,11 @@ class LeadsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def lead_params
-      params.require(:lead).permit(:user_id, :created_date, :completed_date, :customer_name, :room_name, :room_num, :template, :template_name, :memo, :status, :notice_created, :notice_change_limit, :scheduled_resident_date, :scheduled_payment_date, :scheduled_contract_date, :steps_rate)
+      params.require(:lead).permit(:created_date, :completed_date, :customer_name, :room_name, :room_num, :template, :template_name, :memo, :status, :notice_created, :notice_change_limit, :scheduled_resident_date, :scheduled_payment_date, :scheduled_contract_date, :steps_rate)
+    end
+    
+    # Only allow user_id of trusted parameters.
+    def lead_params_only_user_id
+      params.require(:lead).permit(:user_id)
     end
 end

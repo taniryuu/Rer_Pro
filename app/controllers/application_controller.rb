@@ -16,7 +16,23 @@ class ApplicationController < ActionController::Base
   # @userが現在ログインしているユーザーである場合のみアクセス可
   def correct_user
     unless @user == current_user
-      flash[:notice] = "他ユーザーの案件を操作しようとしています。それは不可の設定です"
+      flash[:notice] = "他ユーザーの案件を操作しようとしています。それは不可の設定です。"
+      redirect_to current_user
+    end
+  end
+
+  # @userが同じ会社の上長のみアクセス可
+  def only_superior_user
+    unless current_user.superior? && @user.company_id == current_user.company_id
+      flash[:notice] = "アクセスには上長権限が必要です。"
+      redirect_to current_user
+    end
+  end
+
+  # @userが同じ会社の管理者または現在ログインしているユーザーである場合のみアクセス可
+  def correct_or_admin_user
+    unless @user == current_user || (current_user.admin? && @user.company_id == current_user.company_id)
+      flash[:notice] = "アクセスには本人または管理者権限が必要です。"
       redirect_to current_user
     end
   end
