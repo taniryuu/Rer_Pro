@@ -1,7 +1,8 @@
-<%# 一般ユーザー作成form %>
+<h2>ユーザー新規登録</h2>
 
 <%= form_with(model: @user, url: users_path, local: true) do |f| %>
-  <%= render "devise/shared/error_messages", resource: @user %>
+  <%= render partial: 'shared/error_messages' ,locals: {obj: @user} %>
+
   <div class="field">
     <%= f.label :name %><br/>
     <%= f.text_field :name, autofocus: true, autocomplete: "name" %>
