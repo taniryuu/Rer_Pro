@@ -61,7 +61,7 @@ ActiveRecord::Schema.define(version: 2020_08_30_064219) do
     t.string "login_id", null: false
     t.boolean "superior", default: false
     t.boolean "admin", default: false
-    t.integer "superior_id", null: false
+    t.integer "superior_id"
     t.integer "lead_count", default: 0
     t.integer "lead_count_delay", default: 0
     t.integer "notified_num", default: 3

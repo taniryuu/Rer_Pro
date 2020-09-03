@@ -10,13 +10,14 @@ class User < ApplicationRecord
                  retirement: 2
                }
 
-  validate :active_superior_in_the_same_company, on: :update
+  validate :active_superior_in_the_same_company, on: :update, if: :start_up_create_user?
 
   validates :name, length: { in: 3..50 }
   validates :login_id, uniqueness: true, length: { in: 2..20 }
   validates :superior, inclusion: { in: [true, false] }
   validates :admin, inclusion: { in: [true, false] }
-  validates :superior_id, presence: true, if: :start_up_create_user?
+  validates :superior_id, presence: true, if: :start_up_create_user?,
+                                          unless: -> { admin? }
   validates :lead_count, numericality: { greater_than_or_equal_to: 0 }
   validates :lead_count_delay, numericality: { greater_than_or_equal_to: 0 }
   validates :notified_num, numericality: { greater_than_or_equal_to: 0 }, presence: true
