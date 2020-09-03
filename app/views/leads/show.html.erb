@@ -1,5 +1,34 @@
 <p id="notice"><%= notice %></p>
 
+<%= "あなたの案件です。" if @lead.user_id == current_user.id %>
+<%= @lead.customer_name %>様→
+<%= @lead.room_name %><%= @lead.room_num %>号室
+（担当：<%= link_to "#{@user.name}", user_path(@user) %>）
+<p>
+  <strong>入居予定日:</strong>
+  <%= @lead.scheduled_resident_date %>
+</p>
+
+<p>
+  <strong>入金予定日:</strong>
+  <%= @lead.scheduled_payment_date %>
+</p>
+
+<p>
+  <strong>契約予定日:</strong>
+  <%= @lead.scheduled_contract_date %>
+</p>
+
+
+<%= link_to "担当者を変更する", edit_user_id_lead_path(@lead) if current_user.superior? %>
+
+
+<br>//////////////////////////////////////////////////////////////////////<br>
+Current_userの情報：<br>
+  <%= current_user.id %>-
+  <%= current_user.login_id %><br>
+  <%= current_user.name %><br>
+
 <p>
   <strong>User:</strong>
   <%= @lead.user_id %>

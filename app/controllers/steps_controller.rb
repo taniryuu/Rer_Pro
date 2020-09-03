@@ -1,10 +1,11 @@
 class StepsController < ApplicationController
-  before_action :set_step, only: [:show, :edit, :update, :destroy]
+  before_action :set_step, only: %i(show edit update destroy)
+  before_action :set_lead_and_user_by_lead_id
 
   # GET /steps
   # GET /steps.json
   def index
-    @steps = Step.all
+    @steps = Step.where(lead_id: @lead.id)
   end
 
   # GET /steps/1
@@ -65,6 +66,12 @@ class StepsController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_step
       @step = Step.find(params[:id])
+    end
+    
+    # Use callbacks to share common setup or constraints between actions.
+    def set_lead_and_user_by_lead_id
+      @lead = Lead.find(params[:lead_id])
+      @user = User.find(@lead.user_id)
     end
 
     # Only allow a list of trusted parameters through.
