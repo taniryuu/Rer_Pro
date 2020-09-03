@@ -27,7 +27,9 @@ Rails.application.routes.draw do
       get 'edit_user_id'
       patch 'update_user_id'
     end
-    resources :steps
+    resources :steps do
+      resources :tasks
+    end
 
   end
 

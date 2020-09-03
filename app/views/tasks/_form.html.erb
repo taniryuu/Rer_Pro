@@ -1,8 +1,5 @@
-<%= form_with(model: @task, local: true) do |f| %>
+<%= form_with(url: lead_step_tasks_path(1,1), local: true) do |f| %>
   <%= render 'shared/error_messages_task', object: @task %>
-
-  <%= f.label :step_id %>
-  <%= f.number_field :step_id %>
 
   <%= f.label :name, class: "label-#{yield(:class_text)}" %>
   <%= f.text_field :name, class: "form-control" %>
@@ -11,7 +8,7 @@
   <%= f.text_area :memo, class: "form-control" %>
 
   <%= f.label :status, class: "label-#{yield(:class_text)}" %>
-  <%= f.select :status, Task.statuses.keys.map{ |k| ["enums.task.status.#{k}", k] class: "form-control" %>
+  <%= f.select :status, Task.statuses.keys.map{ |k| ["enums.task.status.#{k}", k] }, class: "form-control" %>
 
   <%= f.label :scheduled_complete_date, class: "label-#{yield(:class_text)}" %>
   <%= f.datetime_local_field :scheduled_complete_date, class: "form-control" %>
