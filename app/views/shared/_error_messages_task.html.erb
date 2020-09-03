@@ -1,0 +1,12 @@
+<% if @task.errors.any? %>
+  <div id="error_explanation">
+    <div class="alert alert-danger">
+      入力エラーが<%= @task.errors.count %>件ありました。
+    </div>
+    <ul>
+    <% @task.errors.full_messages.each do |msg| %>
+      <li><%= msg %></li>
+    <% end %>
+    </ul>
+  </div>
+<% end %>

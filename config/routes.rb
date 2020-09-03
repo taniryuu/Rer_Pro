@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  get 'tasks/new'
   resources :steps
   resources :companies
   
@@ -11,7 +12,10 @@ Rails.application.routes.draw do
   resources :users, only: [:index, :show]
   
   resources :leads do
-    resources :steps
+    resources :steps do
+      resources :tasks
+    end
   end
+
   
 end
