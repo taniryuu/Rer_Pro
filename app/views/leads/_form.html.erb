@@ -1,3 +1,5 @@
+<% must = "＜入力必須＞" %>
+
 <%= form_with(model: lead, local: true) do |form| %>
   <% if lead.errors.any? %>
     <div id="error_explanation">
@@ -11,87 +13,78 @@
     </div>
   <% end %>
 
-  <div class="field">
-    <%= form.label :user_id %>
-    <%= form.number_field :user_id %>
-  </div>
+  担当者：<%= current_user.name %>
 
-  <%#date_selectを使うと「undefined method `day' for "":String」エラーになるため、datetime_local_fieldを使用中 %>
-  <%#エラー解消したら本コメントも削除すること %>
   <div class="field">
-    <%= form.label :created_date %>
-    <%= form.datetime_local_field :created_date %>
+    <%= form.label :customer_name %><%= must %>
+    <%= form.text_field :customer_name, autofocus: true %>
   </div>
 
   <div class="field">
-    <%= form.label :completed_date %>
-    <%= form.datetime_local_field :completed_date %>
-  </div>
-
-  <div class="field">
-    <%= form.label :customer_name %>
-    <%= form.text_field :customer_name %>
-  </div>
-
-  <div class="field">
-    <%= form.label :room_name %>
+    <%= form.label :room_name %><%= must %>
     <%= form.text_field :room_name %>
   </div>
 
   <div class="field">
-    <%= form.label :room_num %>
+    <%= form.label :room_num %><%= must %>
     <%= form.text_field :room_num %>
   </div>
 
   <div class="field">
+    <%= form.label :memo %><br>
+    <%= form.text_area :memo, size: "50x3" %>
+  </div>
+
+----------------------------------------------------------------
+
+  <% unless @lead.new_record? %>
+    <div class="field">
+      <%= form.label :status %>
+      <%= form.select :status, Lead.statuses.keys.map { |k| [I18n.t("enums.lead.status.#{k}"), k]} %>
+    </div>
+
+    <%# date_selectを使うと「undefined method `day' for "":String」エラーになるため、date_fieldを使用中 %>
+    <div class="field">
+      <%= form.label :completed_date %>
+      <%= form.date_field :completed_date, value: @lead.completed_date %><br>
+       ↑ 終了済の案件の場合、入力必須
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :scheduled_resident_date %><%= must %>
+    <%= form.date_field :scheduled_resident_date, value: @lead.scheduled_resident_date %>
+  </div>
+
+  <div class="field">
+    <%= form.label :scheduled_payment_date %><%= must %>
+    <%= form.date_field :scheduled_payment_date, value: @lead.scheduled_payment_date %>
+  </div>
+
+  <div class="field">
+    <%= form.label :scheduled_contract_date %>
+    <%= form.date_field :scheduled_contract_date, value: @lead.scheduled_contract_date %>
+  </div>
+
+  <div class="field">
+    <%= form.label :created_date %><%= must %>
+    <% if @lead.new_record? %>
+      <%= form.date_field :created_date, value: Date.current %>
+    <% else %>
+      <%= form.date_field :created_date, value: @lead.created_date %>
+    <% end %>
+  </div>
+
+----------------------------------------------------------------
+
+  <div class="field">
     <%= form.label :template %>
-    <%= form.check_box :template %>
+    <%= form.check_box :template %>←テンプレートにする場合はチェック
   </div>
 
   <div class="field">
     <%= form.label :template_name %>
     <%= form.text_field :template_name %>
-  </div>
-
-  <div class="field">
-    <%= form.label :memo %>
-    <%= form.text_field :memo %>
-  </div>
-
-  <div class="field">
-    <%= form.label :status %>
-    <%= form.select :status, Lead.statuses.keys.map { |k| [I18n.t("enums.lead.status.#{k}"), k]} %>
-    <%#= form.number_field :status %>
-  </div>
-
-  <div class="field">
-    <%= form.label :notice_created %>
-    <%= form.check_box :notice_created %>
-  </div>
-
-  <div class="field">
-    <%= form.label :notice_change_limit %>
-    <%= form.check_box :notice_change_limit %>
-  </div>
-
-  <div class="field">
-    <%= form.label :scheduled_resident_date %>
-    <%= form.datetime_local_field :scheduled_resident_date %>
-  </div>
-
-  <div class="field">
-    <%= form.label :scheduled_payment_date %>
-    <%= form.datetime_local_field :scheduled_payment_date %>
-  </div>
-
-  <div class="field">
-    <%= form.label :scheduled_contract_date %>
-    <%= form.datetime_local_field :scheduled_contract_date %>
-  </div>
-
-  <div class="field">
-    <%= form.label :steps_rate %>
-    <%= form.number_field :steps_rate %>
   </div>
 
   <div class="actions">

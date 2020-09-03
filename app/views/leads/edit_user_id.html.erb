@@ -1,0 +1,31 @@
+<h1>Editing User Lead</h1>
+
+<%= form_with(model: @lead, url: update_user_id_lead_path(@lead), local: true) do |form| %>
+  <% if @lead.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@lead.errors.count, "error") %> prohibited this lead from being saved:</h2>
+
+      <ul>
+      <% @lead.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  変更者：<%= current_user.name %><br>
+  
+  現在の担当者：<%= @user.name %><br>
+
+  <div class="field">
+    変更後の担当者：
+    <%= form.number_field :user_id, autofocus: true %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit %>
+  </div>
+<% end %>
+
+<%= link_to 'Show', @lead %> |
+<%= link_to 'Back', leads_path %>

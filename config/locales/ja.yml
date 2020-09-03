@@ -10,6 +10,7 @@ ja:
         password: パスワード
         password_confirmation: パスワード確認
         email: メールアドレス
+        notified_num: 期限前通知日数
     errors:
       messages:
         record_invalid: 'バリデーションに失敗しました: %{errors}'
