@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
 class Users::RegistrationsController < Devise::RegistrationsController
-  prepend_before_action :require_no_authentication, only: [:cancel]
-  prepend_before_action :authenticate_scope!, only: [:update, :destroy]
-  prepend_before_action :set_minimum_password_length, only: [:new, :edit]
-  before_action :current_user_admin?, only: %i(new create cancel)
+  prepend_before_action :authenticate_scope!, only: %i(edit update destroy)
+  prepend_before_action :set_minimum_password_length, only: %i(new edit)
+  before_action :current_user_admin?, only: %i(new create)
+  before_action :correct_or_admin_user, only: %i(edit update)
   before_action :configure_sign_up_params, only: [:create]
   before_action :configure_account_update_params, only: [:update]
-  before_action :set_user, only: [:edit, :update]
-  before_action :set_members, only: [:edit, :update]
+  before_action :set_user, only: %i(edit update)
+  before_action :set_members, only: %i(edit update)
 
   # GET /resource/sign_up
   # def new
@@ -113,7 +113,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
     if current_user_is_admin?
       users_path
     else
-      super(resource)
+      user_path(resource)
     end
   end
 
