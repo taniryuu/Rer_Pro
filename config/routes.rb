@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
 
-  get 'tasks/new'
+  
   resources :steps
 
 

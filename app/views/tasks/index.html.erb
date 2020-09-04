@@ -26,9 +26,9 @@
         <td><%= task.scheduled_complete_date %></td>
         <td><%= task.completed_date %></td>
         <td><%= task.canceled_date %></td>
-        <td><%= link_to '一覧表示',lead_step_tasks_path(1,1) %></td>
-        <td><%= link_to '編集', edit_lead_step_task_path(1,1,task.id) %></td>
-        <td><%= link_to '削除', lead_step_task_path(1,1,task.id), method: :delete, data: { confirm: "「#{task.name}」を削除してよろしいですか？" } %></td>
+        <td><%= link_to '詳細表示',lead_step_task_path(@lead.id, @step.id, task.id) %></td>
+        <td><%= link_to '編集', edit_lead_step_task_path(@lead.id, @step.id, task.id) %></td>
+        <td><%= link_to '削除', lead_step_task_path(@lead.id, @step.id ,task.id), method: :delete, data: { confirm: "「#{task.name}」を削除してよろしいですか？" } %></td>
       </tr>
     <% end %>
   </tbody>

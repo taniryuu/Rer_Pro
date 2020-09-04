@@ -1,6 +1,7 @@
 class TasksController < ApplicationController
   before_action :set_task, only: %i(show edit update destroy)
   before_action :set_lead_and_user_by_lead_id
+  before_action :set_step, only: %i(new edit)
 
   def index
     @tasks = Task.all
@@ -57,6 +58,10 @@ class TasksController < ApplicationController
       @task = Task.find(params[:id])
     end
  
+    def set_step
+      @step = Step.find(params[:step_id])
+    end
+
     #Use callbacks to share common setup or constraints between actions.
     def set_lead_and_user_by_lead_id
       @lead = Lead.find(params[:lead_id])
