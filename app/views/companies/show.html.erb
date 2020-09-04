@@ -6,14 +6,11 @@
 </p>
 
 <p>
-  <strong>Admin:</strong>
-  <%= @company.admin %>
-</p>
-
-<p>
   <strong>Status:</strong>
   <%= @company.status_i18n %>
 </p>
+
+<p><%= link_to "管理者登録", new_user_registration_path %></p>
 
 <%= link_to 'Edit', edit_company_path(@company) %> |
 <%= link_to 'Back', companies_path %>

@@ -25,15 +25,11 @@ class CompaniesController < ApplicationController
   # POST /companies.json
   def create
     @company = Company.new(company_params)
-
-    respond_to do |format|
-      if @company.save
-        format.html { redirect_to @company, notice: 'Company was successfully created.' }
-        format.json { render :show, status: :created, location: @company }
-      else
-        format.html { render :new }
-        format.json { render json: @company.errors, status: :unprocessable_entity }
-      end
+    if @company.save
+      redirect_to company_new_user_registration_path(company_id: @company)
+      flash[:success] = "企業を登録しました。続いて管理者を作成してください。"
+    else
+      render :new
     end
   end
 
@@ -64,11 +60,11 @@ class CompaniesController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_company
-      @company = Company.find(params[:id])
+      @company = Company.find(params[:id]).id
     end
 
     # Only allow a list of trusted parameters through.
     def company_params
-      params.require(:company).permit(:name, :admin, :status)
+      params.require(:company).permit(:name, :status)
     end
 end

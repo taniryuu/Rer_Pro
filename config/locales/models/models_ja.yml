@@ -9,6 +9,8 @@ ja:
     attributes:
       company:
         id: ID
+        name: 会社名
+        status: ステータス
       user:
         id: ID
         status: ステータス
