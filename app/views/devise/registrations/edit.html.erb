@@ -22,6 +22,11 @@
   </div>
 
   <div class="field">
+    <%= f.label :status %><br/>
+    <%= f.select :status, User.statuses.keys.map { |k| [I18n.t("enums.user.status.#{k}"), k]}, autofocus: true, autocomplete: "status" %>
+  </div>
+
+  <div class="field">
     <%= f.label :superior_id %><br/>
     <%= f.select :superior_id, superior_list(@users, @user), autofocus: true, autocomplete: "superior_id" %>
   </div>
