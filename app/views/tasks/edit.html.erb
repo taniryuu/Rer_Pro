@@ -2,9 +2,8 @@
 <% provide(:class_text, 'task--edit') %>
 <% provide(:button_text, '更新') %>
 <h1>タスク更新</h1>
-<%= form_with(url: lead_step_task_path(@lead.id, @step.id), method: :patch, local: true) do |f| %>
+<%= form_with(url: lead_step_task_path(@lead, @step), method: :patch, local: true) do |f| %>
   <%= render 'shared/error_messages_task', object: @task %>
-
   <%= f.label :name, class: "label-#{yield(:class_text)}" %>
   <%= f.text_field :name, class: "form-control" %>
   <%= f.label :memo, class: "label-#{yield(:class_text)}" %>
