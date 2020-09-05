@@ -2,7 +2,7 @@
 <% provide(:class_text, 'task--edit') %>
 <% provide(:button_text, '更新') %>
 <h1>タスク更新</h1>
-<%= form_with(model: @task, url: lead_step_task_path(lead_id: @lead, step_id: @step.id), method: :patch, local: true) do |f| %>
+<%= form_with(model: @task, url: lead_step_task_path(lead_id: @lead, step_id: @step), method: :patch, local: true) do |f| %>
 
   <%= render partial: 'shared/error_messages' ,locals: {obj: @task} %>
 
@@ -26,6 +26,7 @@
 
 
   <%= f.submit yield(:button_text), class: "btn-#{yield(:class_text)}" %>
-  <%= f.hidden_field :step_id, class: "form-control", value: params[:step_id] %>
+
+  <%= f.hidden_field :step_id, class: "form-control", value: @step.id %>
 
 <% end %>

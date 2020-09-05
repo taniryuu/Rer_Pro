@@ -19,18 +19,19 @@ class TasksController < ApplicationController
 
   def create
     @task = Task.new(task_params)
+     respond_to do |format|
       if @task.save
-        flash[:success] = "保存できました"
-        redirect_to lead_step_tasks_path(params[:lead_id],params[:step_id])
+        format.html { redirect_to lead_step_tasks_path(params[:lead_id],params[:step_id]), notice: 'Task was successfully created.' }
+        format.json { render :show, status: :created, location: lead_step_tasks_path(params[:lead_id],params[:step_id]) }
       else
-        flash[:fault] = "保存できませんでした"
-        render :new
+        format.html { render :new }
+        format.json { render json: @task.errors, status: :unprocessable_entity }
       end
+    end
   end
 
 
   def update
-    @task.step_id = params[:step_id]
     respond_to do |format|
       if @task.update(task_params)
         format.html { redirect_to lead_step_tasks_path(params[:lead_id],params[:step_id]), notice: 'Task was successfully updated.' }
