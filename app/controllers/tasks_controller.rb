@@ -1,6 +1,6 @@
-class TasksController < ApplicationController
+class TasksController < StepsController
   before_action :set_task, only: %i(show edit update destroy)
-  before_action :set_lead_and_user_by_lead_id
+  #before_action :set_lead_and_user_by_lead_id
   before_action :set_step, only: %i(index new create edit update)
 
   def index
@@ -61,10 +61,10 @@ class TasksController < ApplicationController
     end
 
     #Use callbacks to share common setup or constraints between actions.
-    def set_lead_and_user_by_lead_id
-      @lead = Lead.find(params[:lead_id])
-      @user = User.find(@lead.user_id)
-    end   
+    #def set_lead_and_user_by_lead_id
+    #  @lead = Lead.find(params[:lead_id])
+    #  @user = User.find(@lead.user_id)
+    #end   
 
     def task_params
       params.require(:task).permit(:step_id, :name, :memo, :status, :scheduled_complete_date, :completed_date, :canceled_date)
