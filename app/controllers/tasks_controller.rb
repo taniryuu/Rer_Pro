@@ -1,7 +1,7 @@
 class TasksController < ApplicationController
   before_action :set_task, only: %i(show edit update destroy)
   before_action :set_lead_and_user_by_lead_id
-  before_action :set_step, only: %i(index new edit)
+  before_action :set_step, only: %i(index new create edit update)
 
   def index
     @tasks = Task.all
@@ -19,16 +19,13 @@ class TasksController < ApplicationController
 
   def create
     @task = Task.new(task_params)
-    @task.step_id = params[:step_id]
-    respond_to do |format|
       if @task.save
-        format.html { redirect_to lead_step_tasks_path(params[:lead_id],params[:step_id]), notice: 'Task was successfully created.' }
-        format.json { render :show, status: :created, location: lead_step_tasks_path(params[:lead_id],params[:step_id]) }
+        flash[:success] = "保存できました"
+        redirect_to lead_step_tasks_path(params[:lead_id],params[:step_id])
       else
-        format.html { render :new }
-        format.json { render json: @task.errors, status: :unprocessable_entity }
+        flash[:fault] = "保存できませんでした"
+        render :new
       end
-    end
   end
 
 
@@ -69,6 +66,6 @@ class TasksController < ApplicationController
     end   
 
     def task_params
-      params.permit(:name, :memo, :status, :scheduled_complete_date, :completed_date, :canceled_date)
+      params.require(:task).permit(:step_id, :name, :memo, :status, :scheduled_complete_date, :completed_date, :canceled_date)
     end
 end

@@ -2,11 +2,13 @@
 <% provide(:class_text, 'task--new') %>
 <% provide(:button_text, '作成') %>
 <h1>タスク作成</h1>
-<%= form_with(url: lead_step_tasks_path(@lead, @step), method: :post, local: true) do |f| %>
-  <%= render 'shared/error_messages_task', object: @task %>
+<%= form_with(model: @task, url: lead_step_tasks_path(lead_id: @lead, step_id: @step.id), method: :post, local: true) do |f| %>
+
+  <%= render partial: 'shared/error_messages' ,locals: {obj: @task} %>
 
   <%= f.label :name, class: "label-#{yield(:class_text)}" %>
   <%= f.text_field :name, class: "form-control" %>
+
   <%= f.label :memo, class: "label-#{yield(:class_text)}" %>
   <%= f.text_area :memo, class: "form-control" %>
 
@@ -24,4 +26,5 @@
 
 
   <%= f.submit yield(:button_text), class: "btn-#{yield(:class_text)}" %>
+  <%= f.hidden_field :step_id, class: "form-control", value: params[:step_id] %>
 <% end %>
