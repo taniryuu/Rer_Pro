@@ -5,7 +5,7 @@
 %>
 
 <%= form_for(resource, options) do |f| %>
-
+  <%= render "devise/shared/error_messages", resource: resource %>
     <div class="field">
       <%= f.label :login_id %><br/>
       <% if current_user.admin? %>
@@ -79,4 +79,5 @@
   <% end %>
 
   <%= f.submit %>
+  <%= link_to "戻る", users_path %>
 <% end %>
