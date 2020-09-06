@@ -1,8 +1,7 @@
-class LeadsController < ApplicationController
+class LeadsController < Leads::ApplicationController
   # オブジェクトの準備
   before_action :set_lead_and_user, except: %i(index new create)
   # フィルター（アクセス権限）
-  before_action :authenticate_user!
   before_action :correct_user, only: %i(edit update)
   before_action :only_superior_user, only: %i(edit_user_id update_user_id)
   before_action :correct_or_admin_user, only: %i(destroy)
@@ -37,7 +36,7 @@ class LeadsController < ApplicationController
     @lead = current_user.leads.new(lead_params)
 
     respond_to do |format|
-      if @lead.save
+      if @lead.save && update_steps_rate(@lead)
         format.html { redirect_to @lead, notice: 'Lead was successfully created.' }
         format.json { render :show, status: :created, location: @lead }
       else
@@ -51,7 +50,7 @@ class LeadsController < ApplicationController
   # PATCH/PUT /leads/1.json
   def update
     respond_to do |format|
-      if @lead.update(lead_params)
+      if @lead.update(lead_params) && update_steps_rate(@lead)
         format.html { redirect_to @lead, notice: 'Lead was successfully updated.' }
         format.json { render :show, status: :ok, location: @lead }
       else
@@ -100,4 +99,5 @@ class LeadsController < ApplicationController
     def lead_params_only_user_id
       params.require(:lead).permit(:user_id)
     end
+    
 end

@@ -58,6 +58,9 @@ class ApplicationController < ActionController::Base
       flash[:danger] = "アクセスが無効です。"
     end
   end
+  
+  
+  
   protected
 
     def configure_permitted_parameters

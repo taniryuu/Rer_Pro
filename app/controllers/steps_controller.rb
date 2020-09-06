@@ -1,9 +1,8 @@
-class StepsController < ApplicationController
+class StepsController < Leads::ApplicationController
   # オブジェクトの準備
   before_action :set_step, only: %i(show edit update destroy)
   before_action :set_lead_and_user_by_lead_id
   # フィルター（アクセス権限）
-  before_action :authenticate_user!
   before_action :correct_user, except: %i(index show)
   # 後処理
   after_action :sort_order, only: %i(destroy index)
@@ -47,10 +46,7 @@ class StepsController < ApplicationController
   # PATCH/PUT /steps/1
   # PATCH/PUT /steps/1.json
   def update
-#    debugger
-#    prepare_order(@step.order, params[:step][:order].to_i)
     respond_to do |format|
-      # if @step.update(step_params)
       if update_and_errors_of(@step).blank?
         format.html { redirect_to [@lead, @step], notice: 'Step was successfully updated.' }
         format.json { render :show, status: :ok, location: @step }
@@ -65,6 +61,7 @@ class StepsController < ApplicationController
   # DELETE /steps/1.json
   def destroy
     @step.destroy
+    update_steps_rate(@lead)
     respond_to do |format|
       format.html { redirect_to lead_steps_url, notice: 'Step was successfully destroyed.' }
       format.json { head :no_content }
@@ -96,6 +93,10 @@ class StepsController < ApplicationController
         unless step.save
           errors << step.errors.full_messages
         end
+        # step.update_attribute(:completed_date, "") unless step.status == "completed"
+        step.update_attribute(:status, "completed") if step.completed_date.present?
+        update_completed_tasks_rate(step)
+        update_steps_rate(@lead)
         raise ActiveRecord::Rollback if errors.present?
       end
       errors.presence || nil
@@ -109,6 +110,9 @@ class StepsController < ApplicationController
         unless step.update(step_params)
           errors << step.errors.full_messages
         end
+        step.update_attribute(:status, "completed") if step.completed_date.present?
+        update_completed_tasks_rate(step)
+        update_steps_rate(@lead)
         raise ActiveRecord::Rollback if errors.present?
       end
       errors.presence || nil
@@ -148,4 +152,5 @@ class StepsController < ApplicationController
         end
       end
     end
+    
 end
