@@ -1,31 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">
+<html>
+<head>
+<title>マウスオーバーで詳細表示</title>
+<style type="text/css"><!--
+.type1 {
+position:absolute;
+margin-top: -7px;
+font-size:12px;
+line-height:15px;
+width:1500px;
+clip:rect(0px 500px 15px 0px);
+}
+.type1:hover {
+background-color:#f5f5f5;
+clip:rect(0px 1500px 30px 0px);
+}
+.wTable tr td:nth-child(2) {
+  width:300px;
+}
+--></style>
+</head>
+<body>
 <h1>タスク一覧 </h1>
-
-<table>
-  <thead>
+<h3>To Do リスト</h3>
+<table class="wTable">
+  <!--thead>
     <tr>
-      <th>step_id</th>
+      <th></th>
       <th>name</th>
-      <th>memo</th>
-      <th>status</th>
       <th>scheduled_complete_date</th>
-      <th>completed_date</th>
-      <th>canceled_date</th>
       <th></th>
       <th></th>
       <th></th>
     </tr>
-  </thead>
+  </thead-->
 
   <tbody>
     <% @tasks.each do |task| %>
       <tr>
-        <td><%= task.step_id %></td>
-        <td><%= task.name %></td>
-        <td><%= task.memo %></td>
-        <td><%= task.status %></td>
-        <td><%= task.scheduled_complete_date %></td>
-        <td><%= task.completed_date %></td>
-        <td><%= task.canceled_date %></td>
+        <td><input type="checkbox" name="Computer" id="Computer_checkbox" /></td>
+        <td><div class="type1">
+           <%= task.name %>
+            <br>
+              進捗ID: <%= task.step_id %>, タスク名: <%= task.name %>, タスク詳細: <%= task.memo %>,
+              タスクステータス: <%=task.status %>, 完了予定日: <%= task.scheduled_complete_date %>,
+              完了日: <%= task.completed_date %>, 中止にした日: <%= task.canceled_date %>
+              </div></td>
+        <td><div class="scheduled_complete_date"><%= task.scheduled_complete_date %></div></td>
         <td><%= link_to '詳細表示',lead_step_task_path(@lead, @step, task) %></td>
         <td><%= link_to '編集', edit_lead_step_task_path(@lead, @step, task) %></td>
         <td><%= link_to '削除', lead_step_task_path(@lead, @step ,task), method: :delete, data: { confirm: "「#{task.name}」を削除してよろしいですか？" } %></td>
@@ -35,5 +56,11 @@
 </table>
 
 <br>
+
+<!--div class="type1">
+■詳細情報<br>
+
+</div-->
+
 
 <%= link_to '新規作成', new_lead_step_task_path(@lead,@step) %>
