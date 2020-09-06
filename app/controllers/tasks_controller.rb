@@ -1,7 +1,7 @@
 class TasksController < StepsController
   before_action :set_task, only: %i(show edit update destroy)
   #before_action :set_lead_and_user_by_lead_id
-  before_action :set_step, only: %i(index new create edit update)
+  before_action :set_step, only: %i(show index new create edit update)
 
   def index
     @tasks = Task.all
