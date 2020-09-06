@@ -40,5 +40,5 @@
   <%= @step.completed_tasks_rate %>
 </p>
 
-<%= link_to 'Edit', edit_step_path(@step) %> |
-<%= link_to 'Back', steps_path %>
+<%= link_to 'Edit', edit_lead_step_path(@lead, @step) %> |
+<%= link_to 'Back', lead_steps_path(@lead) %>
