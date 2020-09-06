@@ -19,7 +19,7 @@ class TasksController < StepsController
 
   def create
     @task = Task.new(task_params)
-     respond_to do |format|
+    respond_to do |format|
       if @task.save
         format.html { redirect_to lead_step_tasks_path(params[:lead_id],params[:step_id]), notice: 'Task was successfully created.' }
         format.json { render :show, status: :created, location: lead_step_tasks_path(params[:lead_id],params[:step_id]) }
