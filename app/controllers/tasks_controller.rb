@@ -5,6 +5,7 @@ class TasksController < StepsController
 
   def index
     @tasks = Task.all
+    @task = Task.new
   end
 
   def show

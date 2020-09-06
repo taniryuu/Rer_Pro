@@ -1,5 +1,8 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">
 <html>
+  <% provide(:title, 'New task') %>
+  <% provide(:class_text, 'task--new') %>
+  <% provide(:button_text, '作成') %>
   <head>
     <title>マウスオーバーで詳細表示</title>
     <style type="text/css">
@@ -46,7 +49,37 @@
 
     <br>
 
-    <%= link_to '新規作成', new_lead_step_task_path(@lead,@step) %>
+    <%= form_with(model: @task, url: lead_step_tasks_path(lead_id: @lead, step_id: @step), method: :post, local: true) do |f| %>
+  
+      <%= render partial: 'shared/error_messages' ,locals: {obj: @task} %>
+  
+      <div class="row">
+        <div class="col-2">
+          <div class="form-group">            
+            <%= f.label :name, class: "label-#{yield(:class_text)}"%>
+            <%= f.text_field :name, class: "form-control" %>          
+          </div>
+        </div>
+        <div class="col-2">
+          <div class="form-group">  
+            <%= f.label :scheduled_complete_date, class: "label-#{yield(:class_text)}" %>
+            <%= f.datetime_local_field :scheduled_complete_date, class: 'form-control' %>
+          </div>  
+        </div> 
+
+        <div class="col-2 align-self-end">
+          <div class="form-group">        
+            <%= f.submit yield(:button_text), class: "btn-#{yield(:class_text)}" %>
+          </div>
+        </div>
+
+        <%= f.hidden_field :step_id, class: "form-control", value: @step.id %> 
+      
+      </div>
+    
+    <% end %>
+
+    <!--%= link_to '新規作成', new_lead_step_task_path(@lead,@step) %-->
 
   </body>
 </html>
