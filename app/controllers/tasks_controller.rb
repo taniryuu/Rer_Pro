@@ -1,7 +1,7 @@
 class TasksController < StepsController
   before_action :set_task, only: %i(show edit update destroy)
   #before_action :set_lead_and_user_by_lead_id
-  before_action :set_step, only: %i(index new create edit update)
+  before_action :set_step, only: %i(show index new create edit update)
 
   def index
     @tasks = Task.all
@@ -19,8 +19,13 @@ class TasksController < StepsController
 
   def create
     @task = Task.new(task_params)
+<<<<<<< HEAD
      respond_to do |format|
       if @task.save && update_completed_tasks_rate(@step)
+=======
+    respond_to do |format|
+      if @task.save
+>>>>>>> be17e783c9e51579cd0285d83788c55b05d64618
         format.html { redirect_to lead_step_tasks_path(params[:lead_id],params[:step_id]), notice: 'Task was successfully created.' }
         format.json { render :show, status: :created, location: lead_step_tasks_path(params[:lead_id],params[:step_id]) }
       else
