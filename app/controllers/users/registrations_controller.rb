@@ -3,12 +3,10 @@
 class Users::RegistrationsController < Devise::RegistrationsController
   prepend_before_action :authenticate_scope!, only: %i(edit update destroy)
   prepend_before_action :set_minimum_password_length, only: %i(new edit)
-  before_action :current_user_admin?, only: %i(new create)
-  before_action :correct_or_admin_user, only: %i(edit update)
+  before_action :set_members, only: %i(edit update)
+  before_action :same_company_id, only: %i(edit update)
   before_action :configure_sign_up_params, only: [:create]
   before_action :configure_account_update_params, only: [:update]
-  before_action :set_user, only: %i(edit update)
-  before_action :set_members, only: %i(edit update)
 
   # GET /resource/sign_up
   # def new
@@ -22,8 +20,8 @@ class Users::RegistrationsController < Devise::RegistrationsController
 
   # GET /resource/edit
   def edit
-    if by_admin_user?(params)
-      self.resource = resource_class.to_adapter.get!(params[:id])
+    if by_admin_user?(params) && resource_class.to_adapter.get(params[:id]).try(:id)
+      self.resource = resource_class.to_adapter.get(params[:id])
     else
       authenticate_scope!
       super
@@ -32,10 +30,10 @@ class Users::RegistrationsController < Devise::RegistrationsController
 
   # PUT /resource
   def update
-    if by_admin_user?(params)
-      self.resource = resource_class.to_adapter.get!(params[:id])
+    if by_admin_user?(params) && resource_class.to_adapter.get(params[:id]).try(:id)
+      self.resource = resource_class.to_adapter.get(params[:id])
     else
-      self.resource = resource_class.to_adapter.get!(send(:"current_#{resource_name}").to_key)
+      self.resource = resource_class.to_adapter.get(send(:"current_#{resource_name}").to_key)
     end
 
     prev_unconfirmed_email = resource.unconfirmed_email if resource.respond_to?(:unconfirmed_email)
@@ -131,23 +129,6 @@ class Users::RegistrationsController < Devise::RegistrationsController
   def update_resource_without_password(resource, params)
     resource.update_without_password(params)
   end
-
-  # def creatable?
-  #   raise CanCan::AccessDenied unless user_signed_in?
-
-  #   if !current_user_is_admin?
-  #     raise CanCan::AccessDenied
-  #   end
-  # end
-
-  # def editable?
-  #   raise CanCan::AccessDenied unless user_signed_in?
-
-  #   if params[:id].present? && !current_user_is_admin?
-  #     raise CanCan::AccessDenied
-  #   end
-  # end
-
 
   # The path used after sign up for inactive accounts.
   def after_inactive_sign_up_path_for(resource)
