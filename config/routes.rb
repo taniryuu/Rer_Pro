@@ -6,6 +6,7 @@ Rails.application.routes.draw do
       post 'users' => 'users/registrations#create', as: :user_registration
     end
   end
+
   
   devise_scope :user do
     root :to => "devise/sessions#new"
@@ -26,7 +27,11 @@ Rails.application.routes.draw do
       get 'edit_user_id'
       patch 'update_user_id'
     end
-    resources :steps
+    resources :steps do
+      resources :tasks
+    end
+
   end
+
   
 end

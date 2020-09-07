@@ -1,0 +1,32 @@
+<% provide(:title, 'New task') %>
+<% provide(:class_text, 'task--new') %>
+<% provide(:button_text, '作成') %>
+<h1>タスク作成</h1>
+<%= form_with(model: @task, url: lead_step_tasks_path(lead_id: @lead, step_id: @step), method: :post, local: true) do |f| %>
+
+  <%= render partial: 'shared/error_messages' ,locals: {obj: @task} %>
+
+  <%= f.label :name, class: "label-#{yield(:class_text)}" %>
+  <%= f.text_field :name, class: "form-control" %>
+
+  <%= f.label :memo, class: "label-#{yield(:class_text)}" %>
+  <%= f.text_area :memo, class: "form-control" %>
+
+  <%= f.label :status, class: "label-#{yield(:class_text)}" %>
+  <%= f.select :status, Task.statuses.keys.map{ |k| ["enums.task.status.#{k}", k] }, class: "form-control" %>
+
+  <%= f.label :scheduled_complete_date, class: "label-#{yield(:class_text)}" %>
+  <%= f.datetime_local_field :scheduled_complete_date, class: "form-control" %>
+
+  <%= f.label :completed_date, class: "label-#{yield(:class_text)}" %>
+  <%= f.datetime_local_field :completed_date, class: "form-control" %>
+
+  <%= f.label :canceled_date, class: "label-#{yield(:class_text)}" %>
+  <%= f.datetime_local_field :canceled_date, class: "form-control" %>
+
+
+  <%= f.submit yield(:button_text), class: "btn-#{yield(:class_text)}" %>
+
+  <%= f.hidden_field :step_id, class: "form-control", value: @step.id %>
+
+<% end %>
