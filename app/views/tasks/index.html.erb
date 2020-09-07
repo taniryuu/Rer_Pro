@@ -1,39 +1,28 @@
-<h1>タスク一覧 </h1>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">
+<html>
+  <head>
+    <title>マウスクリックで詳細表示</title>
+  </head>
+  <body>
+    <h1>タスク一覧 </h1>
+    <h3>To Do リスト</h3>
+    <table>
+      <tbody>
+        <% @tasks.each do |task| %>
+          <tr>
+            <td><input type="checkbox" name="Delete" id="delete_checkbox" /></td>
+            <td><%= link_to "#{task.name}", lead_step_task_path(@lead, @step, task) %></td>
+            <td><%= task.scheduled_complete_date %></td>
+            <td><%= link_to '削除', lead_step_task_path(@lead, @step ,task), method: :delete, data: { confirm: "「#{task.name}」を削除してよろしいですか？" } %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
 
-<table>
-  <thead>
-    <tr>
-      <th>step_id</th>
-      <th>name</th>
-      <th>memo</th>
-      <th>status</th>
-      <th>scheduled_complete_date</th>
-      <th>completed_date</th>
-      <th>canceled_date</th>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
+    <br>
 
-  <tbody>
-    <% @tasks.each do |task| %>
-      <tr>
-        <td><%= task.step_id %></td>
-        <td><%= task.name %></td>
-        <td><%= task.memo %></td>
-        <td><%= task.status %></td>
-        <td><%= task.scheduled_complete_date %></td>
-        <td><%= task.completed_date %></td>
-        <td><%= task.canceled_date %></td>
-        <td><%= link_to '詳細表示',lead_step_task_path(@lead, @step, task) %></td>
-        <td><%= link_to '編集', edit_lead_step_task_path(@lead, @step, task) %></td>
-        <td><%= link_to '削除', lead_step_task_path(@lead, @step ,task), method: :delete, data: { confirm: "「#{task.name}」を削除してよろしいですか？" } %></td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
+    <%= link_to '新規作成', new_lead_step_task_path(@lead,@step) %>
 
-<br>
+  </body>
+</html>
 
-<%= link_to '新規作成', new_lead_step_task_path(@lead,@step) %>
