@@ -42,7 +42,7 @@ gem 'bcrypt', '~> 3.1.7'
 gem 'devise'
 gem 'devise-i18n'
 # bootstrap
-gem 'bootstrap','~> 4.0.0'
+gem 'bootstrap','~> 4.5.0'
 gem 'mini_racer'
 gem 'jquery-rails'
 # enum
