@@ -60,6 +60,7 @@ group :development, :test do
   gem 'rspec-rails'
   gem 'rails-controller-testing'
   gem 'sqlite3'
+  gem "factory_bot_rails" # テストデータを簡単につくれるgem
 end
 
 group :development do
