@@ -33,15 +33,15 @@ RSpec.describe Step, type: :model do
     end
   end
   
-  # gem 'factory_bot_rails'が必要。少し時間がかかりそうなので後回し。
+  # stepモデルを１つしか作っていないのにテストできているのか怪しいので、また時間のあるときに見直す。
   describe Step do
     context 'の:orderカラムは同じ案件内でuniqueness' do
-      # subject { FactoryBot.build(:step) }
-  
-      # it do
-      #   should validate_uniqueness_of(:order).
-      #     scoped_to(:lead_id)
-      # end
+      subject { FactoryBot.build(:step) }
+
+      it do
+        should validate_uniqueness_of(:order).
+        scoped_to(:lead_id)
+      end
     end
   end
   
