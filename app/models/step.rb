@@ -15,8 +15,10 @@ class Step < ApplicationRecord
   # :orderカラムが連番であることを保証するには、最大値がレコードの数と一致する必要があるが、更新の都合上1つ余裕を持たせている。
   def order_is_serial_number
     steps_of_same_lead = Step.where(lead_id: self.lead_id)
-    unless steps_of_same_lead.pluck(:order).max <= steps_of_same_lead.count + 1 
-      errors.add(:order, "が「1から始まる連番」になっていません。")
+    if steps_of_same_lead.present?
+      unless steps_of_same_lead.pluck(:order).max <= steps_of_same_lead.count + 1 
+        errors.add(:order, "が「1から始まる連番」になっていません。")
+      end
     end
   end
   
