@@ -1,4 +1,7 @@
 <h1>ユーザー一覧</h1>
+<%= link_to "新規登録", new_user_path %>
+<%= link_to "マイページ", current_user %>
+
 <% @users.each do |user| %>
   <p>
     <%= user.name %>

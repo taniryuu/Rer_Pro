@@ -20,12 +20,17 @@ class TasksController < StepsController
   def create
     @task = Task.new(task_params)
 <<<<<<< HEAD
+<<<<<<< HEAD
      respond_to do |format|
       if @task.save && update_completed_tasks_rate(@step)
 =======
     respond_to do |format|
       if @task.save
 >>>>>>> be17e783c9e51579cd0285d83788c55b05d64618
+=======
+    respond_to do |format|
+      if @task.save && update_completed_tasks_rate(@step)
+>>>>>>> e6e9f6ac31a8f735f555a78d5e8e4fd8662a0496
         format.html { redirect_to lead_step_tasks_path(params[:lead_id],params[:step_id]), notice: 'Task was successfully created.' }
         format.json { render :show, status: :created, location: lead_step_tasks_path(params[:lead_id],params[:step_id]) }
       else

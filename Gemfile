@@ -42,7 +42,7 @@ gem 'bcrypt', '~> 3.1.7'
 gem 'devise'
 gem 'devise-i18n'
 # bootstrap
-gem 'bootstrap','~> 4.0.0'
+gem 'bootstrap','~> 4.5.0'
 gem 'mini_racer'
 gem 'jquery-rails'
 # enum
@@ -60,6 +60,7 @@ group :development, :test do
   gem 'rspec-rails'
   gem 'rails-controller-testing'
   gem 'sqlite3'
+  gem "factory_bot_rails" # テストデータを簡単につくれるgem
 end
 
 group :development do

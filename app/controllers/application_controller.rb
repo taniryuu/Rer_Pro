@@ -2,11 +2,6 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
   before_action :configure_permitted_parameters, if: :devise_controller?
 
-  # ユーザーIDを取得し識別
-  def set_user
-    @user = User.find(params[:id])
-  end
-
   # ログインしているユーザーがいる企業の社員全員取得
   def set_members
     @users = current_user.company_of_user
@@ -53,14 +48,19 @@ class ApplicationController < ActionController::Base
 
   # ログインユーザーを管理者かどうか識別し管理者以外ならtopに戻しflash表示
   def current_user_admin?
-    if user_signed_in? && current_user.admin?
-      redirect_to root
-      flash[:danger] = "アクセスが無効です。"
+    unless user_signed_in? && current_user.admin?
+      redirect_to current_user
+      flash[:danger] = "管理者以外のアクセスは無効です。"
     end
   end
-  
-  
-  
+
+  # 自分の所属する企業と違うユーザーの場合のみ
+  def same_company_id
+    unless @user.company_id == current_user.company_id
+      redirect_to current_user
+      flash[:danger] = "無効なアクセスが確認されました。"
+    end
+  end
   protected
 
     def configure_permitted_parameters
