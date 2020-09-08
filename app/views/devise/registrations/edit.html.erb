@@ -1,30 +1,42 @@
-<% form_url = (request.path_info.to_s == edit_other_user_registration_path(resource)) ? other_user_registration_path(resource): user_registration_path %>
+<% form_url = (request.path_info.to_s == edit_other_user_registration_path(resource)) ? other_user_registration_path(resource): user_path(resource) %>
 <%
   options = { url: form_url }
   options[:as] = resource_name if defined?(resource_name) && resource_name.present?
 %>
 
 <%= form_for(resource, options) do |f| %>
-
-  <div class="field">
-    <%= f.label :login_id %><br/>
-    <%= f.text_field :login_id, autofocus: true, autocomplete: "login_id" %>
-  </div>
+  <%= render "devise/shared/error_messages", resource: resource %>
+    <div class="field">
+      <%= f.label :login_id %><br/>
+      <% if current_user.admin? %>
+        <%= f.text_field :login_id, autofocus: true, autocomplete: "login_id" %>
+      <% else %>
+        <%= resource.login_id %>
+        <%= f.hidden_field :login_id, value: resource.login_id %>
+      <% end %>
+    </div>
 
   <div class="field">
     <%= f.label :name %><br/>
-    <%= f.text_field :name, autofocus: true, autocomplete: "name" %>
+    <% if current_user.admin? %>
+      <%= f.text_field :name, autofocus: true, autocomplete: "name" %>
+    <% else %>
+      <%= resource.name %>
+      <%= f.hidden_field :name, value: resource.name %>
+    <% end %>
   </div>
 
-  <div class="field">
-    <%= f.label :superior %><br/>
-    <%= f.check_box :superior, autofocus: true, autocomplete: "superior" %>
-  </div>
+  <% if current_user.admin? %>
+    <div class="field">
+      <%= f.label :superior %><br/>
+      <%= f.check_box :superior, autofocus: true, autocomplete: "superior" %>
+    </div>
 
-  <div class="field">
-    <%= f.label :status %><br/>
-    <%= f.select :status, User.statuses.keys.map { |k| [I18n.t("enums.user.status.#{k}"), k]}, autofocus: true, autocomplete: "status" %>
-  </div>
+    <div class="field">
+      <%= f.label :status %><br/>
+      <%= f.select :status, User.statuses.keys.map { |k| [I18n.t("enums.user.status.#{k}"), k]}, autofocus: true, autocomplete: "status" %>
+    </div>
+  <% end %>
 
   <div class="field">
     <%= f.label :superior_id %><br/>
@@ -37,17 +49,17 @@
   </div>
 
   <div class="field">
-    <%= f.label :email %><br />
+    <%= f.label :email %><br/>
     <% if !defined?(password_only) || !password_only %>
       <%= f.email_field :email, autofocus: true, autocomplete: "email" %>
     <% end %>
   </div>
 
   <div class="field">
-    <%= f.label :password %> <i>(<%= t('.leave_blank_if_you_don_t_want_to_change_it') %>)</i><br />
+    <%= f.label :password %> <i>(<%= t('.leave_blank_if_you_don_t_want_to_change_it') %>)</i><br/>
     <%= f.password_field :password, autocomplete: "new-password" %>
     <% if @minimum_password_length %>
-      <br />
+      <br/>
       <em><%= t('devise.shared.minimum_password_length', count: @minimum_password_length) %></em>
     <% end %>
   </div>
@@ -55,7 +67,7 @@
   <% resource.new_record? ? required = true : required = false %>
 
   <div class="field">
-    <%= f.label :password_confirmation %><br />
+    <%= f.label :password_confirmation %><br/>
     <%= f.password_field :password_confirmation, autocomplete: "off" %>
   </div>
   
@@ -67,4 +79,5 @@
   <% end %>
 
   <%= f.submit %>
+  <%= link_to "戻る", users_path %>
 <% end %>

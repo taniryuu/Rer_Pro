@@ -33,7 +33,7 @@ class User < ApplicationRecord
 
   # 所属している企業内に他のユーザーが存在するか検証
   def start_up_create_user?
-    User.where(company_id: self.company_id) == nil?
+    User.where(company_id: self.company_id).nil?
   end
 
   # 同じ会社内の全ユーザー一覧
