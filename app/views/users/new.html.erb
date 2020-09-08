@@ -38,6 +38,7 @@
 
   <div class="actions">
     <%= f.submit "登録" %>
+    <%= link_to "戻る", users_path %>
   </div>
   <%= f.hidden_field :company_id, autofocus: true, value: current_user.company_id %>
   <%= f.hidden_field :superior_id, autofocus: true, value: current_user.superior_id %>
