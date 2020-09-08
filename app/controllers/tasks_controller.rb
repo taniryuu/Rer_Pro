@@ -1,7 +1,7 @@
 class TasksController < StepsController
   before_action :set_task, only: %i(show edit update destroy)
   #before_action :set_lead_and_user_by_lead_id
-  before_action :set_step, only: %i(index new create edit update)
+  before_action :set_step, only: %i(show index new create edit update)
 
   def index
     @tasks = Task.all
@@ -21,7 +21,7 @@ class TasksController < StepsController
   def create
     @task = Task.new(task_params)
     respond_to do |format|
-      if @task.save
+      if @task.save && update_completed_tasks_rate(@step)
         format.html { redirect_to lead_step_tasks_path(params[:lead_id],params[:step_id]), notice: 'Task was successfully created.' }
         format.json { render :show, status: :created, location: lead_step_tasks_path(params[:lead_id],params[:step_id]) }
       else
@@ -34,7 +34,7 @@ class TasksController < StepsController
 
   def update
     respond_to do |format|
-      if @task.update(task_params)
+      if @task.update(task_params) && update_completed_tasks_rate(@step)
         format.html { redirect_to lead_step_tasks_path(params[:lead_id],params[:step_id]), notice: 'Task was successfully updated.' }
         format.json { render :show, status: :ok, location: lead_step_tasks_path(params[:lead_id],params[:step_id]) }
       else
@@ -46,6 +46,7 @@ class TasksController < StepsController
 
   def destroy
     @task.destroy
+    update_completed_tasks_rate(@step)
     respond_to do |format|
       format.html { redirect_to lead_step_tasks_path(params[:lead_id],params[:step_id]), notice: 'Task was successfully destroyed.' }
       format.json { head :no_content }
