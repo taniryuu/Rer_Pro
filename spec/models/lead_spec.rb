@@ -1,50 +1,9 @@
 require 'rails_helper'
 
 RSpec.describe Lead, type: :model do
-  if Company.find_by(name: "サンプル企業").blank?
-    Company.create!(
-      name: "サンプル企業",
-      admin: false,
-      status: 0
-    )
-  end
-  if User.find_by(name: "サンプル上長").blank?
-    User.create!(
-      name: "サンプル上長",
-      company_id: 1,
-      password: "password",
-      login_id: "00001",
-      superior: true,
-      admin: false,
-      superior_id: 1,
-      lead_count: 0,
-      lead_count_delay: 0,
-      notified_num: 3,
-      email: "sample@email.com",
-      status: 0
-    )
-  end
   
   it "はcreated_date, customer_name, room_name, room_num, scheduled_resident_date, scheduled_payment_dateカラムがあれば有効。" do
-    lead = Lead.create!(
-      user_id: 1,
-      created_date: Date.current.to_s,
-    #  completed_date:	"",
-      customer_name: "お客様A",
-      room_name: "物件A",
-      room_num:	"部屋A",
-    #  template: false,
-    #  template_name: "",
-    #  memo: "",
-    #  status: "進捗中"
-    #  notice_created: true
-    #  notice_change_limit: false
-      scheduled_resident_date: (Date.current + 21).to_s,
-      scheduled_payment_date: (Date.current + 14).to_s,
-    #  scheduled_contract_date: ""
-    #  steps_rate: 0
-    )
-    expect(lead).to be_valid
+    expect(FactoryBot.build(:lead)).to be_valid
   end
   
   presense_columns = [:created_date, :customer_name, :room_name, :room_num, :scheduled_resident_date, :scheduled_payment_date]
