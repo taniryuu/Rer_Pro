@@ -25,17 +25,19 @@ class UsersController < Users::ApplicationController
   end
 
   def destroy
-    # 次回以降の作成箇所
-    # if $DELETE_COMMAND == params[:command]
-    #   if @user.leads.where(completed_date: "").empty?
-    #     flash[:success] = "成功しました" if @user.destroy
-    #   else
-    #     flash[:danger] = "未完了の案件を担当しています。別の担当者に変えてください"
-    #   end
-    # else
-    #   flash[:danger] = "正しく入力してください"
-    # end
-    # redirect_to users_url
+    $DELETE_COMMAND = "Delete".freeze
+    @user = User.find(params[:command])
+    if $DELETE_COMMAND == params[:input_delete]
+      # 現在はユーザーの持ってる案件の完了日が空文字である場合がない場合に分岐させてます
+      if @user.leads.find_by(completed_date: "").empty?
+        flash[:success] = "成功しました" if @user.destroy
+      else
+        flash[:danger] = "未完了の案件を担当しています。別の担当者に変えてください"
+      end
+    else
+      flash[:danger] = "正しく入力してください"
+    end
+    redirect_to users_url
   end
 
   private
