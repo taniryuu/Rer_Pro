@@ -32,7 +32,8 @@ class UsersController < Users::ApplicationController
     if $DELETE_COMMAND == params[:input_delete] && same_company_id_judge(@user)
       # 現在はユーザーの持ってる案件の完了日が空文字がない場合に分岐させてます
       if @user.leads.find_by(completed_date: "").blank?
-        flash[:success] = "成功しました" if @user.destroy
+        @user.destroy
+        flash[:success] = "成功しました"
       else
         flash[:danger] = "未完了の案件を担当しています。別の担当者に変えてください"
       end
