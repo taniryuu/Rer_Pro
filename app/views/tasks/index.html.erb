@@ -11,13 +11,18 @@
     <h3>To Do リスト</h3>
     <table>
       <tbody>
-        <% @tasks.each do |task| %>
-          <tr>
-            <td><input type="checkbox" name="Delete" id="delete_checkbox" /></td>
-            <td><%= link_to "#{task.name}", lead_step_task_path(@lead, @step, task) %></td>
-            <td><%= task.scheduled_complete_date %></td>
-            <td><%= link_to '削除', lead_step_task_path(@lead, @step ,task), method: :delete, data: { confirm: "「#{task.name}」を削除してよろしいですか？" } %></td>
-          </tr>
+        <%= form_with(model: @tasks, url: tasks_update_add_delete_list_lead_step_path(1,1), local: true, mothod: :post) do |f| %>
+          <% @tasks.each do |task| %>
+            <tr>
+              <td><%= f.check_box(:delete_task, { multiple: true, class: "check_box"}, checked_value = "true", unchecked_value = "false") %></td>
+              <td><%= link_to "#{task.name}", lead_step_task_path(@lead, @step, task) %></td>
+              <td><%= task.scheduled_complete_date %></td>
+              <td><%= link_to '削除', lead_step_task_path(@lead, @step ,task), method: :delete, data: { confirm: "「#{task.name}」を削除してよろしいですか？" } %></td>
+            </tr>
+          <% end %>
+          <div>
+            <%= f.submit "更新" %>
+          </div>
         <% end %>
       </tbody>
     </table>

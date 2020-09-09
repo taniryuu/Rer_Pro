@@ -28,10 +28,13 @@ Rails.application.routes.draw do
       patch 'update_user_id'
     end
     resources :steps do
+      member do
+        get 'tasks/edit_add_delte_list'
+        post 'tasks/update_add_delete_list'
+      end
       resources :tasks
     end
 
   end
 
-  
 end

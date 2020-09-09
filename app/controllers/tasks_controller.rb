@@ -53,6 +53,13 @@ class TasksController < StepsController
     end
   end
 
+  def edit_add_delete_list
+  end
+
+  def update_add_delete_list
+    debugger
+  end
+
   private
     def set_task
       @task = Task.find(params[:id])
