@@ -58,6 +58,23 @@ class TasksController < StepsController
   end
 
   def update_add_delete_list
+    today = Date.current
+    year = today.year
+    month = today.month
+    day = today.day
+    year_s = year.to_s
+    if month < 10
+      month_s = '0' + month.to_s
+    else
+      month_s = month.to_s
+    end
+    if day < 10
+      day_s = '0' + day.to_s
+    else
+      day_s = day.to_s
+    end
+    today_s = year_s + '-' + month_s + '-' + day_s
+
     checkbox_array = []
     checkbox_array = params[:task][:delete_task]
     n = checkbox_array.size
@@ -75,6 +92,7 @@ class TasksController < StepsController
         i2 += 1
         deleted_tasks.each do |deleted_task|
           deleted_task.update_attribute(:status, "completed")
+          deleted_task.update_attribute(:completed_date, today_s)
         end
       end
     end
@@ -99,5 +117,5 @@ class TasksController < StepsController
 
     def task_params
       params.require(:task).permit(:step_id, :name, :memo, :status, :scheduled_complete_date, :completed_date, :canceled_date)
-    end
+    end 
 end
