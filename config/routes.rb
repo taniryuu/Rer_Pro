@@ -22,12 +22,18 @@ Rails.application.routes.draw do
     match 'users/:id', to: 'users/registrations#update', via: [:patch, :put], as: :other_user_registration
   end
   
-  resources :leads do
+  resources :leads, shallow: true do
     member do
       get 'edit_user_id'
       patch 'update_user_id'
     end
     resources :steps do
+      member do
+        get 'edit_status' => 'steps/step_statuses#edit', as: :edit_statuses_of
+        patch 'complete' => 'steps/step_statuses#complete', as: :complete
+        patch 'restart' => 'steps/step_statuses#restart', as: :restart
+        patch 'cancel' => 'steps/step_statuses#cancel', as: :cancel
+      end
       resources :tasks
     end
 

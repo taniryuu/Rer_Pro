@@ -2,7 +2,7 @@
 <% provide(:class_text, 'task--new') %>
 <% provide(:button_text, '作成') %>
 <h1>タスク作成</h1>
-<%= form_with(model: @task, url: lead_step_tasks_path(lead_id: @lead, step_id: @step), method: :post, local: true) do |f| %>
+<%= form_with(model: @task, url: step_tasks_path(@step), method: :post, local: true) do |f| %>
 
   <%= render partial: 'shared/error_messages' ,locals: {obj: @task} %>
 
