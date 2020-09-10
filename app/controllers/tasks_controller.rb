@@ -1,12 +1,12 @@
 class TasksController < StepsController
   before_action :set_task, only: %i(show edit update destroy)
   #before_action :set_lead_and_user_by_lead_id
-  before_action :set_step, only: %i(show index new create edit update edit_add_delete_list update_add_delete_list)
+  before_action :set_step, only: %i(show index new create edit update destroy edit_add_delete_list update_add_delete_list)
 
   def index
     @tasks = @step.tasks.where(status: "not_yet").order(:scheduled_complete_date)
+    @deleted_tasks_array = @step.tasks.where(status: "completed")
     @task = @step.tasks.new
-    #debugger
   end
 
   def show
@@ -84,8 +84,8 @@ class TasksController < StepsController
       end
     end
     n1 = checkbox_array.size
-    #deleted_tasks = []
     i2 = 0
+    @deleted_tasks_array = @step.tasks.where(status: "completed")
     n1.times do |i1|
       if checkbox_array[i1] == "true"
         deleted_tasks = @step.tasks.where(status: "not_yet").order(:scheduled_complete_date).limit(1).offset(i1 - i2)
@@ -96,7 +96,6 @@ class TasksController < StepsController
         end
       end
     end
-    
     redirect_to lead_step_tasks_url(@lead, @step)
   end
 

@@ -1,4 +1,3 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">
 <html>
   <% provide(:title, 'New task') %>
   <% provide(:class_text, 'task--new') %>
@@ -11,7 +10,7 @@
     <h3>To Do リスト</h3>
     <table>
       <tbody>
-        <%= form_with(model: @tasks, url: tasks_update_add_delete_list_lead_step_path(1,1), local: true, mothod: :post) do |f| %>
+        <%= form_with(model: @tasks, url: tasks_update_add_delete_list_lead_step_path(@lead,@step), local: true, mothod: :post) do |f| %>
           <% @tasks.each do |task| %>
             <tr>
               <td><%= f.check_box(:delete_task, { multiple: true, class: "check_box"}, checked_value = "true", unchecked_value = "false") %></td>
@@ -20,9 +19,11 @@
               <td><%= link_to '削除', lead_step_task_path(@lead, @step ,task), method: :delete, data: { confirm: "「#{task.name}」を削除してよろしいですか？" } %></td>
             </tr>
           <% end %>
-          <div>
+          <tr>
+            <td>
             <%= f.submit "更新" %>
-          </div>
+            </td>
+          </tr>
         <% end %>
       </tbody>
     </table>
@@ -58,6 +59,19 @@
       </div>
     
     <% end %>
+
+    <h3>済 リスト</h3>
+    <table>
+      <tbody>
+        <% @deleted_tasks_array.each do |task| %>
+          <tr>
+            <td><%= task.name %></td>
+            <td><%= task.scheduled_complete_date %></td>
+            <td><%= link_to '削除', lead_step_task_path(@lead, @step ,task), method: :delete, data: { confirm: "「#{task.name}」を削除してよろしいですか？" } %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
 
     <!--%= link_to '新規作成', new_lead_step_task_path(@lead,@step) %-->
 
