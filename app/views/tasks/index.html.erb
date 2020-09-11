@@ -10,7 +10,7 @@
     <h3>To Do リスト</h3>
     <table>
       <tbody>
-        <%= form_with(model: @tasks, url: tasks_update_add_delete_list_lead_step_path(@lead,@step), local: true, mothod: :post) do |f| %>
+        <%= form_with(model: @tasks, url: tasks_update_add_delete_list_step_path(@step), local: true, mothod: :post) do |f| %>
           <% @tasks.each do |task| %>
             <tr>
               <td><%= f.check_box(:delete_task, { multiple: true, class: "check_box"}, checked_value = "true", unchecked_value = "false") %></td>
@@ -31,7 +31,7 @@
     <br>
 
 
-    <%= form_with(model: @task, url: lead_step_tasks_path(lead_id: @lead, step_id: @step), method: :post, local: true) do |f| %>
+    <%= form_with(model: @task, url: step_tasks_path(step_id: @step), method: :post, local: true) do |f| %>
   
       <%= render partial: 'shared/error_messages' ,locals: {obj: @task} %>
   
@@ -68,7 +68,7 @@
           <tr>
             <td><%= task.name %></td>
             <td><%= task.scheduled_complete_date %></td>
-            <td><%= link_to '削除', lead_step_task_path(@lead, @step ,task), method: :delete, data: { confirm: "「#{task.name}」を削除してよろしいですか？" } %></td>
+            <td><%= link_to '削除', task_path(task), method: :delete, data: { confirm: "「#{task.name}」を削除してよろしいですか？" } %></td>
           </tr>
         <% end %>
       </tbody>
