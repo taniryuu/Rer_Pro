@@ -19,7 +19,7 @@
   </head>
   <body>
     <%= render "shared/header1" %>
-    <%= render "shared/header2" if current_user.present? %>
+    <%= render "shared/header2" if user_signed_in? %>
     <% flash.each do |message_type, msg| %>
       <div class="alert alert-<%= message_type %>"><%= msg %></div>
     <% end %>
