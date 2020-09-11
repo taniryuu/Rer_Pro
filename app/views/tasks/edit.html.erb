@@ -2,7 +2,7 @@
 <% provide(:class_text, 'task--edit') %>
 <% provide(:button_text, '更新') %>
 <h1>タスク編集</h1>
-<%= form_with(model: @task, url: lead_step_task_path(lead_id: @lead, step_id: @step), method: :patch, local: true) do |f| %>
+<%= form_with(model: @task, url: task_path(@task), method: :patch, local: true) do |f| %>
 
   <%= render partial: 'shared/error_messages' ,locals: {obj: @task} %>
 

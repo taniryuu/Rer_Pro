@@ -1,7 +1,7 @@
 class StepsController < Leads::ApplicationController
   # オブジェクトの準備
   before_action :set_step, only: %i(show edit update destroy)
-  before_action :set_lead_and_user_by_lead_id
+  before_action :set_lead_and_user_by_lead_id, only: %i(index new create)
   # フィルター（アクセス権限）
   before_action :correct_user, except: %i(index show)
   # 後処理
@@ -34,7 +34,7 @@ class StepsController < Leads::ApplicationController
     @step = @lead.steps.new(step_params)
     respond_to do |format|
       if save_and_errors_of(@step).blank?
-        format.html { redirect_to [@lead, @step], notice: 'Step was successfully created.' }
+        format.html { redirect_to @step, notice: 'Step was successfully created.' }
         format.json { render :show, status: :created, location: @step }
       else
         format.html { render :new }
@@ -48,7 +48,7 @@ class StepsController < Leads::ApplicationController
   def update
     respond_to do |format|
       if update_and_errors_of(@step).blank?
-        format.html { redirect_to [@lead, @step], notice: 'Step was successfully updated.' }
+        format.html { redirect_to @step, notice: 'Step was successfully updated.' }
         format.json { render :show, status: :ok, location: @step }
       else
         format.html { render :edit }
@@ -63,7 +63,7 @@ class StepsController < Leads::ApplicationController
     @step.destroy
     update_steps_rate(@lead)
     respond_to do |format|
-      format.html { redirect_to lead_steps_url, notice: 'Step was successfully destroyed.' }
+      format.html { redirect_to lead_steps_url(@lead), notice: 'Step was successfully destroyed.' }
       format.json { head :no_content }
     end
   end
@@ -72,6 +72,8 @@ class StepsController < Leads::ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_step
       @step = Step.find(params[:id])
+      @lead = Lead.find(@step.lead_id)
+      @user = User.find(@lead.user_id)
     end
     
     # Use callbacks to share common setup or constraints between actions.

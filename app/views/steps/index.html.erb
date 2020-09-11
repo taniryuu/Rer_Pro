@@ -28,9 +28,9 @@
         <td><%= step.scheduled_complete_date %></td>
         <td><%= step.completed_date %></td>
         <td><%= step.completed_tasks_rate %></td>
-        <td><%= link_to 'Show', lead_step_path(@lead, step) %></td>
-        <td><%= link_to 'Edit', edit_lead_step_path(@lead, step) %></td>
-        <td><%= link_to 'Destroy', lead_step_path(@lead, step), method: :delete, data: { confirm: 'Are you sure?' } %></td>
+        <td><%= link_to 'Show', step_path(step) %></td>
+        <td><%= link_to 'Edit', edit_step_path(step) %></td>
+        <td><%= link_to 'Destroy', step_path(step), method: :delete, data: { confirm: 'Are you sure?' } %></td>
       </tr>
     <% end %>
   </tbody>
