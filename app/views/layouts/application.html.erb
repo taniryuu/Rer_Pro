@@ -7,9 +7,19 @@
 
     <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
     <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
-  </head>
 
+    <%# Bootstrap %>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Jekyll v4.1.1">
+
+    <link rel="canonical" href="https://getbootstrap.com/docs/4.5/examples/offcanvas/">
+  </head>
   <body>
+    <%= render "shared/header1" %>
+    <%= render "shared/header2" if current_user.present? %>
     <% flash.each do |message_type, msg| %>
       <div class="alert alert-<%= message_type %>"><%= msg %></div>
     <% end %>
