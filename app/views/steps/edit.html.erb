@@ -1,6 +1,6 @@
 <h1>Editing Step</h1>
 
-<%= render 'form', step: @step %>
+<%= render 'form', lead: nil, step: @step %>
 
-<%= link_to 'Show', [@lead, @step] %> |
-<%= link_to 'Back', lead_steps_path %>
+<%= link_to 'Show', @step %> |
+<%= link_to 'Back', lead_steps_path(@lead) %>
