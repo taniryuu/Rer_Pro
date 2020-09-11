@@ -6,7 +6,45 @@
   <p>
     <%= user.name %>
     <%= link_to "変更", edit_other_user_registration_path(user) %>
-    <%# deleteは単語入力で条件クリア %>
-    <%= link_to "削除", user_path(user), method: :delete, data: { confirm: "「#{user.name}」を削除してもよろしいですか？" } %>
+    <!-- delete modal -->
+    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#user-delete" data-name="<%= user.name %>" data-id="<%= user.id %>">
+      削除
+    </button>
   </p>
 <% end %>
+
+<!-- Modal -->
+<div class="modal fade" id="user-delete" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="user-deleteLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="user-deleteLabel"><span class="user-name"></span>を削除します</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <%= form_with(model: @user, url: user_path(current_user), method: :delete, local: true) do |f| %>
+        <div class="modal-body">
+          <%= f.label "Deleteと入力してください" %><br>
+          <%= f.text_field :input_delete, placeholder: "Delete" %>
+          <%= f.hidden_field :command, value: "", class: "user-id" %>
+        </div>
+        <div class="modal-footer">
+          <%= f.submit "削除", class: "btn btn-outline-danger" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<script> 
+  $('#user-delete').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget);
+    var id = button.data('id');
+    var name = button.data('name');
+    
+    var modal = $(this);
+    modal.find('.user-id').val(id);
+    modal.find('.user-name').text(name);
+  });
+</script>

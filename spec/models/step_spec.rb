@@ -1,62 +1,17 @@
 require 'rails_helper'
 
 RSpec.describe Step, type: :model do
-  if Company.find_by(name: "サンプル企業").blank?
-    Company.create!(
-      name: "サンプル企業",
-      admin: false,
-      status: 0
-    )
-  end
-  if User.find_by(name: "サンプル上長").blank?
-    User.create!(
-      name: "サンプル上長",
-      company_id: 1,
-      password: "password",
-      login_id: "00001",
-      superior: true,
-      admin: false,
-      superior_id: 1,
-      lead_count: 0,
-      lead_count_delay: 0,
-      notified_num: 3,
-      email: "sample@email.com",
-      status: 0
-    )
-  end
-  if Lead.find_by(customer_name: "お客様A").blank?
-    Lead.create!(
-      user_id: 1,
-      created_date: Date.current.to_s,
-    #  completed_date:	"",
-      customer_name: "お客様A",
-      room_name: "物件A",
-      room_num:	"部屋A",
-    #  template: false,
-    #  template_name: "",
-    #  memo: "",
-    #  status: "進捗中"
-    #  notice_created: true
-    #  notice_change_limit: false
-      scheduled_resident_date: (Date.current + 21).to_s,
-      scheduled_payment_date: (Date.current + 14).to_s,
-    #  scheduled_contract_date: ""
-    #  steps_rate: 0
-    )
-  end
+  company = FactoryBot.build(:company)
+  company.save! if Company.find_by(name: company.name).blank?
+  
+  user = FactoryBot.build(:user)
+  user.save! if User.find_by(name: user.name).blank?
+  
+  lead = FactoryBot.build(:lead)
+  lead.save! if Lead.find_by(customer_name: lead.customer_name).blank?
   
   it "はlead_id, name, status, order, scheduled_complete_date, completed_tasks_rateカラムがあれば有効。" do
-    step = Step.create!(
-      lead_id: 1,
-      name: "進捗1",
-      # memo: "進捗#{i+1}のメモ",
-      status: 0,
-      order: 1,
-      scheduled_complete_date: "#{Date.current + 3}",
-      # completed_date: "",
-      completed_tasks_rate: 0
-    )
-    expect(step).to be_valid
+    expect(FactoryBot.build(:step)).to be_valid
   end
   
   presense_columns = [:name, :status, :order, :scheduled_complete_date, :completed_tasks_rate]
@@ -69,7 +24,7 @@ RSpec.describe Step, type: :model do
   length_columns = [[:name, 2, 50], 
                     [:memo, 0, 400],
                     [:scheduled_complete_date, 0, 32],
-                    [:completed_date, 0, 32]
+                    # [:completed_date, 0, 32]
                   ]
   length_columns. each do |length_column|
     describe "の#{length_column[0]}は文字数制限あり" do
@@ -78,15 +33,15 @@ RSpec.describe Step, type: :model do
     end
   end
   
-  # gem 'factory_bot_rails'が必要。少し時間がかかりそうなので後回し。
+  # stepモデルを１つしか作っていないのにテストできているのか怪しいので、また時間のあるときに見直す。
   describe Step do
     context 'の:orderカラムは同じ案件内でuniqueness' do
-      # subject { FactoryBot.build(:step) }
-  
-      # it do
-      #   should validate_uniqueness_of(:order).
-      #     scoped_to(:lead_id)
-      # end
+      subject { FactoryBot.build(:step) }
+
+      it do
+        should validate_uniqueness_of(:order).
+        scoped_to(:lead_id)
+      end
     end
   end
   
