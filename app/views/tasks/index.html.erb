@@ -16,6 +16,7 @@
               <td><%= f.check_box(:delete_task, { multiple: true, class: "check_box"}, checked_value = "true", unchecked_value = "false") %></td>
               <td><%= link_to "#{task.name}", task_path(task) %></td>
               <td><%= task.scheduled_complete_date %></td>
+              <td><%= link_to '中止', add_canceled_list_task_path(task) %>
               <td><%= link_to '削除', task_path(task), method: :delete, data: { confirm: "「#{task.name}」を削除してよろしいですか？" } %></td>
             </tr>
           <% end %>
@@ -27,9 +28,8 @@
         <% end %>
       </tbody>
     </table>
-
-    <br>
-
+ 
+    <!-- 入力フォーム -->
 
     <%= form_with(model: @task, url: step_tasks_path(step_id: @step), method: :post, local: true) do |f| %>
   
@@ -66,7 +66,20 @@
       <tbody>
         <% @deleted_tasks_array.each do |task| %>
           <tr>
-            <td><%= task.name %></td>
+            <td><%= link_to "#{task.name}", task_path(task) %></td>
+            <td><%= task.scheduled_complete_date %></td>
+            <td><%= link_to '削除', task_path(task), method: :delete, data: { confirm: "「#{task.name}」を削除してよろしいですか？" } %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+    <h3>中止 リスト</h3>
+    <table>
+      <tbody>
+        <% @canceled_tasks_array.each do |task| %>
+          <tr>
+            <td><%= link_to "#{task.name}", task_path(task) %></td>
             <td><%= task.scheduled_complete_date %></td>
             <td><%= link_to '削除', task_path(task), method: :delete, data: { confirm: "「#{task.name}」を削除してよろしいですか？" } %></td>
           </tr>

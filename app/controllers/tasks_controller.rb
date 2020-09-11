@@ -1,12 +1,13 @@
 class TasksController < Leads::ApplicationController
-  before_action :set_task, only: %i(show edit update destroy)
+  before_action :set_task, only: %i(show edit update destroy add_canceled_list)
   #before_action :set_lead_and_user_by_lead_id
   before_action :set_step, only: %i(index new create)
   before_action :set_step_in_add_delete_list, only: %i(edit_add_delete_list update_add_delete_list)
 
   def index
     @tasks = @step.tasks.where(status: "not_yet").order(:scheduled_complete_date)
-    @deleted_tasks_array = @step.tasks.where(status: "completed")
+    @deleted_tasks_array = @step.tasks.where(status: "completed").order(:scheduled_complete_date)
+    @canceled_tasks_array = @step.tasks.where(status: "canceled").order(:scheduled_complete_date)
     @task = @step.tasks.new
   end
 
@@ -86,7 +87,8 @@ class TasksController < Leads::ApplicationController
     end
     n1 = checkbox_array.size
     i2 = 0
-    @deleted_tasks_array = @step.tasks.where(status: "completed")
+    @deleted_tasks_array = @step.tasks.where(status: "completed").order(:scheduled_complete_date)
+
     n1.times do |i1|
       if checkbox_array[i1] == "true"
         deleted_tasks = @step.tasks.where(status: "not_yet").order(:scheduled_complete_date).limit(1).offset(i1 - i2)
@@ -97,6 +99,12 @@ class TasksController < Leads::ApplicationController
         end
       end
     end
+    redirect_to step_tasks_url(@step)
+  end
+
+  def add_canceled_list
+    flash[:danger] = "#{@task.name}を中止リストに追加します"
+    @task.update_attribute(:status, "canceled")
     redirect_to step_tasks_url(@step)
   end
 

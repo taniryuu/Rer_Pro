@@ -35,12 +35,16 @@ Rails.application.routes.draw do
         patch 'cancel' => 'steps/step_statuses#cancel', as: :cancel
       end
       member do
-        get 'tasks/edit_add_delte_list'
+        get 'tasks/edit_add_delete_list'
         post 'tasks/update_add_delete_list'
+        #get 'tasks/add_canceled_list'
       end
-      resources :tasks
+      resources :tasks do
+        member do
+          get 'add_canceled_list'
+        end
+      end
     end
-
   end
 
 end
