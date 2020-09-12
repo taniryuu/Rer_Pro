@@ -74,22 +74,7 @@ class TasksController < Leads::ApplicationController
   end
 
   def update_add_delete_list
-    today = Date.current
-    year = today.year
-    month = today.month
-    day = today.day
-    year_s = year.to_s
-    if month < 10
-      month_s = '0' + month.to_s
-    else
-      month_s = month.to_s
-    end
-    if day < 10
-      day_s = '0' + day.to_s
-    else
-      day_s = day.to_s
-    end
-    today_s = year_s + '-' + month_s + '-' + day_s
+    today_s = Date.current.strftime("%Y-%m-%d")
 
     checkbox_array = []
     checkbox_array = params[:task][:delete_task]
@@ -133,7 +118,7 @@ class TasksController < Leads::ApplicationController
     else
       flash[:danger] = "#{@task.name}の更新は失敗しました。" + @task.errors.full_messages[0]
     end
-      redirect_to step_tasks_url(@step)
+    redirect_to step_tasks_url(@step)
   end
 
   private
