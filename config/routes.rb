@@ -34,14 +34,16 @@ Rails.application.routes.draw do
         patch 'restart' => 'steps/step_statuses#restart', as: :restart
         patch 'cancel' => 'steps/step_statuses#cancel', as: :cancel
       end
+      member do
+        get 'tasks/edit_add_delete_list'
+        post 'tasks/update_add_delete_list'
+      end
       resources :tasks
     end
 
   end
 
 
-  get '/leads/:lead_id/steps/:step_id/tasks/edit_add_delete_list/', to: 'tasks#edit_add_delete_list', as: 'tasks_edit_add_delete_list_lead_step'
-  post '/leads/:lead_id/steps/:step_id/tasks/udate_add_delete_list', to: 'tasks#update_add_delete_list', as: 'tasks_update_add_delete_list_lead_step' 
 
 
 end

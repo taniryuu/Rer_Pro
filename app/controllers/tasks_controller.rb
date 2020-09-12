@@ -1,8 +1,8 @@
 class TasksController < Leads::ApplicationController
   before_action :set_task, only: %i(show edit update destroy)
   #before_action :set_lead_and_user_by_lead_id
-  before_action :set_step, only: %i(index new create edit_add_delete_list update_add_delete_list)
-
+  before_action :set_step, only: %i(index new create)
+  before_action :set_step_in_add_delete_list, only: %i(edit_add_delete_list update_add_delete_list)
   def index
     @tasks = @step.tasks.where(status: "not_yet").order(:scheduled_complete_date)
     @deleted_tasks_array = @step.tasks.where(status: "completed")
@@ -96,7 +96,7 @@ class TasksController < Leads::ApplicationController
         end
       end
     end
-    redirect_to lead_step_tasks_url(@lead, @step)
+    redirect_to step_tasks_path(@step)
   end
 
   private
@@ -107,6 +107,10 @@ class TasksController < Leads::ApplicationController
  
     def set_step
       @step = Step.find(params[:step_id])
+    end
+
+    def set_step_in_add_delete_list
+      @step = Step.find(params[:id])
     end
 
     #Use callbacks to share common setup or constraints between actions.
