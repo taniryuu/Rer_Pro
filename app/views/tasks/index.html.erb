@@ -16,7 +16,7 @@
               <td><%= f.check_box(:delete_task, { multiple: true, class: "check_box"}, checked_value = "true", unchecked_value = "false") %></td>
               <td><%= link_to "#{task.name}", task_path(task) %></td>
               <td><%= task.scheduled_complete_date %></td>
-              <td><%= link_to '中止', add_canceled_list_task_path(task) %>
+              <td><%= link_to '中止', add_canceled_list_task_path(task), data: { confirm: "「#{task.name}」を中止リストに移動してよろしいですか？" } %></td>
               <td><%= link_to '削除', task_path(task), method: :delete, data: { confirm: "「#{task.name}」を削除してよろしいですか？" } %></td>
             </tr>
           <% end %>
@@ -81,6 +81,7 @@
           <tr>
             <td><%= link_to "#{task.name}", task_path(task) %></td>
             <td><%= task.scheduled_complete_date %></td>
+            <td><%= link_to '復活', revive_from_canceled_list_task_path(task), data: { confirm: "「#{task.name}」を復活してよろしいですか？"} %>
             <td><%= link_to '削除', task_path(task), method: :delete, data: { confirm: "「#{task.name}」を削除してよろしいですか？" } %></td>
           </tr>
         <% end %>

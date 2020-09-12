@@ -1,5 +1,5 @@
 class TasksController < Leads::ApplicationController
-  before_action :set_task, only: %i(show edit update destroy add_canceled_list)
+  before_action :set_task, only: %i(show edit update destroy add_canceled_list revive_from_canceled_list)
   #before_action :set_lead_and_user_by_lead_id
   before_action :set_step, only: %i(index new create)
   before_action :set_step_in_add_delete_list, only: %i(edit_add_delete_list update_add_delete_list)
@@ -103,8 +103,12 @@ class TasksController < Leads::ApplicationController
   end
 
   def add_canceled_list
-    flash[:danger] = "#{@task.name}を中止リストに追加します"
     @task.update_attribute(:status, "canceled")
+    redirect_to step_tasks_url(@step)
+  end
+
+  def revive_from_canceled_list
+    @task.update_attribute(:status, "not_yet")
     redirect_to step_tasks_url(@step)
   end
 
