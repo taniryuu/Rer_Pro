@@ -41,7 +41,8 @@ Rails.application.routes.draw do
       resources :tasks do
         member do
           get 'add_canceled_list'
-          get 'revive_from_canceled_list'
+          get 'edit_revive_from_canceled_list'
+          patch 'update_revive_from_canceled_list'
         end
       end
     end

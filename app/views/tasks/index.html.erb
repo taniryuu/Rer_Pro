@@ -1,11 +1,5 @@
-<html>
-  <% provide(:title, 'New task') %>
   <% provide(:class_text, 'task--new') %>
   <% provide(:button_text, '作成') %>
-  <head>
-    <title>マウスクリックで詳細表示</title>
-  </head>
-  <body>
     <h1>タスク一覧 </h1>
     <h3>To Do リスト</h3>
     <table>
@@ -81,18 +75,15 @@
           <tr>
             <td><%= link_to "#{task.name}", task_path(task) %></td>
             <td><%= task.scheduled_complete_date %></td>
-            <td><%= link_to '復活', revive_from_canceled_list_task_path(task), data: { confirm: "「#{task.name}」を復活してよろしいですか？"} %>
+            <td><%= link_to '復活', edit_revive_from_canceled_list_task_path(task), remote: true, data: { confirm: "「#{task.name}」を復活してよろしいですか？"} %>
             <td><%= link_to '削除', task_path(task), method: :delete, data: { confirm: "「#{task.name}」を削除してよろしいですか？" } %></td>
           </tr>
         <% end %>
       </tbody>
     </table>
 
-    <!--%= link_to '新規作成', new_lead_step_task_path(@lead,@step) %-->
+    <!--モーダルウインドウ表示-->
+    <div id="edit-revive-from-canceled-list" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>
 
-    <!--%= link_to '新規作成', new_step_task_path(@step) %-->
 
-
-  </body>
-</html>
 

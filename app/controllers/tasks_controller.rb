@@ -1,8 +1,10 @@
 class TasksController < Leads::ApplicationController
-  before_action :set_task, only: %i(show edit update destroy add_canceled_list revive_from_canceled_list)
-  #before_action :set_lead_and_user_by_lead_id
+  before_action :set_task, only: %i(show edit update destroy add_canceled_list edit_revive_from_canceled_list update_revive_from_canceled_list)
+  #before_action :set_lead_and_user_by_lead_id, only: %i(index)
   before_action :set_step, only: %i(index new create)
   before_action :set_step_in_add_delete_list, only: %i(edit_add_delete_list update_add_delete_list)
+  before_action :correct_user, except: %i(index show)
+
 
   def index
     @tasks = @step.tasks.where(status: "not_yet").order(:scheduled_complete_date)
@@ -23,6 +25,9 @@ class TasksController < Leads::ApplicationController
 
   def create
     @task = Task.new(task_params)
+    if day_is_older_than_now(@task.scheduled_complete_date)
+      flash[:danger] = "完了予定日に過去の日付を入力しようとしています。"
+    end
     respond_to do |format|
       if @task.save && update_completed_tasks_rate(@step)
         format.html { redirect_to step_tasks_path(@step), notice: 'Task was successfully created.' }
@@ -38,6 +43,15 @@ class TasksController < Leads::ApplicationController
   def update
     respond_to do |format|
       if @task.update(task_params) && update_completed_tasks_rate(@step)
+        if day_is_older_than_now(@task.scheduled_complete_date)
+          if !@task.completed_date.blank? && day_is_older_than_now(@task.completed_date)
+            flash[:danger] = "完了予定日と完了日に過去の日付を入力しようとしています。"
+          else
+            flash[:danger] = "完了予定日に過去の日付を入力しようとしています。"
+          end
+        elsif !@task.completed_date.blank? && day_is_older_than_now(@task.completed_date)
+          flash[:danger] = "完了日に過去の日付を入力しようとしています。"
+        end
         format.html { redirect_to step_tasks_path(@step), notice: 'Task was successfully updated.' }
         format.json { render :show, status: :ok, location: step_tasks_path(@step) }
       else
@@ -107,33 +121,52 @@ class TasksController < Leads::ApplicationController
     redirect_to step_tasks_url(@step)
   end
 
-  def revive_from_canceled_list
-    @task.update_attribute(:status, "not_yet")
-    redirect_to step_tasks_url(@step)
+  def edit_revive_from_canceled_list
+  end
+
+  def update_revive_from_canceled_list
+    if @task.update_attributes(revive_from_canceled_list_params)
+      if day_is_older_than_now(@task.scheduled_complete_date)
+        flash[:danger] = "完了予定日に過去の日付を入力しようとしています。"
+      end
+      @task.update_attribute(:status, "not_yet")
+    else
+      flash[:danger] = "#{@task.name}の更新は失敗しました。" + @task.errors.full_messages[0]
+    end
+      redirect_to step_tasks_url(@step)
   end
 
   private
     def set_task
       @task = Task.find(params[:id])
       @step = Step.find(@task.step_id)
+      @lead = Lead.find(@step.lead_id)
+      @user = User.find(@lead.user_id)
     end
  
     def set_step
       @step = Step.find(params[:step_id])
-      #@step = Step.find(@task.step_id)
+      @lead = Lead.find(@step.lead_id)
+      @user = User.find(@lead.user_id)
     end
 
     def set_step_in_add_delete_list
       @step = Step.find(params[:id])
+      @lead = Lead.find(@step.lead_id)
+      @user = User.find(@lead.user_id)
     end
-
-    #Use callbacks to share common setup or constraints between actions.
-    #def set_lead_and_user_by_lead_id
-    #  @lead = Lead.find(params[:lead_id])
-    #  @user = User.find(@lead.user_id)
-    #end   
 
     def task_params
       params.require(:task).permit(:step_id, :name, :memo, :status, :scheduled_complete_date, :completed_date, :canceled_date)
-    end 
+    end
+
+    def revive_from_canceled_list_params
+      params.require(:task).permit(:scheduled_complete_date)
+    end
+ 
+    def day_is_older_than_now(day)
+      day[0, 4].to_i * 10_000 + day[5, 2].to_i * 100 + day[8, 2].to_i < Date.current.year * 10_000 + Date.current.month * 100 + Date.current.day 
+    end
+
+
 end
