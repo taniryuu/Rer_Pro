@@ -1,9 +1,12 @@
 class TasksController < Leads::ApplicationController
+  #include AjaxHelper
   before_action :set_task, only: %i(show edit update destroy add_canceled_list edit_revive_from_canceled_list update_revive_from_canceled_list)
   #before_action :set_lead_and_user_by_lead_id, only: %i(index)
   before_action :set_step, only: %i(index new create)
-  before_action :set_step_in_add_delete_list, only: %i(edit_add_delete_list update_add_delete_list)
+  before_action :set_step_by_id, only: %i(edit_add_delete_list update_add_delete_list edit_check_status_1 update_check_status_1)
   before_action :correct_user, except: %i(index show)
+
+  
 
 
   def index
@@ -102,7 +105,17 @@ class TasksController < Leads::ApplicationController
   def add_canceled_list
     @task.update_attribute(:status, "canceled")
     @task.update_attribute(:canceled_date, Date.current.strftime("%Y-%m-%d"))
-    redirect_to step_tasks_url(@step)
+    if check_status
+      #respond_to do |format|
+        #format.js { render ajax_redirect_to(tasks_edit_check_status_1_step_path(@step)) }
+      #format.js { redirect_to tasks_edit_check_status_1_step_path(@step) }
+      #redirect_to tasks_edit_check_status_1_step_path(@step), format: 'js'
+      #end
+      #render :js => "window.location = '/tasks/edit_check_status_1'"
+      redirect_to tasks_edit_check_status_1_step_path(@step)
+    else
+      redirect_to step_tasks_url(@step)
+    end
   end
 
   def edit_revive_from_canceled_list
@@ -120,6 +133,13 @@ class TasksController < Leads::ApplicationController
     redirect_to step_tasks_url(@step)
   end
 
+  def edit_check_status_1
+  end
+
+  def update_check_status_1
+  end
+
+
   private
     def set_task
       @task = Task.find(params[:id])
@@ -134,7 +154,7 @@ class TasksController < Leads::ApplicationController
       @user = User.find(@lead.user_id)
     end
 
-    def set_step_in_add_delete_list
+    def set_step_by_id
       @step = Step.find(params[:id])
       @lead = Lead.find(@step.lead_id)
       @user = User.find(@lead.user_id)
@@ -152,5 +172,10 @@ class TasksController < Leads::ApplicationController
       day.blank? ? false : Date.parse(day) < Date.current
     end
 
+    def check_status
+      @step.tasks.where(status: "not_yet").count == 0 && @step.tasks.where(status: "completed").count == 0
+       
+        #redirect_to tasks_edit_check_status_1_step_path(@step), format: 'js'
+    end
 
 end

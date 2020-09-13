@@ -37,6 +37,8 @@ Rails.application.routes.draw do
       member do
         get 'tasks/edit_add_delete_list'
         post 'tasks/update_add_delete_list'
+        get 'tasks/edit_check_status_1'
+        patch 'tasks/update_check_status_1'
       end
       resources :tasks do
         member do
