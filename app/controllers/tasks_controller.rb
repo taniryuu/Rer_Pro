@@ -149,12 +149,7 @@ class TasksController < Leads::ApplicationController
     end
  
     def day_is_older_than_now(day)
-      if day.blank?
-         false
-      else
-        day_d = Date.parse(day)
-        day_d < Date.current
-      end
+      day.blank? ? false : Date.parse(day) < Date.current
     end
 
 
