@@ -58,10 +58,10 @@
     <h3>済 リスト</h3>
     <table>
       <tbody>
-        <% @deleted_tasks_array.each do |task| %>
+        <% @completed_tasks_array.each do |task| %>
           <tr>
             <td><%= link_to "#{task.name}", task_path(task) %></td>
-            <td><%= task.scheduled_complete_date %></td>
+            <td><%= task.completed_date %></td>
             <td><%= link_to '削除', task_path(task), method: :delete, data: { confirm: "「#{task.name}」を削除してよろしいですか？" } %></td>
           </tr>
         <% end %>
@@ -74,7 +74,7 @@
         <% @canceled_tasks_array.each do |task| %>
           <tr>
             <td><%= link_to "#{task.name}", task_path(task) %></td>
-            <td><%= task.scheduled_complete_date %></td>
+            <td><%= task.canceled_date %></td>
             <td><%= link_to '復活', edit_revive_from_canceled_list_task_path(task), remote: true, data: { confirm: "「#{task.name}」を復活してよろしいですか？"} %>
             <td><%= link_to '削除', task_path(task), method: :delete, data: { confirm: "「#{task.name}」を削除してよろしいですか？" } %></td>
           </tr>

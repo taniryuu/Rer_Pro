@@ -8,8 +8,8 @@ class TasksController < Leads::ApplicationController
 
   def index
     @tasks = @step.tasks.where(status: "not_yet").order(:scheduled_complete_date)
-    @deleted_tasks_array = @step.tasks.where(status: "completed").order(:scheduled_complete_date)
-    @canceled_tasks_array = @step.tasks.where(status: "canceled").order(:scheduled_complete_date)
+    @completed_tasks_array = @step.tasks.where(status: "completed").order(:completed_date)
+    @canceled_tasks_array = @step.tasks.where(status: "canceled").order(:canceled_date)
     @task = @step.tasks.new
   end
 
@@ -43,13 +43,11 @@ class TasksController < Leads::ApplicationController
   def update
     respond_to do |format|
       if @task.update(task_params) && update_completed_tasks_rate(@step)
-        if day_is_older_than_now(@task.scheduled_complete_date)
-          if !@task.completed_date.blank? && day_is_older_than_now(@task.completed_date)
-            flash[:danger] = "完了予定日と完了日に過去の日付を入力しようとしています。"
-          else
-            flash[:danger] = "完了予定日に過去の日付を入力しようとしています。"
-          end
-        elsif !@task.completed_date.blank? && day_is_older_than_now(@task.completed_date)
+        if day_is_older_than_now(@task.scheduled_complete_date) && day_is_older_than_now(@task.completed_date)
+          flash[:danger] = "完了予定日と完了日に過去の日付を入力しようとしています。"
+        elsif day_is_older_than_now(@task.scheduled_complete_date)
+          flash[:danger] = "完了予定日に過去の日付を入力しようとしています。"
+        elsif day_is_older_than_now(@task.completed_date)
           flash[:danger] = "完了日に過去の日付を入力しようとしています。"
         end
         format.html { redirect_to step_tasks_path(@step), notice: 'Task was successfully updated.' }
@@ -86,7 +84,7 @@ class TasksController < Leads::ApplicationController
     end
     n1 = checkbox_array.size
     i2 = 0
-    @deleted_tasks_array = @step.tasks.where(status: "completed").order(:scheduled_complete_date)
+    @completed_tasks_array = @step.tasks.where(status: "completed").order(:completed_date)
 
     n1.times do |i1|
       if checkbox_array[i1] == "true"
@@ -103,6 +101,7 @@ class TasksController < Leads::ApplicationController
 
   def add_canceled_list
     @task.update_attribute(:status, "canceled")
+    @task.update_attribute(:canceled_date, Date.current.strftime("%Y-%m-%d"))
     redirect_to step_tasks_url(@step)
   end
 
@@ -150,7 +149,12 @@ class TasksController < Leads::ApplicationController
     end
  
     def day_is_older_than_now(day)
-      day[0, 4].to_i * 10_000 + day[5, 2].to_i * 100 + day[8, 2].to_i < Date.current.year * 10_000 + Date.current.month * 100 + Date.current.day 
+      if day.blank?
+         false
+      else
+        day_d = Date.parse(day)
+        day_d < Date.current
+      end
     end
 
 
