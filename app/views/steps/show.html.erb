@@ -43,3 +43,46 @@
 <%= link_to 'Task-index', step_tasks_path(@step) %> |
 <%= link_to 'Edit', edit_step_path(@step) %> |
 <%= link_to 'Back', lead_steps_path(@lead) %>
+
+
+<br>
+<br>
+
+
+    <!-- delete modal -->
+    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#step-complete" data-name="<%= @step.name %>" data-id="<%= @step.id %>">
+      完了
+    </button>
+
+<!-- Modal -->
+<div class="modal fade" id="step-complete" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="step-completeLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="step-completeLabel"><span class="step-name"></span>を完了します</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        aaa
+      </div>
+      <div class="modal-footer">
+        iii
+      </div>
+    </div>
+  </div>
+</div>
+
+<script> 
+  $('#step-complete').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget);
+    var id = button.data('id');
+    var name = button.data('name');
+    
+    var modal = $(this);
+    modal.find('.step-id').val(id);
+    modal.find('.step-name').text(name);
+  });
+</script>
+
