@@ -7,9 +7,11 @@
     <%= user.name %>
     <%= link_to "変更", edit_other_user_registration_path(user) %>
     <!-- delete modal -->
-    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#user-delete" data-name="<%= user.name %>" data-id="<%= user.id %>">
-      削除
-    </button>
+    <% unless user.admin? %>
+      <button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#user-delete" data-name="<%= user.name %>" data-id="<%= user.id %>">
+        削除
+      </button>
+    <% end %>
   </p>
 <% end %>
 

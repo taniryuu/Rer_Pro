@@ -18,7 +18,6 @@ class UsersController < Users::ApplicationController
       flash[:success] = "登録に成功しました"
       redirect_to users_url
     else
-      flash.now[:danger] = "登録に失敗しました"
       render :new
     end
   end
@@ -28,17 +27,20 @@ class UsersController < Users::ApplicationController
 
   def destroy
     $DELETE_COMMAND = "Delete".freeze
-    @user = User.find(params[:command])
-    if $DELETE_COMMAND == params[:input_delete] && same_company_id_judge(@user)
-      # 現在はユーザーの持ってる案件の完了日が空文字がない場合に分岐させてます
-      if @user.leads.find_by(completed_date: "").blank?
-        @user.destroy
-        flash[:success] = "成功しました"
+    begin
+      @user = User.find(params[:command])
+      if $DELETE_COMMAND == params[:input_delete] && delete_judge(@user)
+        if @user.leads.find_by(completed_date: "").blank?
+          @user.destroy
+          flash[:success] = "成功しました"
+        else
+          flash[:danger] = "未完了の案件を担当しています。別の担当者に変えてください"
+        end
       else
-        flash[:danger] = "未完了の案件を担当しています。別の担当者に変えてください"
+        flash[:danger] = "正しく入力してください"
       end
-    else
-      flash[:danger] = "正しく入力してください"
+    rescue
+      flash[:danger] = "存在しないユーザーに対する操作を確認しました。"
     end
     redirect_to users_url
   end
