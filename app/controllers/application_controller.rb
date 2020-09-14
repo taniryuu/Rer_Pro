@@ -34,11 +34,7 @@ class ApplicationController < ActionController::Base
   # devise関連
   # ログイン時のリダイレクト先
   def after_sign_in_path_for(resource)
-    if current_user
-      user_path(resource)
-    else
-      root_path
-    end
+    current_user ? user_path(resource) : root_path
   end
 
   # ログアウト時のリダイレクト先
@@ -61,6 +57,7 @@ class ApplicationController < ActionController::Base
       flash[:danger] = "無効なアクセスが確認されました。"
     end
   end
+  
   protected
 
     def configure_permitted_parameters
