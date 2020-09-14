@@ -38,12 +38,14 @@ Rails.application.routes.draw do
         get 'tasks/edit_add_delete_list'
         post 'tasks/update_add_delete_list'
       end
-      resources :tasks
+      resources :tasks do
+        member do
+          get 'add_canceled_list'
+          get 'edit_revive_from_canceled_list'
+          patch 'update_revive_from_canceled_list'
+        end
+      end
     end
-
   end
-
-
-
 
 end
