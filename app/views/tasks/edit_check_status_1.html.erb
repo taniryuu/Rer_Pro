@@ -1,2 +1,17 @@
-<!--モーダルウインドウ表示-->
-<div id="edit-check-status-1" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>
+<% provide(:class_text, 'task--check-status-1') %>
+<% provide(:button_text, '選択') %>
+
+<h3>どちらか選択してください </h3>
+
+<%= form_with(url: tasks_update_check_status_1_step_path(step_id: @step), method: :post, local: true) do |f| %>
+        
+  <%= f.radio_button :status_1, :continue , checked: 'checked' %>
+  <%= f.label :status_1, "この進捗にタスクを追加し、現在の進捗を継続する", value: :continue %>
+  <br>
+  <%= f.radio_button :status_1, :delete %>
+  <%= f.label :status_1, "この進捗を削除する", value: :delete %>
+  <br>
+　<%= f.submit yield(:button_text), class: "btn-#{yield(:class_text)}" %>
+  <% end %>
+</div>
+

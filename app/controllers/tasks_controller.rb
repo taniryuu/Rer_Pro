@@ -1,5 +1,4 @@
 class TasksController < Leads::ApplicationController
-  #include AjaxHelper
   before_action :set_task, only: %i(show edit update destroy add_canceled_list edit_revive_from_canceled_list update_revive_from_canceled_list)
   #before_action :set_lead_and_user_by_lead_id, only: %i(index)
   before_action :set_step, only: %i(index new create)
@@ -46,6 +45,11 @@ class TasksController < Leads::ApplicationController
   def update
     respond_to do |format|
       if @task.update(task_params) && update_completed_tasks_rate(@step)
+        if @task.status == "completed" && @task.completed_date.blank?
+          @task.update_attribute(:completed_date, Date.current.strftime("%Y-%m-%d"))
+        elsif @task.status == "canceled" && @task.canceled_date.blank?
+          @task.update_attribute(:canceled_date, Date.current.strftime("%Y-%m-%d"))
+        end
         if day_is_older_than_now(@task.scheduled_complete_date) && day_is_older_than_now(@task.completed_date)
           flash[:danger] = "完了予定日と完了日に過去の日付を入力しようとしています。"
         elsif day_is_older_than_now(@task.scheduled_complete_date)
@@ -75,8 +79,6 @@ class TasksController < Leads::ApplicationController
   end
 
   def update_add_delete_list
-    today_s = Date.current.strftime("%Y-%m-%d")
-
     checkbox_array = []
     checkbox_array = params[:task][:delete_task]
     n = checkbox_array.size
@@ -95,7 +97,9 @@ class TasksController < Leads::ApplicationController
         i2 += 1
         deleted_tasks.each do |deleted_task|
           deleted_task.update_attribute(:status, "completed")
-          deleted_task.update_attribute(:completed_date, today_s)
+          update_completed_tasks_rate(@step)
+          deleted_task.update_attribute(:completed_date, Date.current.strftime("%Y-%m-%d"))
+          
         end
       end
     end
@@ -104,25 +108,16 @@ class TasksController < Leads::ApplicationController
 
   def add_canceled_list
     @task.update_attribute(:status, "canceled")
+    update_completed_tasks_rate(@step)
     @task.update_attribute(:canceled_date, Date.current.strftime("%Y-%m-%d"))
-    if check_status
-      #respond_to do |format|
-        #format.js { render ajax_redirect_to(tasks_edit_check_status_1_step_path(@step)) }
-      #format.js { redirect_to tasks_edit_check_status_1_step_path(@step) }
-      #redirect_to tasks_edit_check_status_1_step_path(@step), format: 'js'
-      #end
-      #render :js => "window.location = '/tasks/edit_check_status_1'"
-      redirect_to tasks_edit_check_status_1_step_path(@step)
-    else
-      redirect_to step_tasks_url(@step)
-    end
+    check_status
   end
 
   def edit_revive_from_canceled_list
   end
 
   def update_revive_from_canceled_list
-    if @task.update_attributes(revive_from_canceled_list_params)
+    if @task.update_attributes(revive_from_canceled_list_params) && update_completed_tasks_rate(@step)
       if day_is_older_than_now(@task.scheduled_complete_date)
         flash[:danger] = "完了予定日に過去の日付を入力しようとしています。"
       end
@@ -137,6 +132,20 @@ class TasksController < Leads::ApplicationController
   end
 
   def update_check_status_1
+    if params[:status_1] == "continue"
+      task1 = Task.new(step_id: @step.id ,name: "new_task", status: 0, scheduled_complete_date: Date.current.strftime("%Y-%m-%d"))
+      if task1.save && update_completed_tasks_rate(@step)
+        @step.update_attribute(:status, "in_progress")
+        redirect_to step_tasks_url(@step)
+      else
+        flash[:danger] = "新しいタスクの追加に失敗しました"
+        redirect_to step_tasks_url(@step)
+      end
+    else
+      lead_id = @step.lead_id
+      @step.destroy
+      redirect_to lead_steps_url(lead_id)
+    end
   end
 
 
@@ -173,9 +182,12 @@ class TasksController < Leads::ApplicationController
     end
 
     def check_status
-      @step.tasks.where(status: "not_yet").count == 0 && @step.tasks.where(status: "completed").count == 0
-       
-        #redirect_to tasks_edit_check_status_1_step_path(@step), format: 'js'
+      if @step.tasks.where(status: "not_yet").count == 0 && @step.tasks.where(status: "completed").count == 0
+        redirect_to tasks_edit_check_status_1_step_url(@step)
+        #redirect_to tasks_edit_check_status_1_step_path(@step, format: "js")
+      else
+        redirect_to step_tasks_url(@step)
+      end 
     end
 
 end
