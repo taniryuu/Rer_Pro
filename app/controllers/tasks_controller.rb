@@ -1,8 +1,10 @@
 class TasksController < Leads::ApplicationController
-  before_action :set_task, only: %i(show edit update destroy add_canceled_list edit_revive_from_canceled_list update_revive_from_canceled_list)
+  before_action :set_task, only: %i(show edit update destroy add_canceled_list 
+                                    edit_revive_from_canceled_list update_revive_from_canceled_list)
   #before_action :set_lead_and_user_by_lead_id, only: %i(index)
   before_action :set_step, only: %i(index new create)
-  before_action :set_step_by_id, only: %i(edit_add_delete_list update_add_delete_list edit_check_status_1 update_check_status_1)
+  before_action :set_step_by_id, only: %i(edit_add_delete_list update_add_delete_list edit_check_status_1 update_check_status_1
+                                          edit_check_status_2 update_check_status_2 edit_check_status_3 update_check_status_3)
   before_action :correct_user, except: %i(index show)
 
   
@@ -30,49 +32,39 @@ class TasksController < Leads::ApplicationController
     if day_is_older_than_now(@task.scheduled_complete_date)
       flash[:danger] = "完了予定日に過去の日付を入力しようとしています。"
     end
-    respond_to do |format|
-      if @task.save && update_completed_tasks_rate(@step)
-        format.html { redirect_to step_tasks_path(@step), notice: 'Task was successfully created.' }
-        format.json { render :show, status: :created, location: step_tasks_path(@step) }
-      else
-        format.html { render :new }
-        format.json { render json: @task.errors, status: :unprocessable_entity }
-      end
+    if @task.save && update_completed_tasks_rate(@step)
+      redirect_to check_status_and_get_url
+    else
+      render :new 
     end
   end
 
 
   def update
-    respond_to do |format|
-      if @task.update(task_params) && update_completed_tasks_rate(@step)
-        if @task.status == "completed" && @task.completed_date.blank?
-          @task.update_attribute(:completed_date, Date.current.strftime("%Y-%m-%d"))
-        elsif @task.status == "canceled" && @task.canceled_date.blank?
-          @task.update_attribute(:canceled_date, Date.current.strftime("%Y-%m-%d"))
-        end
-        if day_is_older_than_now(@task.scheduled_complete_date) && day_is_older_than_now(@task.completed_date)
-          flash[:danger] = "完了予定日と完了日に過去の日付を入力しようとしています。"
-        elsif day_is_older_than_now(@task.scheduled_complete_date)
-          flash[:danger] = "完了予定日に過去の日付を入力しようとしています。"
-        elsif day_is_older_than_now(@task.completed_date)
-          flash[:danger] = "完了日に過去の日付を入力しようとしています。"
-        end
-        format.html { redirect_to step_tasks_path(@step), notice: 'Task was successfully updated.' }
-        format.json { render :show, status: :ok, location: step_tasks_path(@step) }
-      else
-        format.html { render :edit }
-        format.json { render json: @task.errors, status: :unprocessable_entity }
+    if @task.update(task_params) && update_completed_tasks_rate(@step)
+      if @task.status == "completed" && @task.completed_date.blank?
+        @task.update_attribute(:completed_date, Date.current.strftime("%Y-%m-%d"))
+      elsif @task.status == "canceled" && @task.canceled_date.blank?
+        @task.update_attribute(:canceled_date, Date.current.strftime("%Y-%m-%d"))
       end
+      if day_is_older_than_now(@task.scheduled_complete_date) && day_is_older_than_now(@task.completed_date)
+        flash[:danger] = "完了予定日と完了日に過去の日付を入力しようとしています。"
+      elsif day_is_older_than_now(@task.scheduled_complete_date)
+        flash[:danger] = "完了予定日に過去の日付を入力しようとしています。"
+      elsif day_is_older_than_now(@task.completed_date)
+        flash[:danger] = "完了日に過去の日付を入力しようとしています。"
+      end
+      redirect_to check_status_and_get_url
+      #step_tasks_path(@step) and return
+    else
+      render :edit
     end
   end
 
   def destroy
     @task.destroy
     update_completed_tasks_rate(@step)
-    respond_to do |format|
-      format.html { redirect_to step_tasks_path(@step), notice: 'Task was successfully destroyed.' }
-      format.json { head :no_content }
-    end
+    redirect_to check_status_and_get_url
   end
 
   def edit_add_delete_list
@@ -99,18 +91,17 @@ class TasksController < Leads::ApplicationController
           deleted_task.update_attribute(:status, "completed")
           update_completed_tasks_rate(@step)
           deleted_task.update_attribute(:completed_date, Date.current.strftime("%Y-%m-%d"))
-          
         end
       end
     end
-    redirect_to step_tasks_url(@step)
+    redirect_to check_status_and_get_url
   end
 
   def add_canceled_list
     @task.update_attribute(:status, "canceled")
     update_completed_tasks_rate(@step)
     @task.update_attribute(:canceled_date, Date.current.strftime("%Y-%m-%d"))
-    check_status
+    redirect_to check_status_and_get_url
   end
 
   def edit_revive_from_canceled_list
@@ -125,7 +116,7 @@ class TasksController < Leads::ApplicationController
     else
       flash[:danger] = "#{@task.name}の更新は失敗しました。" + @task.errors.full_messages[0]
     end
-    redirect_to step_tasks_url(@step)
+    redirect_to check_status_and_get_url
   end
 
   def edit_check_status_1
@@ -148,7 +139,41 @@ class TasksController < Leads::ApplicationController
     end
   end
 
+  def edit_check_status_2
+  end
 
+  def update_check_status_2
+    if params[:status_2] == "completed"
+      max_date = @step.tasks.where(status: "completed").maximum(:completed_date)
+      @step.update_attributes(completed_date: max_date, status: "completed")
+      redirect_to lead_steps_url(@step)
+    else
+      task2 = Task.new(step_id: @step.id ,name: "new_task", status: 0, scheduled_complete_date: Date.current.strftime("%Y-%m-%d"))
+      if task2.save && update_completed_tasks_rate(@step)
+        @step.update_attribute(:status, "in_progress")
+      else
+        flash[:danger] = "新しいタスクの追加に失敗しました"
+      end
+      redirect_to step_tasks_url(@step)
+    end
+  end
+
+  def edit_check_status_3
+  end
+
+  def update_check_status_3
+    case params[:status_3]
+    when "not_yet"
+      @step.update_attribute(:status, "not_yet")
+    when "in_progress"
+      @step.update_attribute(:status, "in_progress")
+    when "inactive"
+      @step.update_attribute(:status, "inactive")
+    else
+      @step.tasks.where(status: "not_yet").update_all(status: "completed")
+    end
+    redirect_to check_status_and_get_url
+  end
   private
     def set_task
       @task = Task.find(params[:id])
@@ -181,12 +206,16 @@ class TasksController < Leads::ApplicationController
       day.blank? ? false : Date.parse(day) < Date.current
     end
 
-    def check_status
+    def check_status_and_get_url
       if @step.tasks.where(status: "not_yet").count == 0 && @step.tasks.where(status: "completed").count == 0
-        redirect_to tasks_edit_check_status_1_step_url(@step)
+        tasks_edit_check_status_1_step_url(@step)
         #redirect_to tasks_edit_check_status_1_step_path(@step, format: "js")
+      elsif @step.tasks.where(status: "not_yet").count == 0 && @step.tasks.where(status: "completed").count >= 1
+        tasks_edit_check_status_2_step_url(@step)
+      elsif @step.tasks.where(status: "not_yet").count >= 1 && @step.status == "completed"
+        tasks_edit_check_status_3_step_url(@step)
       else
-        redirect_to step_tasks_url(@step)
+        step_tasks_url(@step)
       end 
     end
 

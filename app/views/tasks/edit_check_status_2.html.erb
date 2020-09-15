@@ -1,0 +1,17 @@
+<% provide(:class_text, 'task--check-status-2') %>
+<% provide(:button_text, '選択') %>
+
+<h3>どちらか選択してください </h3>
+
+<%= form_with(url: tasks_update_check_status_2_step_path(step_id: @step), method: :post, local: true) do |f| %>
+
+  <%= f.radio_button :status_2, :completed , checked: 'checked' %>
+  <%= f.label :status_2, "「完了」タスクのうち最も遅い完了日を、進捗の完了日とし、現在の進捗を完了する", value: :continue %>
+  <br>
+  <%= f.radio_button :status_2, :continue %>
+  <%= f.label :status_2, "この進捗にタスクを追加し、現在の進捗を継続する", value: :delete %>
+  <br>
+　<%= f.submit yield(:button_text), class: "btn-#{yield(:class_text)}" %>
+  <% end %>
+</div>
+
