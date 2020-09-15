@@ -171,6 +171,7 @@ class TasksController < Leads::ApplicationController
       @step.update_attribute(:status, "inactive")
     else
       @step.tasks.where(status: "not_yet").update_all(status: "completed")
+      update_completed_tasks_rate(@step)
     end
     redirect_to check_status_and_get_url
   end
