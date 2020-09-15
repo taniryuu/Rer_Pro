@@ -31,21 +31,19 @@ Rails.application.routes.draw do
       member do
         get 'edit_status' => 'steps/step_statuses#edit', as: :edit_statuses_of
         patch 'complete' => 'steps/step_statuses#complete', as: :complete
-        patch 'restart' => 'steps/step_statuses#restart', as: :restart
+        patch 'start' => 'steps/step_statuses#start', as: :start
         patch 'cancel' => 'steps/step_statuses#cancel', as: :cancel
       end
       member do
         get 'tasks/edit_add_delete_list'
         post 'tasks/update_add_delete_list'
       end
-      resources :tasks do
-        member do
-          get 'add_canceled_list'
-          get 'edit_revive_from_canceled_list'
-          patch 'update_revive_from_canceled_list'
-        end
-      end
+      resources :tasks
     end
+
   end
+
+
+
 
 end

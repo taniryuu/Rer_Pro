@@ -23,4 +23,13 @@ class Leads::ApplicationController < ApplicationController
     return not_yet_num > 0 ? 100 * completed_num / (completed_num + not_yet_num) : 0
   end
   
+  # 本日付で完了処理を行う。statusカラムとcompleted_dateカラムが必要。
+  def complete(model)
+    if model.update_attributes(status: "completed", completed_date: "#{Date.current}")
+      flash[:success] = "完了しました"
+    else
+      flash[:danger] = "完了処理に失敗しました。システム管理者にご連絡ください。"
+    end
+  end
+  
 end

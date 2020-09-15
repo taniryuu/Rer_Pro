@@ -1,6 +1,6 @@
 class StepsController < Leads::ApplicationController
   # オブジェクトの準備
-  before_action :set_step, only: %i(show edit update destroy)
+  before_action :set_step, except: %i(index new create)
   before_action :set_lead_and_user_by_lead_id, only: %i(index new create)
   # フィルター（アクセス権限）
   before_action :same_company_id
@@ -12,12 +12,13 @@ class StepsController < Leads::ApplicationController
   # GET /steps
   # GET /steps.json
   def index
-    @steps = @lead.steps.all.order(:order)
+    @steps = @lead.steps.all
   end
 
   # GET /steps/1
   # GET /steps/1.json
   def show
+    @steps_from_now_on = @lead.steps.where(status: ["not_yet", "in_progress"])
   end
 
   # GET /steps/new
