@@ -74,9 +74,8 @@
       </div>
       <div class="modal-body">
         <% if @steps_from_now_on.present? %>
-          <%= link_to "新しく作成する場合はこちら", new_lead_step_path(@lead, completed_id: @step.id), class: "pull-right" %>
+          未完了の進捗一覧<br>
           <table class="table table-hover" id="table-shops">
-            未完了の進捗一覧
             <tbody>
               <% @steps_from_now_on.each do |step| %>
                 <tr>
@@ -97,6 +96,7 @@
               <% end %>
             </tbody>
           </table>
+          <%= link_to "新しく作成する場合はこちら", new_lead_step_path(@lead, completed_id: @step.id), class: "pull-right" %>
         <% else %>
           <%= link_to "新たに次の進捗を作成して進む", new_lead_step_path(@lead, completed_id: @step.id), class: "btn btn-primary btn-lg" %>
           <br><br>

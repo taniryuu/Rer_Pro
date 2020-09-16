@@ -24,6 +24,7 @@ class StepsController < Leads::ApplicationController
   # GET /steps/new
   def new
     @step = @lead.steps.new
+    @completed_step = Step.find(params[:completed_id]) if params[:completed_id].present?
   end
 
   # GET /steps/1/edit
@@ -34,13 +35,26 @@ class StepsController < Leads::ApplicationController
   # POST /steps.json
   def create
     @step = @lead.steps.new(step_params)
-    respond_to do |format|
+    completed_id = params[:step][:completed_id]
+    if completed_id.present?
       if save_and_errors_of(@step).blank?
-        format.html { redirect_to @step, notice: 'Step was successfully created.' }
-        format.json { render :show, status: :created, location: @step }
+        @completed_step = Step.find(completed_id) # save_and_errors_ofメソッドの後で定義する。さもないと、上の行で順序が変更になった際にcompleteメソッドでエラーを吐く。
+        complete(@completed_step)
+        flash[:success] = "#{@completed_step.name}を完了し、#{@step.name}を開始しました。"
+        redirect_to @step
       else
-        format.html { render :new }
-        format.json { render json: @step.errors, status: :unprocessable_entity }
+        @completed_step = Step.find(completed_id) # 完了処理が終わっていないので改めてオブジェクトを渡す。
+        render :new
+      end
+    else
+      respond_to do |format|
+        if save_and_errors_of(@step).blank?
+          format.html { redirect_to @step, notice: 'Step was successfully created.' }
+          format.json { render :show, status: :created, location: @step }
+        else
+          format.html { render :new }
+          format.json { render json: @step.errors, status: :unprocessable_entity }
+        end
       end
     end
   end
@@ -93,7 +107,9 @@ class StepsController < Leads::ApplicationController
     def save_and_errors_of(step)
       errors = []
       ActiveRecord::Base.transaction do
+#        debugger
         prepare_order(@lead.steps.count + 1, step.order)
+#        debugger
         unless step.save
           errors << step.errors.full_messages
         end
@@ -124,21 +140,20 @@ class StepsController < Leads::ApplicationController
     
     # 〇番(pre_order)だったデータを避難し、×番(new_order)を空けておく処理
     def prepare_order(pre_order, new_order)
-      unless pre_order == new_order
+      unless pre_order == new_order || pre_order.blank? || new_order.blank?
         # Updateの場合、pre_orderを最大値+1に一時避難
-        # debugger
         @lead.steps.find_by(order: pre_order).update_attribute(:order, @lead.steps.count + 1) unless @step.new_record?
         if pre_order < new_order
           # (pre_order + 1)..new_orderを前にずらす処理
           ((pre_order + 1)..new_order).each do |order_num|
-            step = @lead.steps.find_by(order: order_num)
-            step.update_attribute(:order, order_num - 1)
+            back_step = @lead.steps.find_by(order: order_num)
+            back_step.update_attribute(:order, order_num - 1)
           end
         else
           # new_order..(pre_order - 1)の順番を後ろにずらす処理
           (new_order..(pre_order - 1)).reverse_each do |order_num|
-            step = @lead.steps.find_by(order: order_num)
-            step.update_attribute(:order, order_num + 1)
+            next_step = @lead.steps.find_by(order: order_num)
+            next_step.update_attribute(:order, order_num + 1)
           end
         end
       end

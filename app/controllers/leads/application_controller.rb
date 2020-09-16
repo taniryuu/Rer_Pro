@@ -11,10 +11,12 @@ class Leads::ApplicationController < ApplicationController
   
   # stepのタスク達成率を更新
   def update_completed_tasks_rate(step)
-    not_yet_tasks_num = step.tasks.where(status: "not_yet").count
-    completed_tasks_num = step.tasks.where(status: "completed").count
-    new_rate = step.completed_date.present? ? 100 : calculate_rate(completed_tasks_num, not_yet_tasks_num)
-    step.update_attribute(:completed_tasks_rate, new_rate)
+    if step.id.present?
+      not_yet_tasks_num = step.tasks.where(status: "not_yet").count
+      completed_tasks_num = step.tasks.where(status: "completed").count
+      new_rate = step.completed_date.present? ? 100 : calculate_rate(completed_tasks_num, not_yet_tasks_num)
+      step.update_attribute(:completed_tasks_rate, new_rate)
+    end
   end
   
   # 計算メソッド
@@ -23,12 +25,16 @@ class Leads::ApplicationController < ApplicationController
     return not_yet_num > 0 ? 100 * completed_num / (completed_num + not_yet_num) : 0
   end
   
-  # 本日付で完了処理を行う。statusカラムとcompleted_dateカラムが必要。
-  def complete(model)
-    if model.update_attributes(status: "completed", completed_date: "#{Date.current}")
+  # 本日付で完了処理を行う。
+  def complete(step)
+#    debugger
+    if step.update_attributes(status: "completed", completed_date: "#{Date.current}", completed_tasks_rate: 100)
       flash[:success] = "完了しました"
+      true
     else
+    debugger
       flash[:danger] = "完了処理に失敗しました。システム管理者にご連絡ください。"
+      false
     end
   end
   

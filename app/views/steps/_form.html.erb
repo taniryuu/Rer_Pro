@@ -1,15 +1,5 @@
 <%= form_with(model: [lead, step], local: true) do |form| %>
-  <% if step.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(step.errors.count, "error") %> prohibited this step from being saved:</h2>
-
-      <ul>
-      <% step.errors.full_messages.each do |message| %>
-        <li><%= message %></li>
-      <% end %>
-      </ul>
-    </div>
-  <% end %>
+  <%= render 'devise/shared/error_messages', resource: @step %>
 
   <div class="field">
     <%= form.label :name %>
@@ -29,22 +19,42 @@
 
 ----------------------------------------------------------------
 
-  <div class="field">
-    <%= form.label :status %>
-    <%= form.select :status, Step.statuses.keys.map { |k| [I18n.t("enums.step.status.#{k}"), k]} %>
-  </div>
+  <% if @completed_step.present? %>
 
-  <%#date_selectを使うと「undefined method `day' for "":String」エラーになるため、date_fieldを使用中 %>
-  <div class="field">
-    <%= form.label :scheduled_complete_date %>
-    <%= form.date_field :scheduled_complete_date, value: step.scheduled_complete_date %>
-  </div>
+    <%= form.hidden_field :completed_id, value: @completed_step.id %>
 
-  <div class="field">
-    <%= form.label :completed_date %>
-    <%= form.date_field :completed_date, value: step.completed_date %>
-  </div>
-  ↑ 完了済の進捗の場合、入力必須<br>
+    <div class="field">
+      <%= form.label :status %>：進捗中
+      <%= form.hidden_field :status, value: "in_progress" %>
+    </div>
+  
+    <div class="field">
+      <%= form.label :scheduled_complete_date %>
+      <%= form.date_field :scheduled_complete_date, value: step.scheduled_complete_date %>
+      （入力必須）
+    </div>
+  
+  <% else %>
+  
+    <div class="field">
+      <%= form.label :status %>
+      <%= form.select :status, Step.statuses.keys.map { |k| [I18n.t("enums.step.status.#{k}"), k]} %>
+    </div>
+  
+    <%#date_selectを使うと「undefined method `day' for "":String」エラーになるため、date_fieldを使用中 %>
+    <div class="field">
+      <%= form.label :scheduled_complete_date %>
+      <%= form.date_field :scheduled_complete_date, value: step.scheduled_complete_date %>
+      ↑ 進捗中の進捗の場合、入力必須<br>
+    </div>
+  
+    <div class="field">
+      <%= form.label :completed_date %>
+      <%= form.date_field :completed_date, value: step.completed_date %>
+      ↑ 完了済の進捗の場合、入力必須<br>
+    </div>
+    
+  <% end %>
 ----------------------------------------------------------------<br>
 ここで一緒にタスクを追加、編集できると良い。<br>
 ----------------------------------------------------------------<br>

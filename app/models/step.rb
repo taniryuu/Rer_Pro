@@ -7,7 +7,7 @@ class Step < ApplicationRecord
   validates :memo, length: { in: 0..400 }
   validates :order, presence: true, uniqueness: { scope: :lead_id }, 
                     numericality: {only_integer: true, greater_than_or_equal_to: 1}
-  validate :order_is_serial_number
+#  validate :order_is_serial_number, on: [:create, :update]
   validates :status, presence: true
   validates :scheduled_complete_date, presence: true, length: { in: 0..32 }, if: -> { status == "in_progress" }
   validates :completed_date, presence: true, length: { in: 0..32 }, if: -> { status == "completed" }
@@ -18,7 +18,8 @@ class Step < ApplicationRecord
   def order_is_serial_number
     steps_of_same_lead = Step.where(lead_id: self.lead_id)
     if steps_of_same_lead.present?
-      unless steps_of_same_lead.pluck(:order).max <= steps_of_same_lead.count + 1 
+      unless steps_of_same_lead.pluck(:order).max <= steps_of_same_lead.count + 1
+        debugger
         errors.add(:order, "が「1から始まる連番」になっていません。")
       end
     end
