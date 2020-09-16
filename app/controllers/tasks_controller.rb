@@ -3,8 +3,8 @@ class TasksController < Leads::ApplicationController
                                     edit_revive_from_canceled_list update_revive_from_canceled_list)
   #before_action :set_lead_and_user_by_lead_id, only: %i(index)
   before_action :set_step, only: %i(index new create)
-  before_action :set_step_by_id, only: %i(edit_add_delete_list update_add_delete_list edit_check_status_1 update_check_status_1
-                                          edit_check_status_2 update_check_status_2 edit_check_status_3 update_check_status_3)
+  before_action :set_step_by_id, only: [:edit_add_delete_list, :update_add_delete_list, :edit_check_status_1, :update_check_status_1,
+                                        :edit_check_status_2, :update_check_status_2, :edit_check_status_3, :update_check_status_3]
   before_action :correct_user, except: %i(index show)
 
   
@@ -42,11 +42,8 @@ class TasksController < Leads::ApplicationController
 
   def update
     if @task.update(task_params) && update_completed_tasks_rate(@step)
-      if @task.status == "completed" && @task.completed_date.blank?
-        @task.update_attribute(:completed_date, Date.current.strftime("%Y-%m-%d"))
-      elsif @task.status == "canceled" && @task.canceled_date.blank?
-        @task.update_attribute(:canceled_date, Date.current.strftime("%Y-%m-%d"))
-      end
+      @task.if_date_blank_then_today("completed")
+      @task.if_date_blank_then_today("canceled")
       if day_is_older_than_now(@task.scheduled_complete_date) && day_is_older_than_now(@task.completed_date)
         flash[:danger] = "完了予定日と完了日に過去の日付を入力しようとしています。"
       elsif day_is_older_than_now(@task.scheduled_complete_date)
@@ -122,8 +119,11 @@ class TasksController < Leads::ApplicationController
   def edit_check_status_1
   end
 
+  #タスク操作後、進捗に「未」のタスクが無く、かつ「完了」のタスクも無い場合
   def update_check_status_1
+    #１行目のラジオボタンを選択したとき
     if params[:status_1] == "continue"
+      #この進捗に「完了予定日」が本日で、statusが「未」の新しいタスクを追加し、現在の進捗を「進捗中」とする
       task1 = Task.new(step_id: @step.id ,name: "new_task", status: 0, scheduled_complete_date: Date.current.strftime("%Y-%m-%d"))
       if task1.save && update_completed_tasks_rate(@step)
         @step.update_attribute(:status, "in_progress")
@@ -132,7 +132,9 @@ class TasksController < Leads::ApplicationController
         flash[:danger] = "新しいタスクの追加に失敗しました"
         redirect_to step_tasks_url(@step)
       end
+    #２行目のラジオボタンを選択したとき
     else
+      #この進捗を削除する
       lead_id = @step.lead_id
       @step.destroy
       redirect_to lead_steps_url(lead_id)
@@ -142,12 +144,17 @@ class TasksController < Leads::ApplicationController
   def edit_check_status_2
   end
 
+  #タスク操作後、進捗に「未」のタスクが無く、かつ「完了」のタスクが１つ以上ある場合
   def update_check_status_2
+    # １行目のラジオボタンを選択したとき
     if params[:status_2] == "completed"
+      #stautsが「完了」のタスクの中でもっとも遅い「完了日」をこの進捗の完了日とし、現在の進捗を「完了」とする
       max_date = @step.tasks.where(status: "completed").maximum(:completed_date)
       @step.update_attributes(completed_date: max_date, status: "completed")
       redirect_to lead_steps_url(@step)
+    # ２行目のラジオボタンと選択したとき
     else
+      #この進捗に「完了予定日」が本日で、statusが「未」の新しいタスクを追加し、現在の進捗を「進捗中」とする
       task2 = Task.new(step_id: @step.id ,name: "new_task", status: 0, scheduled_complete_date: Date.current.strftime("%Y-%m-%d"))
       if task2.save && update_completed_tasks_rate(@step)
         @step.update_attribute(:status, "in_progress")
@@ -161,15 +168,24 @@ class TasksController < Leads::ApplicationController
   def edit_check_status_3
   end
 
+  #タスク操作後、進捗に「未」のタスクがあるにも関わらず、進捗のstatusが「完了」の場合
   def update_check_status_3
     case params[:status_3]
+    #１行目のラジオボタンを選択したとき
     when "not_yet"
+      #現在の進捗を「未」とする
       @step.update_attribute(:status, "not_yet")
+    #２行目のラジオボタンを選択したとき
     when "in_progress"
+      #現在の進捗を「進捗中」とする
       @step.update_attribute(:status, "in_progress")
+    #３行目のラジオボタンを選択したとき
     when "inactive"
+      #現在の進捗を「保留」とする
       @step.update_attribute(:status, "inactive")
+    #４行目のラジオボタンを選択したとき
     else
+      #現在の進捗の「未」のタスクをすべて「完了」とし、その後check_status_2のurlへ飛ぶ
       @step.tasks.where(status: "not_yet").update_all(status: "completed")
       update_completed_tasks_rate(@step)
     end
@@ -207,14 +223,24 @@ class TasksController < Leads::ApplicationController
       day.blank? ? false : Date.parse(day) < Date.current
     end
 
+
     def check_status_and_get_url
+      # タスク操作後、
+      
+      # 進捗に「未」のタスクが無く、かつ「完了」のタスクも無い場合、status_1のurlにリダイレクトする
       if @step.tasks.where(status: "not_yet").count == 0 && @step.tasks.where(status: "completed").count == 0
         tasks_edit_check_status_1_step_url(@step)
         #redirect_to tasks_edit_check_status_1_step_path(@step, format: "js")
+
+      #進捗に「未」のタスクが無く、かつ「完了」のタスクが１つ以上ある場合、status_2のurlにリダイレクトする
       elsif @step.tasks.where(status: "not_yet").count == 0 && @step.tasks.where(status: "completed").count >= 1
         tasks_edit_check_status_2_step_url(@step)
+
+      #進捗に「未」のタスクがあるにも関わらず、進捗のstatusが「完了」の場合、status_3のurlにリダイレクトする
       elsif @step.tasks.where(status: "not_yet").count >= 1 && @step.status == "completed"
         tasks_edit_check_status_3_step_url(@step)
+      
+      #以上いずれでもない場合、tasks#indexにリダイレクトする
       else
         step_tasks_url(@step)
       end 

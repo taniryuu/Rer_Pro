@@ -1,0 +1,17 @@
+<% provide(:class_text, 'revive-from-canceled-list') %>
+<% provide(:button_text, '更新') %>
+
+<h3>完了予定日を入力してください</h3>
+<%= form_with(model: @task, url: update_revive_from_canceled_list_task_path(@task), local: true, method: :patch) do |f| %>
+
+  <%= render partial: 'shared/error_messages' ,locals: {obj: @task} %>
+
+  <%= f.label :name, class: "label-#{yield(:class_text)}" %>
+  <p><%= @task.name %></p>
+
+  <%= f.label :scheduled_complete_date, class: "label-#{yield(:class_text)}" %>
+  <%= f.datetime_local_field :scheduled_complete_date %>
+  <br>
+  <%= f.submit yield(:button_text), class: "btn-#{yield(:class_text)}" %>
+          
+<% end %>
