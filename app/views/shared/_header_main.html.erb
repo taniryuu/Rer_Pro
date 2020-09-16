@@ -1,0 +1,34 @@
+<% if user_signed_in? %>
+  <nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-dark">
+    <%= link_to "Rer Pro", user_path(current_user), class: "navbar-brand mr-auto mr-lg-0" %>
+    <button class="navbar-toggler p-0 border-0" type="button" data-toggle="offcanvas">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="navbar-collapse offcanvas-collapse" id="navbarsExampleDefault">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item"><a class="nav-link active"><%= company_name(current_user) %></a></li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><%= current_user.name %></a>
+          <div class="dropdown-menu" aria-labelledby="dropdown01">
+            <% if current_user.admin? %>
+              <%= link_to "ユーザー一覧", users_path, class: "dropdown-item" %>
+            <% elsif current_user.superior? %>
+              <%= link_to "担当者一覧", users_path, class: "dropdown-item" %>
+            <% else %>
+              <a class="dropdown-item" href="#">担当案件一覧</a>
+            <% end %>
+            <%= link_to "マイアカウント", edit_other_user_registration_path(current_user), class: "dropdown-item" %>
+            <%= link_to "ログアウト", destroy_user_session_path(params[:user_id]), method: :delete, class: "dropdown-item", data: {confirm: "ログアウトしますか？"} %>
+          </div>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">案件一覧</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+<% else %>
+  <nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-dark">
+    <%= link_to "Rer Pro", root_path, class: "navbar-brand mr-auto mr-lg-0" %>
+  </nav>
+<% end %>
