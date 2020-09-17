@@ -1,6 +1,8 @@
 class Lead < ApplicationRecord
   belongs_to :user
   has_many :steps, dependent: :destroy
+  default_scope -> { order(created_date: :desc) }
+  
   validates :created_date, presence: true
   validates :completed_date, presence: true, if: -> { status == "completed" }
   validates :customer_name, presence: true, length: { in: 2..50 }

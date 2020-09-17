@@ -43,3 +43,87 @@
 <%= link_to 'Task-index', step_tasks_path(@step) %> |
 <%= link_to 'Edit', edit_step_path(@step) %> |
 <%= link_to 'Back', lead_steps_path(@lead) %>
+
+
+<br>
+<br>
+
+
+  <!-- change step_status -->
+<% if @step.status == "not_yet" %>
+  <%= form_with(url: start_step_path(@step), model: @step, local: true) do |form| %>
+    <%= form.label :scheduled_complete_date %>
+    <%= form.date_field :scheduled_complete_date, value: @step.scheduled_complete_date %>
+    <%= form.submit "開始", class: "btn btn-primary" %>
+  <% end %>
+<% elsif @step.status == "in_progress" %>
+  <button type="button" class="btn btn-info" data-toggle="modal" data-target="#step-complete" data-name="<%= @step.name %>" data-id="<%= @step.id %>">完了</button>
+<% elsif @step.status == "inactive" %>
+  <button type="button" class="btn btn-info">再開</button>
+<% elsif @step.status == "completed" %>
+  <button type="button" class="btn btn-info">再開</button>
+<% elsif @step.status == "template" %>
+  <button type="button" class="btn btn-info">このテンプレートを使用して新規作成</button>
+<% end %>
+
+<!-- Modal -->
+<div class="modal fade" id="step-complete" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="step-completeLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="step-completeLabel"><span class="step-name"></span>を完了します。次の操作を選択してください。</h5>
+        <button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <% if @steps_from_now_on.present? %>
+          未完了の進捗一覧<br>
+          <table class="table table-hover" id="table-shops">
+            <tbody>
+              <% @steps_from_now_on.each do |step| %>
+                <tr>
+                  <td>Step<%= step.order %></td>
+                  <% if step.status == "not_yet" %>
+                    <td>
+                      <%= form_with(url: start_step_path(step, completed_id: @step.id), model: step, local: true) do |form| %>
+                        <%= form.label :scheduled_complete_date %>
+                        <%= form.date_field :scheduled_complete_date, value: step.scheduled_complete_date %>
+                        <%= form.submit "完了予定日を設定し#{step.name}を開始する", class: "btn btn-primary btn-sm" %>
+                      <% end %>
+                    </td>
+                  <% else %>
+                    <td><%= link_to "#{step.name}を継続(既に開始済)", step_path(step, completed_id: @step.id), class: "btn btn-default btn-sm" %></td>
+                  <% end %>
+                  <td><%= link_to "詳細確認", step_path(step), target: :_blank %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+          <%= link_to "新しく作成する場合はこちら", new_lead_step_path(@lead, completed_id: @step.id), class: "pull-right" %>
+        <% else %>
+          <%= link_to "新たに次の進捗を作成して進む", new_lead_step_path(@lead, completed_id: @step.id), class: "btn btn-primary btn-lg" %>
+          <br><br>
+          <%= link_to "全ての進捗を完了＋案件自体を完了にする", lead_path(@lead, completed_id: @step.id), 
+            data: { confirm: '本案件を全て完了とします。本当によろしいですか？（終了済の扱いになります。）' }, class: "btn btn-info btn-lg pull-right" %>
+        <% end %>
+      </div>
+      <div class="modal-footer">
+        ※まだ進捗は完了していません。
+      </div>
+    </div>
+  </div>
+</div>
+
+<script> 
+  $('#step-complete').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget);
+    var id = button.data('id');
+    var name = button.data('name');
+    
+    var modal = $(this);
+    modal.find('.step-id').val(id);
+    modal.find('.step-name').text(name);
+  });
+</script>
+

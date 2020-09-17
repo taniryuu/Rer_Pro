@@ -15,14 +15,14 @@
             <% elsif current_user.superior? %>
               <%= link_to "担当者一覧", users_path, class: "dropdown-item" %>
             <% else %>
-              <a class="dropdown-item" href="#">担当案件一覧</a>
+              <%= link_to "担当案件一覧", "#", class: "dropdown-item" %>
             <% end %>
             <%= link_to "マイアカウント", edit_other_user_registration_path(current_user), class: "dropdown-item" %>
             <%= link_to "ログアウト", destroy_user_session_path(params[:user_id]), method: :delete, class: "dropdown-item", data: {confirm: "ログアウトしますか？"} %>
           </div>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">案件一覧</a>
+          <%= link_to "案件一覧", leads_path, class: "nav-link active" %>
         </li>
       </ul>
     </div>
