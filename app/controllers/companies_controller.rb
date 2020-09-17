@@ -15,6 +15,7 @@ class CompaniesController < ApplicationController
   # GET /companies/new
   def new
     @company = Company.new
+    @user = User.new
   end
 
   # GET /companies/1/edit
@@ -24,11 +25,19 @@ class CompaniesController < ApplicationController
   # POST /companies
   # POST /companies.json
   def create
-    @company = Company.new(company_params)
-    if @company.save
-      redirect_to company_new_user_registration_path(company_id: @company)
-      flash[:success] = "企業を登録しました。続いて管理者を作成してください。"
-    else
+    begin
+      @company = Company.new(company_params)
+      @user = User.new(user_params)
+      @company[status: "active", admin: false]
+      ActiveRecord::Base.transaction do
+        @user[:company_id] = @company.id if @company.save
+        @user[superior: true, admin: true, superior_id: ""]
+        @user.save!
+        sign_in @user
+        flash[:success] = "新規作成に成功しました"
+        redirect_to user_path(@user)
+      end
+    rescue
       render :new
     end
   end
@@ -65,6 +74,10 @@ class CompaniesController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def company_params
-      params.require(:company).permit(:name, :status)
+      params.require(:company).permit(:name)
+    end
+
+    def user_params
+      params.require(:company).permit(user: [:name, :login_id, :email, :password, :password_confirmation])[:user]
     end
 end
