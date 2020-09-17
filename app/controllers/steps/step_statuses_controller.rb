@@ -10,7 +10,7 @@ class Steps::StepStatusesController < StepsController
     if @step.update_attributes(status: "in_progress", scheduled_complete_date: params[:step][:scheduled_complete_date])
       if params[:completed_id].present?
         completed_step = Step.find(params[:completed_id])
-        complete(completed_step)
+        complete_step(completed_step)
         flash[:success] = "#{completed_step.name}を完了し、#{@step.name}を開始しました。"
       else
         flash[:success] = "#{@step.name}を開始しました。"

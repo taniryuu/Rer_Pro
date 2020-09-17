@@ -100,11 +100,12 @@
         <% else %>
           <%= link_to "新たに次の進捗を作成して進む", new_lead_step_path(@lead, completed_id: @step.id), class: "btn btn-primary btn-lg" %>
           <br><br>
-          <%= link_to "全ての進捗が完了したので、案件自体を完了にする", "#", class: "btn btn-default btn-lg pull-right" %>
+          <%= link_to "全ての進捗を完了＋案件自体を完了にする", lead_path(@lead, completed_id: @step.id), 
+            data: { confirm: '本案件を全て完了とします。本当によろしいですか？（終了済の扱いになります。）' }, class: "btn btn-info btn-lg pull-right" %>
         <% end %>
       </div>
       <div class="modal-footer">
-        iii
+        ※まだ進捗は完了していません。
       </div>
     </div>
   </div>

@@ -25,15 +25,26 @@ class Leads::ApplicationController < ApplicationController
     return not_yet_num > 0 ? 100 * completed_num / (completed_num + not_yet_num) : 0
   end
   
-  # 本日付で完了処理を行う。
-  def complete(step)
-#    debugger
+  # 本日付で案件の完了処理を行う。
+  def complete_lead(lead)
+    if lead.update_attributes(status: "completed", completed_date: "#{Date.current}", steps_rate: 100)
+      flash[:success] = "完了しました"
+      true
+    else
+    debugger
+      flash[:danger] = "案件の完了処理に失敗しました。システム管理者にご連絡ください。"
+      false
+    end
+  end
+  
+  # 本日付で進捗の完了処理を行う。
+  def complete_step(step)
     if step.update_attributes(status: "completed", completed_date: "#{Date.current}", completed_tasks_rate: 100)
       flash[:success] = "完了しました"
       true
     else
     debugger
-      flash[:danger] = "完了処理に失敗しました。システム管理者にご連絡ください。"
+      flash[:danger] = "#{step.name}の完了処理に失敗しました。システム管理者にご連絡ください。"
       false
     end
   end

@@ -18,7 +18,12 @@ class StepsController < Leads::ApplicationController
   # GET /steps/1
   # GET /steps/1.json
   def show
-    @steps_from_now_on = @lead.steps.where(status: ["not_yet", "in_progress"])
+    if params[:completed_id].present?
+      completed_step = Step.find(params[:completed_id])
+      complete_step(completed_step)
+      flash[:success] = "#{completed_step.name}を完了しました。引き続き、#{@step.name}に取り組んでください。"
+    end
+    @steps_from_now_on = @lead.steps.where(status: ["not_yet", "in_progress"]).where.not(id: @step.id)
   end
 
   # GET /steps/new
@@ -39,7 +44,7 @@ class StepsController < Leads::ApplicationController
     if completed_id.present?
       if save_and_errors_of(@step).blank?
         @completed_step = Step.find(completed_id) # save_and_errors_ofメソッドの後で定義する。さもないと、上の行で順序が変更になった際にcompleteメソッドでエラーを吐く。
-        complete(@completed_step)
+        complete_step(@completed_step)
         flash[:success] = "#{@completed_step.name}を完了し、#{@step.name}を開始しました。"
         redirect_to @step
       else

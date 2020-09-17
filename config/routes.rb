@@ -26,6 +26,7 @@ Rails.application.routes.draw do
     member do
       get 'edit_user_id'
       patch 'update_user_id'
+      patch 'complete_all_steps'
     end
     resources :steps do
       member do
