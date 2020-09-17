@@ -1,9 +1,9 @@
 class CompaniesController < ApplicationController
   before_action :set_company, only: [:show, :edit, :update, :destroy]
-  before_action :current_user_admin?, only: %i(show edit update destroy)
   before_action :authenticate_user!, except: %i(new create)
+  before_action :current_user_admin?, only: %i(show edit update destroy)
   before_action :admin_company?, only: %i(index)
-  before_action :same_company?, only: %i(show edit update destroy)
+  before_action :same_company_or_admin_company?, only: %i(show edit update destroy)
 
   # GET /companies
   # GET /companies.json
@@ -47,14 +47,11 @@ class CompaniesController < ApplicationController
   # PATCH/PUT /companies/1
   # PATCH/PUT /companies/1.json
   def update
-    respond_to do |format|
-      if @company.update(company_params)
-        format.html { redirect_to @company, notice: 'Company was successfully updated.' }
-        format.json { render :show, status: :ok, location: @company }
-      else
-        format.html { render :edit }
-        format.json { render json: @company.errors, status: :unprocessable_entity }
-      end
+    if @company.update(company_params)
+      redirect_to @company
+      flash[:success] = "更新しました。"
+    else
+      render :edit
     end
   end
 
@@ -62,38 +59,37 @@ class CompaniesController < ApplicationController
   # DELETE /companies/1.json
   def destroy
     @company.destroy
-    respond_to do |format|
-      format.html { redirect_to companies_url, notice: 'Company was successfully destroyed.' }
-      format.json { head :no_content }
-    end
+    flash[:success] = "削除に成功しました。"
+    redirect_to root_url
   end
 
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_company
-      @company = Company.find(params[:id]).id
+      @company = Company.find(params[:id])
     end
 
     # Only allow a list of trusted parameters through.
     def company_params
-      params.require(:company).permit(:name)
+      params.require(:company).permit(:name, :status)
     end
 
     def user_params
       params.require(:company).permit(user: [:name, :login_id, :email, :password, :password_confirmation, :admin, :superior])[:user]
     end
 
-    def same_company?
-      unless @company == Company.find(current_user.company_id)
-        redirect_to current_user
+    # current_userのCompanyに管理者権限がない場合のアクセス制限
+    def admin_company?
+      unless Company.find(current_user.company_id).admin?
+        redirect_to root_url
         flash[:danger] = "無効なアクセスが確認されました。"
       end
     end
 
-    # Companyに管理者権限がない場合のアクセス制限
-    def admin_company?
-      unless Company.find(current_user.company_id).admin?
-        redirect_to root_url
+    # @companyとログインしたユーザーのcompany_idの一致+Companyの管理者権限を検証
+    def same_company_or_admin_company?
+      unless @company == Company.find(current_user.company_id) || Company.find(current_user.company_id).admin? == true
+        redirect_to current_user
         flash[:danger] = "無効なアクセスが確認されました。"
       end
     end
