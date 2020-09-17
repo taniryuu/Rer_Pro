@@ -1,7 +1,29 @@
 class Leads::ApplicationController < ApplicationController
   before_action :authenticate_user!
   
-    
+  # 本日付で案件の完了処理を実行
+  def complete_lead(lead)
+    if lead.update_attributes(status: "completed", completed_date: "#{Date.current}", steps_rate: 100)
+      flash[:success] = "完了しました"
+      true
+    else
+      flash[:danger] = "案件の完了処理に失敗しました。システム管理者にご連絡ください。"
+      false
+    end
+  end
+  
+  # 本日付で進捗の完了処理を実行
+  def complete_step(lead, step)
+    if step.update_attributes(status: "completed", completed_date: "#{Date.current}", completed_tasks_rate: 100)
+      update_steps_rate(lead)
+      flash[:success] = "完了しました"
+      true
+    else
+      flash[:danger] = "#{step.name}の完了処理に失敗しました。システム管理者にご連絡ください。"
+      false
+    end
+  end
+  
   # leadの進捗率を更新
   def update_steps_rate(lead)
     not_yet_steps_num = lead.steps.where(status: ["not_yet", "in_progress"]).count
@@ -23,30 +45,6 @@ class Leads::ApplicationController < ApplicationController
   # 完了分と未了分から完了した割合を計算し、%を出力
   def calculate_rate(completed_num, not_yet_num)
     return not_yet_num > 0 ? 100 * completed_num / (completed_num + not_yet_num) : 0
-  end
-  
-  # 本日付で案件の完了処理を行う。
-  def complete_lead(lead)
-    if lead.update_attributes(status: "completed", completed_date: "#{Date.current}", steps_rate: 100)
-      flash[:success] = "完了しました"
-      true
-    else
-    debugger
-      flash[:danger] = "案件の完了処理に失敗しました。システム管理者にご連絡ください。"
-      false
-    end
-  end
-  
-  # 本日付で進捗の完了処理を行う。
-  def complete_step(step)
-    if step.update_attributes(status: "completed", completed_date: "#{Date.current}", completed_tasks_rate: 100)
-      flash[:success] = "完了しました"
-      true
-    else
-    debugger
-      flash[:danger] = "#{step.name}の完了処理に失敗しました。システム管理者にご連絡ください。"
-      false
-    end
   end
   
 end

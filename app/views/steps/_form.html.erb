@@ -41,7 +41,6 @@
       <%= form.select :status, Step.statuses.keys.map { |k| [I18n.t("enums.step.status.#{k}"), k]} %>
     </div>
   
-    <%#date_selectを使うと「undefined method `day' for "":String」エラーになるため、date_fieldを使用中 %>
     <div class="field">
       <%= form.label :scheduled_complete_date %>
       <%= form.date_field :scheduled_complete_date, value: step.scheduled_complete_date %>

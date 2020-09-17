@@ -49,9 +49,13 @@
 <br>
 
 
-  <!-- complete modal -->
+  <!-- change step_status -->
 <% if @step.status == "not_yet" %>
-  <button type="button" class="btn btn-info">開始</button>
+  <%= form_with(url: start_step_path(@step), model: @step, local: true) do |form| %>
+    <%= form.label :scheduled_complete_date %>
+    <%= form.date_field :scheduled_complete_date, value: @step.scheduled_complete_date %>
+    <%= form.submit "開始", class: "btn btn-primary" %>
+  <% end %>
 <% elsif @step.status == "in_progress" %>
   <button type="button" class="btn btn-info" data-toggle="modal" data-target="#step-complete" data-name="<%= @step.name %>" data-id="<%= @step.id %>">完了</button>
 <% elsif @step.status == "inactive" %>
