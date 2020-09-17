@@ -88,7 +88,7 @@ class CompaniesController < ApplicationController
 
     # @companyとログインしたユーザーのcompany_idの一致+Companyの管理者権限を検証
     def same_company_or_admin_company?
-      unless @company == Company.find(current_user.company_id) || Company.find(current_user.company_id).admin? == true
+      unless @company == Company.find(current_user.company_id) || Company.find(current_user.company_id).admin?
         redirect_to current_user
         flash[:danger] = "無効なアクセスが確認されました。"
       end
