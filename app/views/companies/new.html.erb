@@ -5,6 +5,8 @@
   <div class="field">
     <%= form.label :name %>
     <%= form.text_field :name %>
+    <%= form.hidden_field :admin, value: false %>
+    <%= form.hidden_field :status, value: "active" %>
   </div>
 
   <h3>管理者登録</h3>
@@ -37,7 +39,8 @@
       <%= f.label :password_confirmation %><br/>
       <%= f.password_field :password_confirmation, autocomplete: "new-password" %>
     </div>
-
+    <%= f.hidden_field :admin, value: true %>
+    <%= f.hidden_field :superior, value: true %>
   <% end %>
   <div class="actions">
     <%= form.submit %>

@@ -1,5 +1,9 @@
 class CompaniesController < ApplicationController
   before_action :set_company, only: [:show, :edit, :update, :destroy]
+  before_action :current_user_admin?, only: %i(show edit update destroy)
+  before_action :authenticate_user!, except: %i(new create)
+  before_action :admin_company?, only: %i(index)
+  before_action :same_company?, only: %i(show edit update destroy)
 
   # GET /companies
   # GET /companies.json
@@ -28,14 +32,12 @@ class CompaniesController < ApplicationController
     begin
       @company = Company.new(company_params)
       @user = User.new(user_params)
-      @company[status: "active", admin: false]
       ActiveRecord::Base.transaction do
-        @user[:company_id] = @company.id if @company.save
-        @user[superior: true, admin: true, superior_id: ""]
+        @user[:company_id] = @company.id if @company.update(admin: false, status: "active")
         @user.save!
         sign_in @user
         flash[:success] = "新規作成に成功しました"
-        redirect_to user_path(@user)
+        redirect_to current_user
       end
     rescue
       render :new
@@ -78,6 +80,21 @@ class CompaniesController < ApplicationController
     end
 
     def user_params
-      params.require(:company).permit(user: [:name, :login_id, :email, :password, :password_confirmation])[:user]
+      params.require(:company).permit(user: [:name, :login_id, :email, :password, :password_confirmation, :admin, :superior])[:user]
+    end
+
+    def same_company?
+      unless @company == Company.find(current_user.company_id)
+        redirect_to current_user
+        flash[:danger] = "無効なアクセスが確認されました。"
+      end
+    end
+
+    # Companyに管理者権限がない場合のアクセス制限
+    def admin_company?
+      unless Company.find(current_user.company_id).admin?
+        redirect_to root_url
+        flash[:danger] = "無効なアクセスが確認されました。"
+      end
     end
 end

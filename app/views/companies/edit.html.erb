@@ -1,6 +1,17 @@
-<h1>Editing Company</h1>
+<h1>会社名編集</h1>
 
-<%= render 'form', company: @company %>
+<%= form_with(model: company, local: true) do |form| %>
+
+
+  <div class="field">
+    <%= form.label :name %>
+    <%= form.text_field :name %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit %>
+  </div>
+<% end %>
 
 <%= link_to 'Show', @company %> |
 <%= link_to 'Back', companies_path %>
