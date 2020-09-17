@@ -18,12 +18,13 @@
     <link rel="canonical" href="https://getbootstrap.com/docs/4.5/examples/offcanvas/">
   </head>
   <body>
-    <%= render "shared/header1" %>
-    <%= render "shared/header2" if user_signed_in? %>
+    <%= render "shared/header_main" %>
+    <%= render "shared/header_sub" if user_signed_in? %>
     <% flash.each do |message_type, msg| %>
       <div class="alert alert-<%= message_type %>"><%= msg %></div>
     <% end %>
     <%= yield %>
     <%= debug(params) if Rails.env.development? %>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
   </body>
 </html>

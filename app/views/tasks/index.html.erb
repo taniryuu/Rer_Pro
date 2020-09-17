@@ -75,7 +75,7 @@
           <tr>
             <td><%= link_to "#{task.name}", task_path(task) %></td>
             <td><%= task.canceled_date %></td>
-            <td><%= link_to '復活', edit_revive_from_canceled_list_task_path(task), remote: true, data: { confirm: "「#{task.name}」を復活してよろしいですか？"} %>
+            <td><%= link_to '復活', edit_revive_from_canceled_list_task_path(task), data: { confirm: "「#{task.name}」を復活してよろしいですか？"} %>
             <td><%= link_to '削除', task_path(task), method: :delete, data: { confirm: "「#{task.name}」を削除してよろしいですか？" } %></td>
           </tr>
         <% end %>
@@ -83,5 +83,3 @@
     </table>
 
 
-    <!--モーダルウインドウ表示-->
-    <div id="edit-revive-from-canceled-list" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>

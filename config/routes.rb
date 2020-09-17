@@ -38,6 +38,12 @@ Rails.application.routes.draw do
       member do
         get 'tasks/edit_add_delete_list'
         post 'tasks/update_add_delete_list'
+        get 'tasks/edit_check_status_1'
+        post 'tasks/update_check_status_1'
+        get 'tasks/edit_check_status_2'
+        post 'tasks/update_check_status_2'
+        get 'tasks/edit_check_status_3'
+        post 'tasks/update_check_status_3'
       end
       resources :tasks
     end

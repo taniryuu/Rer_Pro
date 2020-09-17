@@ -15,4 +15,9 @@ module ApplicationHelper
     end
     return superior_id
   end
+
+  # 企業名を取得
+  def company_name(user)
+    Company.find(user.company_id).name
+  end
 end
