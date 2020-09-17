@@ -1,11 +1,16 @@
 <h1>会社名編集</h1>
 
-<%= form_with(model: company, local: true) do |form| %>
-
+<%= form_with(model: @company, local: true) do |form| %>
+  <%= render 'devise/shared/error_messages', resource: @company %>
 
   <div class="field">
     <%= form.label :name %>
     <%= form.text_field :name %>
+  </div>
+
+  <div class="field">
+    <%= form.label :status %>
+    <%= form.select :status, Company.statuses.keys.map { |k| [I18n.t("enums.company.status.#{k}"), k]} %>
   </div>
 
   <div class="actions">
@@ -13,5 +18,4 @@
   </div>
 <% end %>
 
-<%= link_to 'Show', @company %> |
-<%= link_to 'Back', companies_path %>
+<%= link_to '戻る', companies_path %>
