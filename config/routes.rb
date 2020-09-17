@@ -37,12 +37,12 @@ Rails.application.routes.draw do
       member do
         get 'tasks/edit_add_delete_list'
         post 'tasks/update_add_delete_list'
-        get 'tasks/edit_check_status_1'
-        post 'tasks/update_check_status_1'
-        get 'tasks/edit_check_status_2'
-        post 'tasks/update_check_status_2'
-        get 'tasks/edit_check_status_3'
-        post 'tasks/update_check_status_3'
+        get 'tasks/edit_continue_or_destroy_step'
+        post 'tasks/update_continue_or_destroy_step'
+        get 'tasks/edit_complete_or_continue_step'
+        post 'tasks/update_complete_or_continue_step'
+        get 'tasks/edit_change_status_or_complete_task'
+        post 'tasks/update_change_status_or_complete_task'
       end
       resources :tasks do
         member do
