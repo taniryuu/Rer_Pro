@@ -1,12 +1,6 @@
 Rails.application.routes.draw do
 
-  resources :companies do
-    devise_scope :user do
-      get 'users/sign_up' => 'users/registrations#new', as: :new_user_registration
-      post 'users' => 'users/registrations#create', as: :user_registration
-    end
-  end
-
+  resources :companies
   
   devise_scope :user do
     root :to => "devise/sessions#new"
