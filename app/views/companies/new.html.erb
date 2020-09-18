@@ -1,10 +1,10 @@
 <%= form_with(model: @company, url: companies_path, method: :post, local: true) do |form| %>
-  <%= render partial: "shared/arrey_error_messages", locals: {obj: [@company, @user]} %>
+  <%= render "shared/arrey_error_messages", obj: [@company, @user] %>
   <h3>会社新規登録</h3>
   
   <div class="field">
     <%= form.label :name %>
-    <%= form.text_field :name %>
+    <%= form.text_field :name, autofocus: true %>
     <%= form.hidden_field :admin, value: false %>
     <%= form.hidden_field :status, value: "active" %>
   </div>
@@ -14,17 +14,17 @@
   <%= form.fields_for @user do |f| %>
     <div class="field">
       <%= f.label :name %><br/>
-      <%= f.text_field :name, autofocus: true, autocomplete: "name" %>
+      <%= f.text_field :name, autocomplete: "name" %>
     </div>
 
     <div class="field">
       <%= f.label :login_id %><br/>
-      <%= f.text_field :login_id, autofocus: true, autocomplete: "login_id" %>
+      <%= f.text_field :login_id, autocomplete: "login_id" %>
     </div>
 
     <div class="field">
       <%= f.label :email %><br/>
-      <%= f.email_field :email, autofocus: true, autocomplete: "email" %>
+      <%= f.email_field :email, autocomplete: "email" %>
     </div>
 
     <div class="field">
