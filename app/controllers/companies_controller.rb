@@ -33,7 +33,7 @@ class CompaniesController < ApplicationController
       @company = Company.new(company_params)
       @user = User.new(user_params)
       ActiveRecord::Base.transaction do
-        @user[:company_id] = @company.id if @company.update(admin: false, status: "active")
+        @user.company_id = @company.id if @company.update(admin: false, status: "active")
         @user.save!
         sign_in @user
         flash[:success] = "新規作成に成功しました"
