@@ -4,7 +4,7 @@
 <h3>完了予定日を入力してください</h3>
 <%= form_with(model: @task, url: update_revive_from_canceled_list_task_path(@task), local: true, method: :patch) do |f| %>
 
-  <%= render partial: 'shared/error_messages' ,locals: {obj: @task} %>
+  <%= render 'devise/shared/error_messages', resource: @task %>
 
   <%= f.label :name, class: "label-#{yield(:class_text)}" %>
   <p><%= @task.name %></p>

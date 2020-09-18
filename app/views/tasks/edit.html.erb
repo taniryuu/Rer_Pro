@@ -4,7 +4,7 @@
 <h1>タスク編集</h1>
 <%= form_with(model: @task, url: task_path(@task), method: :patch, local: true) do |f| %>
 
-  <%= render partial: 'shared/error_messages' ,locals: {obj: @task} %>
+  <%= render 'devise/shared/error_messages', resource: @task %>
 
   <%= f.label :name, class: "label-#{yield(:class_text)}" %>
   <%= f.text_field :name, class: "form-control" %>
