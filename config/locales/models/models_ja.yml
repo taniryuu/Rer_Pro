@@ -13,6 +13,16 @@ ja:
         status: ステータス
       user:
         id: ID
+        name: 名前
+        login_id: ログインID
+        superior: 上司
+        admin: 管理者
+        superior_id: 通知送信先
+        company: 会社名
+        password: パスワード
+        password_confirmation: パスワード確認
+        email: メールアドレス
+        notified_num: 期限前通知日数
         status: ステータス
       lead:
         id: ID
