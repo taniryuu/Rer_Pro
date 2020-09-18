@@ -13,7 +13,7 @@
   <%= f.text_area :memo, class: "form-control" %>
 
   <%= f.label :status, class: "label-#{yield(:class_text)}" %>
-  <%= f.select :status, Task.statuses.keys.map{ |k| ["enums.task.status.#{k}", k] }, class: "form-control" %>
+  <%= f.select :status, Task.statuses.keys.map{ |k| [I18n.t("enums.task.status.#{k}"), k] }, class: "form-control" %>
 
   <%= f.label :scheduled_complete_date, class: "label-#{yield(:class_text)}" %>
   <%= f.datetime_local_field :scheduled_complete_date, class: "form-control" %>
