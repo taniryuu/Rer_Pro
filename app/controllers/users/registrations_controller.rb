@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 class Users::RegistrationsController < Devise::RegistrationsController
-  prepend_before_action :authenticate_scope!, only: %i(edit update destroy)
-  prepend_before_action :set_minimum_password_length, only: %i(new edit)
+  prepend_before_action :authenticate_scope!, only: %i(edit update)
+  prepend_before_action :set_minimum_password_length, only: %i(edit)
   before_action :set_members, only: %i(edit update)
   before_action :same_company_id, only: %i(edit update)
-  before_action :configure_sign_up_params, only: [:create]
+  # before_action :configure_sign_up_params, only: [:create]
   before_action :configure_account_update_params, only: [:update]
 
   # GET /resource/sign_up
@@ -79,9 +79,9 @@ class Users::RegistrationsController < Devise::RegistrationsController
   protected
 
   # If you have extra params to permit, append them to the sanitizer.
-  def configure_sign_up_params
-    devise_parameter_sanitizer.permit(:sign_up, keys: [:attribute])
-  end
+  # def configure_sign_up_params
+  #   devise_parameter_sanitizer.permit(:sign_up, keys: [:attribute])
+  # end
 
   # If you have extra params to permit, append them to the sanitizer.
   def configure_account_update_params
@@ -98,13 +98,13 @@ class Users::RegistrationsController < Devise::RegistrationsController
   end
 
   # The path used after sign up.
-  def after_sign_up_path_for(resource)
-    if current_user_is_admin?
-      users_path
-    else
-      super(resource)
-    end
-  end
+  # def after_sign_up_path_for(resource)
+  #   if current_user_is_admin?
+  #     users_path
+  #   else
+  #     super(resource)
+  #   end
+  # end
 
   # The path used after update.
   def after_update_path_for(resource)
@@ -116,15 +116,15 @@ class Users::RegistrationsController < Devise::RegistrationsController
   end
 
   # The path used after sign up for inactive accounts.
-  def after_inactive_sign_up_path_for(resource)
-    super(resource)
-  end
+  # def after_inactive_sign_up_path_for(resource)
+  #   super(resource)
+  # end
 
-  def sign_up(resource_name, resource)
-    if !current_user_is_admin?
-      sign_in(resource_name, resource)
-    end
-  end
+  # def sign_up(resource_name, resource)
+  #   if !current_user_is_admin?
+  #     sign_in(resource_name, resource)
+  #   end
+  # end
   
   def update_resource_without_password(resource, params)
     resource.update_without_password(params)

@@ -4,7 +4,8 @@ class Company < ApplicationRecord
                  inactive: 1 
                }
   
-  validates :name, presence: true, 
+  validates :name, presence: true,
+                   length: { in: 2..30 },
                    uniqueness: true
   validates :admin, inclusion: { in: [true, false] }
   validates :status, presence: true

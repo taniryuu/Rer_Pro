@@ -1,5 +1,50 @@
-<h1>会社新規登録</h1>
+<%= form_with(model: @company, url: companies_path, method: :post, local: true) do |form| %>
+  <%= render "shared/arrey_error_messages", obj: [@company, @user] %>
+  <h3>会社新規登録</h3>
+  
+  <div class="field">
+    <%= form.label :name %>
+    <%= form.text_field :name, autofocus: true %>
+    <%= form.hidden_field :admin, value: false %>
+    <%= form.hidden_field :status, value: "active" %>
+  </div>
 
-<%= render 'form', company: @company %>
+  <h3>管理者登録</h3>
 
-<%= link_to '戻る', companies_path %>
+  <%= form.fields_for @user do |f| %>
+    <div class="field">
+      <%= f.label :name %><br/>
+      <%= f.text_field :name, autocomplete: "name" %>
+    </div>
+
+    <div class="field">
+      <%= f.label :login_id %><br/>
+      <%= f.text_field :login_id, autocomplete: "login_id" %>
+    </div>
+
+    <div class="field">
+      <%= f.label :email %><br/>
+      <%= f.email_field :email, autocomplete: "email" %>
+    </div>
+
+    <div class="field">
+      <%= f.label :password %>
+      <% if @minimum_password_length %>
+      <em><%= t('devise.shared.minimum_password_length', count: @minimum_password_length) %></em>
+      <% end %><br/>
+      <%= f.password_field :password, autocomplete: "new-password" %>
+    </div>
+
+    <div class="field">
+      <%= f.label :password_confirmation %><br/>
+      <%= f.password_field :password_confirmation, autocomplete: "new-password" %>
+    </div>
+    <%= f.hidden_field :admin, value: true %>
+    <%= f.hidden_field :superior, value: true %>
+  <% end %>
+  <div class="actions">
+    <%= form.submit %>
+  </div>
+<% end %>
+
+<%= link_to '戻る', root_path %>

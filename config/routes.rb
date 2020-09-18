@@ -1,12 +1,6 @@
 Rails.application.routes.draw do
 
-  resources :companies do
-    devise_scope :user do
-      get 'users/sign_up' => 'users/registrations#new', as: :new_user_registration
-      post 'users' => 'users/registrations#create', as: :user_registration
-    end
-  end
-
+  resources :companies
   
   devise_scope :user do
     root :to => "devise/sessions#new"
@@ -30,8 +24,7 @@ Rails.application.routes.draw do
     resources :steps do
       member do
         get 'edit_status' => 'steps/step_statuses#edit', as: :edit_statuses_of
-        patch 'complete' => 'steps/step_statuses#complete', as: :complete
-        patch 'restart' => 'steps/step_statuses#restart', as: :restart
+        patch 'start' => 'steps/step_statuses#start', as: :start
         patch 'cancel' => 'steps/step_statuses#cancel', as: :cancel
       end
       member do
@@ -44,14 +37,12 @@ Rails.application.routes.draw do
         get 'tasks/edit_change_status_or_complete_task'
         post 'tasks/update_change_status_or_complete_task'
       end
-      resources :tasks do
-        member do
-          get 'add_canceled_list'
-          get 'edit_revive_from_canceled_list'
-          patch 'update_revive_from_canceled_list'
-        end
-      end
+      resources :tasks
     end
+
   end
+
+
+
 
 end
