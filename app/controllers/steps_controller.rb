@@ -18,12 +18,13 @@ class StepsController < Leads::ApplicationController
   # GET /steps/1
   # GET /steps/1.json
   def show
-    if params[:completed_id].present?
-      completed_step = Step.find(params[:completed_id])
-      complete_step(@lead, completed_step)
-      flash[:success] = "#{completed_step.name}を完了しました。引き続き、#{@step.name}に取り組んでください。"
-    end
-    @steps_from_now_on = @lead.steps.where(status: ["not_yet", "in_progress"]).where.not(id: @step.id)
+    # if params[:completed_id].present?
+    #   completed_step = Step.find(params[:completed_id])
+    #   complete_step(@lead, completed_step)
+    #   flash[:success] = "#{completed_step.name}を完了しました。引き続き、#{@step.name}に取り組んでください。"
+    # end
+    @steps_except_self = @lead.steps.where.not(id: @step.id)
+    @steps_from_now_on = @steps_except_self.where(status: ["not_yet", "in_progress"])
   end
 
   # GET /steps/new

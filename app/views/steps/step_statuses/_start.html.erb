@@ -1,0 +1,5 @@
+<%= form_with(url: start_step_path(step, completed_id: completed_id), model: step, local: true) do |form| %>
+  <%= form.label :scheduled_complete_date %>
+  <%= form.date_field :scheduled_complete_date, value: step.scheduled_complete_date %>
+  <%= form.submit button_name, class: "btn btn-primary" %>
+<% end %>

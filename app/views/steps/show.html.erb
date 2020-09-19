@@ -51,17 +51,13 @@
 
   <!-- change step_status -->
 <% if @step.status == "not_yet" %>
-  <%= form_with(url: start_step_path(@step), model: @step, local: true) do |form| %>
-    <%= form.label :scheduled_complete_date %>
-    <%= form.date_field :scheduled_complete_date, value: @step.scheduled_complete_date %>
-    <%= form.submit "開始", class: "btn btn-primary" %>
-  <% end %>
+  <%= render 'steps/step_statuses/start', step: @step, completed_id: nil, button_name: "開始" %>
+<% elsif @step.status == "inactive" %>
+  <%= render 'steps/step_statuses/start', step: @step, completed_id: nil, button_name: "再開" %>
 <% elsif @step.status == "in_progress" %>
   <button type="button" class="btn btn-info" data-toggle="modal" data-target="#step-complete" data-name="<%= @step.name %>" data-id="<%= @step.id %>">完了</button>
-<% elsif @step.status == "inactive" %>
-  <button type="button" class="btn btn-info">再開</button>
 <% elsif @step.status == "completed" %>
-  <button type="button" class="btn btn-info">再開</button>
+  <%= render 'steps/step_statuses/start', step: @step, completed_id: nil, button_name: "再開" %>
 <% elsif @step.status == "template" %>
   <button type="button" class="btn btn-info">このテンプレートを使用して新規作成</button>
 <% end %>
@@ -77,39 +73,59 @@
         </button>
       </div>
       <div class="modal-body">
+        進捗一覧<br>
+        <table class="table table-hover" id="table-shops">
+          <tbody>
+            <% @steps_except_self.each do |step| %>
+              <tr>
+                <td>Step<%= step.order %></td>
+                <% if step.status == "not_yet" %>
+                  <td><%= render 'steps/step_statuses/start', step: step, completed_id: @step.id, button_name: "完了予定日を設定して開始する" %></td>
+                <% elsif step.status == "inactive" %>
+                  <td>
+                    <p>
+                      <a class="btn btn-default btn-xs" data-toggle="collapse" href="#collapseStep<%= step.id %>">
+                    	  <%= "(#{step.status_i18n})" %>
+                      </a>
+                    </p>
+                    <div id="collapseStep<%= step.id %>" class="collapse">
+                    	<div class="well">
+                        <%= render 'steps/step_statuses/start', step: step, completed_id: @step.id, button_name: "完了予定日を再設定して再開する" %>
+                    	</div>
+                    </div>
+                  </td>
+                <% elsif step.status == "in_progress" %>
+                  <td><%= link_to "＜#{step.status_i18n}＞#{step.name}を継続", complete_step_path(step, @step), method: :patch, class: "btn btn-info btn-sm" %></td>
+                <% elsif step.status == "completed" %>
+                  <td>
+                    <p>
+                      <a class="btn btn-default btn-xs" data-toggle="collapse" href="#collapseStep<%= step.id %>">
+                    	  <%= step.status_i18n %>
+                      </a>
+                    </p>
+                    <div id="collapseStep<%= step.id %>" class="collapse">
+                    	<div class="well">
+                        <%= render 'steps/step_statuses/start', step: step, completed_id: @step.id, button_name: "完了予定日を再設定して再開する" %>
+                    	</div>
+                    </div>
+                  </td>
+                <% end %>
+                <td><%= link_to "詳細確認", step_path(step), target: :_blank %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
         <% if @steps_from_now_on.present? %>
-          未完了の進捗一覧<br>
-          <table class="table table-hover" id="table-shops">
-            <tbody>
-              <% @steps_from_now_on.each do |step| %>
-                <tr>
-                  <td>Step<%= step.order %></td>
-                  <% if step.status == "not_yet" %>
-                    <td>
-                      <%= form_with(url: start_step_path(step, completed_id: @step.id), model: step, local: true) do |form| %>
-                        <%= form.label :scheduled_complete_date %>
-                        <%= form.date_field :scheduled_complete_date, value: step.scheduled_complete_date %>
-                        <%= form.submit "完了予定日を設定し#{step.name}を開始する", class: "btn btn-primary btn-sm" %>
-                      <% end %>
-                    </td>
-                  <% else %>
-                    <td><%= link_to "#{step.name}を継続(既に開始済)", step_path(step, completed_id: @step.id), class: "btn btn-default btn-sm" %></td>
-                  <% end %>
-                  <td><%= link_to "詳細確認", step_path(step), target: :_blank %></td>
-                </tr>
-              <% end %>
-            </tbody>
-          </table>
           <%= link_to "新しく作成する場合はこちら", new_lead_step_path(@lead, completed_id: @step.id), class: "pull-right" %>
         <% else %>
           <%= link_to "新たに次の進捗を作成して進む", new_lead_step_path(@lead, completed_id: @step.id), class: "btn btn-primary btn-lg" %>
           <br><br>
-          <%= link_to "全ての進捗を完了＋案件自体を完了にする", lead_path(@lead, completed_id: @step.id), 
+          <%= link_to "全ての進捗を完了＋案件自体を完了にする", complete_step_path(@step, @step), method: :patch, 
             data: { confirm: '本案件を全て完了とします。本当によろしいですか？（終了済の扱いになります。）' }, class: "btn btn-info btn-lg pull-right" %>
         <% end %>
       </div>
       <div class="modal-footer">
-        ※まだ進捗は完了していません。
+        <%= "* まだこの時点では#{@step.name}は完了していません。" %>
       </div>
     </div>
   </div>

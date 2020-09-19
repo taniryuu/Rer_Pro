@@ -1,9 +1,8 @@
-class Leads::ApplicationController < ApplicationController
-  before_action :authenticate_user!
+class Leads::ApplicationController < Users::ApplicationController
   
   # 本日付で案件の完了処理を実行
   def complete_lead(lead)
-    if lead.update_attributes(status: "completed", completed_date: "#{Date.current}", steps_rate: 100)
+    if lead.update_attributes(status: "completed", completed_date: "#{Date.current}")
       flash[:success] = "完了しました"
       true
     else
@@ -44,7 +43,7 @@ class Leads::ApplicationController < ApplicationController
   # 計算メソッド
   # 完了分と未了分から完了した割合を計算し、%を出力
   def calculate_rate(completed_num, not_yet_num)
-    return not_yet_num > 0 ? 100 * completed_num / (completed_num + not_yet_num) : 0
+    return completed_num == 0 ? 0 : 100 * completed_num / (completed_num + not_yet_num)
   end
   
 end

@@ -27,7 +27,7 @@
 
     <%= form_with(model: @task, url: step_tasks_path(step_id: @step), method: :post, local: true) do |f| %>
   
-      <%= render partial: 'shared/error_messages' ,locals: {obj: @task} %>
+      <%= render 'devise/shared/error_messages', resource: @step %>
   
       <div class="row">
         <div class="col-2">

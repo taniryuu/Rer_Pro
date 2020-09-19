@@ -17,11 +17,11 @@ class LeadsController < Leads::ApplicationController
   # GET /leads/1
   # GET /leads/1.json
   def show
-    if params[:completed_id].present?
-      complete_step(@lead, Step.find(params[:completed_id]))
-      complete_lead(@lead)
-      flash.now[:success] = "全ての進捗が完了し、本案件は終了済となりました。おつかれさまでした。"
-    end
+    # if params[:completed_id].present?
+    #   complete_step(@lead, Step.find(params[:completed_id]))
+    #   complete_lead(@lead)
+    #   flash.now[:success] = "全ての進捗が完了し、本案件は終了済となりました。おつかれさまでした。"
+    # end
   end
 
   # GET /leads/new
