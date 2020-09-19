@@ -83,7 +83,7 @@ class StepsController < Leads::ApplicationController
   # DELETE /steps/1.json
   def destroy
     @step.destroy
-    update_steps_rate(@lead)
+    check_status_completed_or_not(@lead, nil)
     respond_to do |format|
       format.html { redirect_to lead_steps_url(@lead), notice: 'Step was successfully destroyed.' }
       format.json { head :no_content }
@@ -120,9 +120,12 @@ class StepsController < Leads::ApplicationController
           errors << step.errors.full_messages
         end
         # step.update_attribute(:completed_date, "") unless step.status == "completed"
-        step.update_attribute(:status, "completed") if step.completed_date.present?
-        update_completed_tasks_rate(step)
-        update_steps_rate(@lead)
+        # step.update_attribute(:status, "completed") if step.completed_date.present?
+        # update_completed_tasks_rate(step)
+        # update_steps_rate(@lead)
+        check_status_completed_or_not(@lead, step)
+        errors << @lead.errors.full_messages if @lead.errors.present?
+        errors << step.errors.full_messages if step.errors.present?
         raise ActiveRecord::Rollback if errors.present?
       end
       errors.presence || nil
@@ -136,9 +139,12 @@ class StepsController < Leads::ApplicationController
         unless step.update(step_params)
           errors << step.errors.full_messages
         end
-        step.update_attribute(:status, "completed") if step.completed_date.present?
-        update_completed_tasks_rate(step)
-        update_steps_rate(@lead)
+        # step.update_attribute(:status, "completed") if step.completed_date.present?
+        # update_completed_tasks_rate(step)
+        # update_steps_rate(@lead)
+        check_status_completed_or_not(@lead, step)
+        errors << @lead.errors.full_messages if @lead.errors.present?
+        errors << step.errors.full_messages if step.errors.present?
         raise ActiveRecord::Rollback if errors.present?
       end
       errors.presence || nil

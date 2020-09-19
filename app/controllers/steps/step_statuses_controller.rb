@@ -40,7 +40,8 @@ class Steps::StepStatusesController < StepsController
         update_steps_rate(@lead)
       end
       
-      raise ActiveRecord::Rollback if @step.errors.present?
+      check_status_completed_or_not(@lead, @step)
+      raise ActiveRecord::Rollback if @lead.errors.present? || @step.errors.present?
     end
     
     if @step.errors.present?
@@ -54,8 +55,7 @@ class Steps::StepStatusesController < StepsController
   
   def cancel
     if @step.update_attributes(status: "inactive", canceled_date: "#{Date.current}")
-      update_completed_tasks_rate(@step)
-      update_steps_rate(@lead)
+      check_status_completed_or_not(@lead, @step)
       flash[:success] = "#{@step.name}を中止しました。以後、本進捗は通知対象になりません。"
     else
       flash[:danger] = "#{@step.name}の中止処理に失敗しました。システム管理者にご連絡ください。"
