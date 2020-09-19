@@ -67,7 +67,7 @@ class LeadsController < Leads::ApplicationController
     end
   end
 
-  # PATCH/PUT /leads/1/update_user_id
+  # 案件の担当者を変更（上長のみ）
   def update_user_id
     respond_to do |format|
       if @lead.update(lead_params_only_user_id)

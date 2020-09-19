@@ -36,6 +36,11 @@
 </p>
 
 <p>
+  <strong>Canceled date:</strong>
+  <%= @step.canceled_date %>
+</p>
+
+<p>
   <strong>Completed tasks rate:</strong>
   <%= @step.completed_tasks_rate %>
 </p>
@@ -52,9 +57,11 @@
   <!-- change step_status -->
 <% if @step.status == "not_yet" %>
   <%= render 'steps/step_statuses/start', step: @step, completed_id: nil, button_name: "開始" %>
+  <%= render 'steps/step_statuses/cancel', step: @step %>
 <% elsif @step.status == "inactive" %>
   <%= render 'steps/step_statuses/start', step: @step, completed_id: nil, button_name: "再開" %>
 <% elsif @step.status == "in_progress" %>
+  <%= render 'steps/step_statuses/cancel', step: @step %>
   <button type="button" class="btn btn-info" data-toggle="modal" data-target="#step-complete" data-name="<%= @step.name %>" data-id="<%= @step.id %>">完了</button>
 <% elsif @step.status == "completed" %>
   <%= render 'steps/step_statuses/start', step: @step, completed_id: nil, button_name: "再開" %>

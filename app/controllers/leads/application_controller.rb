@@ -15,7 +15,6 @@ class Leads::ApplicationController < Users::ApplicationController
   def complete_step(lead, step)
     if step.update_attributes(status: "completed", completed_date: "#{Date.current}", completed_tasks_rate: 100)
       update_steps_rate(lead)
-      flash[:success] = "完了しました"
       true
     else
       flash[:danger] = "#{step.name}の完了処理に失敗しました。システム管理者にご連絡ください。"

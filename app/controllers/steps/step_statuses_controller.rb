@@ -19,22 +19,48 @@ class Steps::StepStatusesController < StepsController
   end
   
   def start
-    if @step.update_attributes(status: "in_progress", scheduled_complete_date: params[:step][:scheduled_complete_date])
+    ActiveRecord::Base.transaction do
+      case @step.status
+        when "not_yet"
+          @success_message = "#{@step.name}を開始しました。" if @step.update_attributes(status: "in_progress", scheduled_complete_date: params[:step][:scheduled_complete_date])
+        when "inactive"
+          @success_message = "#{@step.name}を再開しました。" if @step.update_attributes(status: "in_progress", scheduled_complete_date: params[:step][:scheduled_complete_date], canceled_date: "")
+        when "in_progress"
+          @success_message = "#{@step.name}は既に進捗中です。"
+        when "completed"
+          @success_message = "#{@step.name}を再開しました。" if @step.update_attributes(status: "in_progress", scheduled_complete_date: params[:step][:scheduled_complete_date], completed_date: "")
+      end
+      update_completed_tasks_rate(@step)
+
       if params[:completed_id].present?
         completed_step = Step.find(params[:completed_id])
         complete_step(@lead, completed_step)
-        flash[:success] = "#{completed_step.name}を完了し、#{@step.name}を開始しました。"
+        @success_message = "#{completed_step.name}を完了し、#{@step.name}を開始しました。"
       else
-        update_completed_tasks_rate(@step)
-        flash[:success] = "#{@step.name}を開始しました。"
+        update_steps_rate(@lead)
       end
-    else
+      
+      raise ActiveRecord::Rollback if @step.errors.present?
+    end
+    
+    if @step.errors.present?
       flash[:danger] = "完了予定日が正しく入力されていません。空欄は不可です。"
+    else
+      flash[:success] = @success_message
     end
     redirect_to @step
+        
   end
   
   def cancel
+    if @step.update_attributes(status: "inactive", canceled_date: "#{Date.current}")
+      update_completed_tasks_rate(@step)
+      update_steps_rate(@lead)
+      flash[:success] = "#{@step.name}を中止しました。以後、本進捗は通知対象になりません。"
+    else
+      flash[:danger] = "#{@step.name}の中止処理に失敗しました。システム管理者にご連絡ください。"
+    end
+    redirect_to @step
   end
   
 end
