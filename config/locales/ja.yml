@@ -233,3 +233,8 @@ ja:
         in_progress: "進捗中"
         completed: "完了"
         template: "テンプレート"
+    task:
+      status:
+        not_yet: "未"
+        completed: "完了"
+        canceled: "中止"
