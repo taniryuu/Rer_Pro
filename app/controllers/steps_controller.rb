@@ -18,11 +18,6 @@ class StepsController < Leads::ApplicationController
   # GET /steps/1
   # GET /steps/1.json
   def show
-    # if params[:completed_id].present?
-    #   completed_step = Step.find(params[:completed_id])
-    #   complete_step(@lead, completed_step)
-    #   flash[:success] = "#{completed_step.name}を完了しました。引き続き、#{@step.name}に取り組んでください。"
-    # end
     @steps_except_self = @lead.steps.where.not(id: @step.id)
     @steps_from_now_on = @steps_except_self.where(status: ["not_yet", "in_progress"])
   end
@@ -113,16 +108,10 @@ class StepsController < Leads::ApplicationController
     def save_and_errors_of(step)
       errors = []
       ActiveRecord::Base.transaction do
-#        debugger
         prepare_order(@lead.steps.count + 1, step.order)
-#        debugger
         unless step.save
           errors << step.errors.full_messages
         end
-        # step.update_attribute(:completed_date, "") unless step.status == "completed"
-        # step.update_attribute(:status, "completed") if step.completed_date.present?
-        # update_completed_tasks_rate(step)
-        # update_steps_rate(@lead)
         check_status_completed_or_not(@lead, step)
         errors << @lead.errors.full_messages if @lead.errors.present?
         errors << step.errors.full_messages if step.errors.present?
@@ -139,9 +128,6 @@ class StepsController < Leads::ApplicationController
         unless step.update(step_params)
           errors << step.errors.full_messages
         end
-        # step.update_attribute(:status, "completed") if step.completed_date.present?
-        # update_completed_tasks_rate(step)
-        # update_steps_rate(@lead)
         check_status_completed_or_not(@lead, step)
         errors << @lead.errors.full_messages if @lead.errors.present?
         errors << step.errors.full_messages if step.errors.present?

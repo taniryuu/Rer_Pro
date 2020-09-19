@@ -31,7 +31,6 @@ class Steps::StepStatusesController < StepsController
           @success_message = "#{@step.name}を再開しました。" if @step.update_attributes(status: "in_progress", scheduled_complete_date: params[:step][:scheduled_complete_date], completed_date: "")
       end
       update_completed_tasks_rate(@step)
-
       if params[:completed_id].present?
         completed_step = Step.find(params[:completed_id])
         complete_step(@lead, completed_step)
@@ -39,7 +38,6 @@ class Steps::StepStatusesController < StepsController
       else
         update_steps_rate(@lead)
       end
-      
       check_status_completed_or_not(@lead, @step)
       raise ActiveRecord::Rollback if @lead.errors.present? || @step.errors.present?
     end
