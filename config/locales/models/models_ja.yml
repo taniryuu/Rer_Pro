@@ -54,4 +54,10 @@ ja:
         completed_tasks_rate: タスク達成率
       task:
         id: ID
-        
+        step_id: 進捗ID
+        name: タスク名
+        memo: タスク詳細
+        status: タスクステータス
+        scheduled_complete_date: 完了予定日
+        completed_date: 完了日
+        canceled_date: 中止にした日

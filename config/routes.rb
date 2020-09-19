@@ -44,7 +44,13 @@ Rails.application.routes.draw do
         get 'tasks/edit_check_status_3'
         post 'tasks/update_check_status_3'
       end
-      resources :tasks
+      resources :tasks do
+        member do
+          get 'add_canceled_list'
+          get 'edit_revive_from_canceled_list'
+          patch 'update_revive_from_canceled_list'
+        end
+      end
     end
 
   end
