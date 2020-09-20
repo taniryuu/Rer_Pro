@@ -3,6 +3,7 @@ class CreateLeads < ActiveRecord::Migration[5.2]
     create_table :leads do |t|
       t.string :created_date, null: false, default: ""
       t.string :completed_date, null: false, default: ""
+      t.string :canceled_date, null: false, default: ""
       t.string :customer_name, null: false, default: ""
       t.string :room_name, null: false, default: ""
       t.string :room_num, null: false, default: ""
