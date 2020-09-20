@@ -23,6 +23,7 @@ ActiveRecord::Schema.define(version: 2020_08_31_123021) do
   create_table "leads", force: :cascade do |t|
     t.string "created_date", default: "", null: false
     t.string "completed_date", default: "", null: false
+    t.string "canceled_date", default: "", null: false
     t.string "customer_name", default: "", null: false
     t.string "room_name", default: "", null: false
     t.string "room_num", default: "", null: false
@@ -49,6 +50,7 @@ ActiveRecord::Schema.define(version: 2020_08_31_123021) do
     t.integer "order", null: false
     t.string "scheduled_complete_date", default: "", null: false
     t.string "completed_date", default: "", null: false
+    t.string "canceled_date", default: "", null: false
     t.integer "completed_tasks_rate", default: 0, null: false
     t.integer "lead_id"
     t.datetime "created_at", null: false
