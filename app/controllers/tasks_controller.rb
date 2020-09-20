@@ -167,7 +167,7 @@ class TasksController < Leads::ApplicationController
       #stautsが「完了」のタスクの中でもっとも遅い「完了日」をこの進捗の完了日とし、現在の進捗を「完了」とする
       latest_date = @step.tasks.where(status: "completed").maximum(:completed_date)
       @step.update_attributes(completed_date: latest_date, status: "completed")
-      redirect_to lead_steps_url(@step)
+      redirect_to step_tasks_url(@step)
     # 進捗中を選択したとき
     else
       #この進捗に「完了予定日」が本日で、statusが「未」の新しいタスクを追加し、現在の進捗を「進捗中」とする
