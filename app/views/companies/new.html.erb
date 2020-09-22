@@ -1,9 +1,10 @@
-<%= form_with(model: @company, url: companies_path, method: :post, local: true) do |form| %>
-  <%= render "shared/arrey_error_messages", obj: [@company, @user] %>
+<%= form_with(model: @company, url: companies_path, local: true) do |form| %>
+  <%= render 'devise/shared/error_messages', resource: @company %>
+
   <h3>会社新規登録</h3>
   
   <div class="field">
-    <%= form.label :name %>
+    <%= form.label :name %><br/>
     <%= form.text_field :name, autofocus: true %>
     <%= form.hidden_field :admin, value: false %>
     <%= form.hidden_field :status, value: "active" %>
@@ -11,7 +12,7 @@
 
   <h3>管理者登録</h3>
 
-  <%= form.fields_for @user do |f| %>
+  <%= form.fields_for :users do |f| %>
     <div class="field">
       <%= f.label :name %><br/>
       <%= f.text_field :name, autocomplete: "name" %>

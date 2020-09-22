@@ -9,7 +9,7 @@ ja:
 #      not_locked: "was not locked"
       not_saved:
         one: "１つのエラーがあります。修正して再度送信して下さい。:"
-        other: "%{count}のエラーがあります。修正して再度送信して下さい。"
+        other: "%{count}件のエラーがあります。修正して再度送信して下さい。"
       taken: "は既に使用されています。"
       blank: "が入力されていません。"
       too_short: "は%{count}文字以上に設定して下さい。"
