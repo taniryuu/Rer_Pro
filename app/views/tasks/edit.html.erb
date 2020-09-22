@@ -1,32 +1,45 @@
-<% provide(:title, 'Edit task') %>
 <% provide(:class_text, 'task--edit') %>
 <% provide(:button_text, '更新') %>
 <h1>タスク編集</h1>
 <%= form_with(model: @task, url: task_path(@task), method: :patch, local: true) do |f| %>
 
   <%= render 'devise/shared/error_messages', resource: @task %>
-
-  <%= f.label :name, class: "label-#{yield(:class_text)}" %>
-  <%= f.text_field :name, class: "form-control" %>
-
-  <%= f.label :memo, class: "label-#{yield(:class_text)}" %>
-  <%= f.text_area :memo, class: "form-control" %>
-
-  <%= f.label :status, class: "label-#{yield(:class_text)}" %>
-  <%= f.select :status, Task.statuses.keys.map{ |k| [I18n.t("enums.task.status.#{k}"), k] }, class: "form-control" %>
-
-  <%= f.label :scheduled_complete_date, class: "label-#{yield(:class_text)}" %>
-  <%= f.datetime_local_field :scheduled_complete_date, class: "form-control" %>
-
-  <%= f.label :completed_date, class: "label-#{yield(:class_text)}" %>
-  <%= f.datetime_local_field :completed_date, class: "form-control" %>
-
-  <%= f.label :canceled_date, class: "label-#{yield(:class_text)}" %>
-  <%= f.datetime_local_field :canceled_date, class: "form-control" %>
-
-
-  <%= f.submit yield(:button_text), class: "btn-#{yield(:class_text)}" %>
-
+  <div>
+    <%= f.label :name, class: "label-#{yield(:class_text)}" %>
+    <%= f.text_field :name %>
+  </div>
+  <div>
+    <%= f.label :memo, class: "label-#{yield(:class_text)}" %>
+    <%= f.text_area :memo, class: "form-control" %>
+  </div>
+  <div>
+    <%= f.label :status, class: "label-#{yield(:class_text)}" %>
+    <%= f.select :status, Task.statuses.keys.map{ |k| [I18n.t("enums.task.status.#{k}"), k] }, class: "form-control" %>
+  </div>
+  <div>
+    <%= f.label :scheduled_complete_date, class: "label-#{yield(:class_text)}" %>
+    <%= f.date_field :scheduled_complete_date, value: Date.parse(@task.scheduled_complete_date) %>
+  </div>  
+  <div>
+    <%= f.label :completed_date, class: "label-#{yield(:class_text)}" %>
+    <% if @task.completed_date.present? %>
+      <%= f.date_field :completed_date, value: Date.parse(@task.completed_date) %>
+    <% else %>
+      <%= f.date_field :completed_date %>
+    <% end %>
+  </div>
+  <div>
+    <%= f.label :canceled_date, class: "label-#{yield(:class_text)}" %>
+    <% if @task.canceled_date.present? %> 
+      <%= f.date_field :canceled_date, value: Date.parse(@task.canceled_date) %>
+    <% else %>
+      <%= f.date_field :canceled_date %>
+    <% end %>
+  </div>
+  <div>
+    <%= f.submit yield(:button_text), class: "btn-#{yield(:class_text)}" %>
+  </div>
   <%= f.hidden_field :step_id, class: "form-control", value: @step.id %>
 
 <% end %>
+<%= button_to '戻る', step_tasks_path(@step), method: :get, class: "btn-#{yield(:class_text)}" %>
