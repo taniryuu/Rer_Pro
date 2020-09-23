@@ -1,4 +1,6 @@
 class CompaniesController < ApplicationController
+  include CompaniesHelper
+  
   before_action :set_company, only: [:show, :edit, :update, :destroy]
   before_action :authenticate_user!, except: %i(new create)
   before_action :current_user_admin?, only: %i(show edit update destroy)
@@ -19,7 +21,7 @@ class CompaniesController < ApplicationController
   # GET /companies/new
   def new
     @company = Company.new
-    @user = User.new
+    @company.users.build
   end
 
   # GET /companies/1/edit
@@ -29,17 +31,14 @@ class CompaniesController < ApplicationController
   # POST /companies
   # POST /companies.json
   def create
-    begin
-      @company = Company.new(company_params)
-      @user = User.new(user_params)
-      ActiveRecord::Base.transaction do
-        @user.company_id = @company.id if @company.update(admin: false, status: "active")
-        @user.save!
-        sign_in @user
-        flash[:success] = "新規作成に成功しました"
-        redirect_to current_user
-      end
-    rescue
+    @company = Company.create(company_and_user_params)
+    @company.admin = false
+    if @company.save
+      user_id = @company.user_ids.first
+      sign_in set_user(user_id)
+      flash[:success] = "新規作成に成功しました"
+      redirect_to current_user
+    else
       render :new
     end
   end
@@ -69,13 +68,12 @@ class CompaniesController < ApplicationController
       @company = Company.find(params[:id])
     end
 
-    # Only allow a list of trusted parameters through.
     def company_params
       params.require(:company).permit(:name, :status)
     end
-
-    def user_params
-      params.require(:company).permit(user: [:name, :login_id, :email, :password, :password_confirmation, :admin, :superior])[:user]
+    # Only allow a list of trusted parameters through.
+    def company_and_user_params
+      params.require(:company).permit(:name, :status, :admin, users_attributes: [:name, :login_id, :email, :password, :password_confirmation, :admin, :superior])
     end
 
     # current_userのCompanyに管理者権限がない場合のアクセス制限

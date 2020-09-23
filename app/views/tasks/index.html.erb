@@ -27,13 +27,8 @@
 
     <%= form_with(model: @task, url: step_tasks_path(step_id: @step), method: :post, local: true) do |f| %>
   
-<<<<<<< HEAD
-      <%= render 'devise/shared/error_messages', resource: @step %>
-  
-=======
       <%= render 'devise/shared/error_messages', resource: @task %>
 
->>>>>>> 4fce2cb8ae72db8449303cd0c49ad835d1a87f7d
       <div class="row">
         <div class="col-2">
           <div class="form-group">            
@@ -44,7 +39,7 @@
         <div class="col-2">
           <div class="form-group">  
             <%= f.label :scheduled_complete_date, class: "label-#{yield(:class_text)}" %>
-            <%= f.datetime_local_field :scheduled_complete_date, class: 'form-control' %>
+            <%= f.date_field :scheduled_complete_date, class: 'form-control' %>
           </div>  
         </div> 
 

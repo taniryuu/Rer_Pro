@@ -10,7 +10,7 @@
   <p><%= @task.name %></p>
 
   <%= f.label :scheduled_complete_date, class: "label-#{yield(:class_text)}" %>
-  <%= f.datetime_local_field :scheduled_complete_date %>
+  <%= f.date_field :scheduled_complete_date %>
   <br>
   <%= f.submit yield(:button_text), class: "btn-#{yield(:class_text)}" %>
           

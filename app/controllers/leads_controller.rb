@@ -10,18 +10,12 @@ class LeadsController < Leads::ApplicationController
   # GET /leads
   # GET /leads.json
   def index
-#    @leads = Lead.where(user_id: Company.find(current_user.company_id).users.pluck(:id)) # SQL発行回数４回
-    @leads = Lead.where(user_id: User.where(company_id: current_user.company_id).pluck(:id)) # SQL発行回数３回でこちらを採用。
+    @leads = Lead.where(user_id: User.where(company_id: current_user.company_id).pluck(:id))
   end
 
   # GET /leads/1
   # GET /leads/1.json
   def show
-    # if params[:completed_id].present?
-    #   complete_step(@lead, Step.find(params[:completed_id]))
-    #   complete_lead(@lead)
-    #   flash.now[:success] = "全ての進捗が完了し、本案件は終了済となりました。おつかれさまでした。"
-    # end
   end
 
   # GET /leads/new

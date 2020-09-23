@@ -33,7 +33,7 @@ class TasksController < Leads::ApplicationController
 
   def create
     @task = Task.new(task_params)
-    if day_is_older_than_today(@task.scheduled_complete_date)
+    if prohibit_future(@task.scheduled_complete_date)
       flash[:danger] = "完了予定日に過去の日付を入力しようとしています。"
     end
     if @task.save && update_completed_tasks_rate(@step)
@@ -50,11 +50,11 @@ class TasksController < Leads::ApplicationController
       @task.date_blank_then_today("completed")
       # 中止にした日が空なら今日の日付を入れる
       @task.date_blank_then_today("canceled")
-      if day_is_older_than_today(@task.scheduled_complete_date) && day_is_older_than_today(@task.completed_date)
+      if prohibit_future(@task.scheduled_complete_date) && prohibit_future(@task.completed_date)
         flash[:danger] = "完了予定日と完了日に過去の日付を入力しようとしています。"
-      elsif day_is_older_than_today(@task.scheduled_complete_date)
+      elsif prohibit_future(@task.scheduled_complete_date)
         flash[:danger] = "完了予定日に過去の日付を入力しようとしています。"
-      elsif day_is_older_than_today(@task.completed_date)
+      elsif prohibit_future(@task.completed_date)
         flash[:danger] = "完了日に過去の日付を入力しようとしています。"
       end
       redirect_to check_status_and_get_url
@@ -122,7 +122,7 @@ class TasksController < Leads::ApplicationController
   # 復活ボタンを押した画面から更新ボタンを押した後の処理
   def update_revive_from_canceled_list
     if @task.update_attributes(revive_from_canceled_list_params) && update_completed_tasks_rate(@step)
-      if day_is_older_than_today(@task.scheduled_complete_date)
+      if prohibit_future(@task.scheduled_complete_date)
         flash[:danger] = "完了予定日に過去の日付を入力しようとしています。"
       end
       @task.update_attribute(:status, "not_yet")
@@ -140,8 +140,8 @@ class TasksController < Leads::ApplicationController
     #進捗を継続を選択したとき
     if params[:continue_or_destroy] == "continue"
       #この進捗に「完了予定日」が本日で、statusが「未」の新しいタスクを追加し、現在の進捗を「進捗中」とする
-      task1 = Task.new(step_id: @step.id ,name: "new_task", status: 0, scheduled_complete_date: Date.current.strftime("%Y-%m-%d"))
-      if task1.save && update_completed_tasks_rate(@step)
+      new_task = Task.new(step_id: @step.id ,name: "new_task", status: 0, scheduled_complete_date: Date.current.strftime("%Y-%m-%d"))
+      if new_task.save && update_completed_tasks_rate(@step)
         @step.update_attribute(:status, "in_progress")
         redirect_to step_tasks_url(@step)
       else
@@ -167,12 +167,12 @@ class TasksController < Leads::ApplicationController
       #stautsが「完了」のタスクの中でもっとも遅い「完了日」をこの進捗の完了日とし、現在の進捗を「完了」とする
       latest_date = @step.tasks.where(status: "completed").maximum(:completed_date)
       @step.update_attributes(completed_date: latest_date, status: "completed")
-      redirect_to lead_steps_url(@step)
+      redirect_to step_tasks_url(@step)
     # 進捗中を選択したとき
     else
       #この進捗に「完了予定日」が本日で、statusが「未」の新しいタスクを追加し、現在の進捗を「進捗中」とする
-      task2 = Task.new(step_id: @step.id ,name: "new_task", status: 0, scheduled_complete_date: Date.current.strftime("%Y-%m-%d"))
-      if task2.save && update_completed_tasks_rate(@step)
+      new_task = Task.new(step_id: @step.id ,name: "new_task", status: 0, scheduled_complete_date: Date.current.strftime("%Y-%m-%d"))
+      if new_task.save && update_completed_tasks_rate(@step)
         @step.update_attribute(:status, "in_progress")
       else
         flash[:danger] = "新しいタスクの追加に失敗しました"
@@ -201,8 +201,8 @@ class TasksController < Leads::ApplicationController
       @step.update_attribute(:status, "inactive")
     #「未」のタスクをすべて「完了」を選択したとき
     else
-      #現在の進捗の「未」のタスクをすべて「完了」とし、その後complete_or_continueのurlへ飛ぶ
-      @step.tasks.where(status: "not_yet").update_all(status: "completed")
+      #現在の進捗の「未」のタスクをすべて「完了」とし、「完了日」を本日とし、その後complete_or_continueのurlへ飛ぶ
+      @step.tasks.where(status: "not_yet").update_all(status: "completed", completed_date: Date.current.strftime("%Y-%m-%d"))
       update_completed_tasks_rate(@step)
     end
     redirect_to check_status_and_get_url
@@ -236,7 +236,7 @@ class TasksController < Leads::ApplicationController
     end
     
     # day空でなく、今日より前ならtrue
-    def day_is_older_than_today(day)
+    def prohibit_future(day)
       day.blank? ? false : Date.parse(day) < Date.current
     end
 

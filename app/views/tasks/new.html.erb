@@ -17,13 +17,13 @@
   <%= f.select :status, Task.statuses.keys.map{ |k| ["enums.task.status.#{k}", k] }, class: "form-control" %>
 
   <%= f.label :scheduled_complete_date, class: "label-#{yield(:class_text)}" %>
-  <%= f.datetime_local_field :scheduled_complete_date, class: "form-control" %>
+  <%= f.date_field :scheduled_complete_date, class: "form-control" %>
 
   <%= f.label :completed_date, class: "label-#{yield(:class_text)}" %>
-  <%= f.datetime_local_field :completed_date, class: "form-control" %>
+  <%= f.date_field :completed_date, class: "form-control" %>
 
   <%= f.label :canceled_date, class: "label-#{yield(:class_text)}" %>
-  <%= f.datetime_local_field :canceled_date, class: "form-control" %>
+  <%= f.date_local_field :canceled_date, class: "form-control" %>
 
 
   <%= f.submit yield(:button_text), class: "btn-#{yield(:class_text)}" %>

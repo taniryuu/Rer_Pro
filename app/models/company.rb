@@ -1,5 +1,7 @@
 class Company < ApplicationRecord
   has_many :users, dependent: :destroy
+  accepts_nested_attributes_for :users
+  
   enum status: { active: 0, 
                  inactive: 1 
                }
