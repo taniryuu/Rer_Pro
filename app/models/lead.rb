@@ -5,6 +5,7 @@ class Lead < ApplicationRecord
   
   validates :created_date, presence: true
   validates :completed_date, presence: true, if: -> { status == "completed" }
+  validate :completed_date_prohibit_future
   validates :customer_name, presence: true, length: { in: 2..50 }
   validates :room_name, presence: true, length: { in: 2..50 }
   validates :room_num, presence: true, length: { in: 1..20 }
@@ -20,4 +21,5 @@ class Lead < ApplicationRecord
     model.validates :template_name, presence: true, length: { minimum: 2 }
   end
   enum status:[:in_progress, :completed, :inactive] # 案件ステータス
+  
 end
