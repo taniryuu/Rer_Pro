@@ -1,7 +1,9 @@
 Rails.application.routes.draw do
 
+  # 会社フォルダ群 company関連
   resources :companies
   
+  # ユーザーフォルダ群（Users::ApplicationControllerを継承）user, devise関連
   devise_scope :user do
     root :to => "devise/sessions#new"
     post 'login' => 'devise/sessions#create', as: :user_session
@@ -16,6 +18,7 @@ Rails.application.routes.draw do
     match 'users/:id', to: 'users/registrations#update', via: [:patch, :put], as: :other_user_registration
   end
   
+  # 案件フォルダ群（Leads::ApplicationControllerを継承）lead, step, task関連
   resources :leads, shallow: true, module: 'leads' do
     member do
       get 'edit_user_id'
@@ -46,10 +49,6 @@ Rails.application.routes.draw do
         end
       end
     end
-
   end
-
-
-
 
 end
