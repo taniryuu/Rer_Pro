@@ -3,7 +3,7 @@ class Leads::StepsController < Leads::ApplicationController
   before_action :set_step, except: %i(index new create)
   before_action :set_lead_and_user_by_lead_id, only: %i(index new create)
   # フィルター（アクセス権限）
-  before_action :same_company_id
+  before_action :only_same_company_id?
   before_action :correct_user, except: %i(index show)
   # 後処理
   after_action :sort_order, only: %i(destroy index)

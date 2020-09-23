@@ -2,7 +2,7 @@ class Leads::LeadsController < Leads::ApplicationController
   # オブジェクトの準備
   before_action :set_lead_and_user, except: %i(index new create)
   # フィルター（アクセス権限）
-  before_action :same_company_id, except: %i(index new create)
+  before_action :only_same_company_id?, except: %i(index new create)
   before_action :correct_user, only: %i(edit update)
   before_action :only_superior_user, only: %i(edit_user_id update_user_id)
   before_action :correct_or_admin_user, only: %i(destroy)

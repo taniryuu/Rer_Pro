@@ -1,11 +1,11 @@
 class CompaniesController < ApplicationController
-  include CompaniesHelper
-  
+  # オブジェクトの準備
   before_action :set_company, only: [:show, :edit, :update, :destroy]
+  # アクセス制限
   before_action :authenticate_user!, except: %i(new create)
   before_action :current_user_admin?, only: %i(show edit update destroy)
-  before_action :admin_company?, only: %i(index)
-  before_action :same_company_or_admin_company?, only: %i(show edit update destroy)
+  before_action :current_user_companies_admin?, only: %i(index)
+  before_action :same_company_or_companies_admin?, only: %i(show edit update destroy)
 
   # GET /companies
   # GET /companies.json
@@ -34,9 +34,8 @@ class CompaniesController < ApplicationController
     @company = Company.create(company_and_user_params)
     @company.admin = false
     if @company.save
-      user_id = @company.user_ids.first
-      sign_in set_user(user_id)
-      flash[:success] = "新規作成に成功しました"
+      sign_in @company.users.first
+      flash[:success] = "新規作成に成功しました。"
       redirect_to current_user
     else
       render :new
@@ -77,7 +76,7 @@ class CompaniesController < ApplicationController
     end
 
     # current_userのCompanyに管理者権限がない場合のアクセス制限
-    def admin_company?
+    def current_user_companies_admin?
       unless Company.find(current_user.company_id).admin?
         redirect_to root_url
         flash[:danger] = "無効なアクセスが確認されました。"
@@ -85,7 +84,7 @@ class CompaniesController < ApplicationController
     end
 
     # @companyとログインしたユーザーのcompany_idの一致+Companyの管理者権限を検証
-    def same_company_or_admin_company?
+    def same_company_or_companies_admin?
       unless @company == Company.find(current_user.company_id) || Company.find(current_user.company_id).admin?
         redirect_to current_user
         flash[:danger] = "無効なアクセスが確認されました。"
