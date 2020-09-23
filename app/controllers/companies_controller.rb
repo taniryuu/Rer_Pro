@@ -72,7 +72,7 @@ class CompaniesController < ApplicationController
     end
     # Only allow a list of trusted parameters through.
     def company_and_user_params
-      params.require(:company).permit(:name, :status, :admin, users_attributes: [:name, :login_id, :email, :password, :password_confirmation, :admin, :superior]).first
+      params.require(:company).permit(:name, :status, :admin, users_attributes: [:name, :login_id, :email, :password, :password_confirmation, :admin, :superior])
     end
 
     # current_userのCompanyに管理者権限がない場合のアクセス制限
