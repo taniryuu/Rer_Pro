@@ -27,8 +27,13 @@
 
     <%= form_with(model: @task, url: step_tasks_path(step_id: @step), method: :post, local: true) do |f| %>
   
+<<<<<<< HEAD
       <%= render 'devise/shared/error_messages', resource: @step %>
   
+=======
+      <%= render 'devise/shared/error_messages', resource: @task %>
+
+>>>>>>> 4fce2cb8ae72db8449303cd0c49ad835d1a87f7d
       <div class="row">
         <div class="col-2">
           <div class="form-group">            
@@ -82,4 +87,5 @@
       </tbody>
     </table>
 
-
+    <!--モーダルウインドウ表示-->
+    <div id="edit-revive-from-canceled-list" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>

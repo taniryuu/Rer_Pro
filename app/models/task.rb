@@ -5,14 +5,15 @@ class Task < ApplicationRecord
   validates :scheduled_complete_date, presence: true
   enum status: [:not_yet, :completed, :canceled] # 進捗ステータス
   
-  # 完了日が現在の日付より未来の日付を入れる場合はアラート
-  validate :completed_date_is_invalid_if_completed_date_is_newer_than_current_date
+  # 完了日に現在の日付より未来の日付を入れる場合はアラート
+  validate :not_newer_than_today
   
-  def completed_date_is_invalid_if_completed_date_is_newer_than_current_date
+  def not_newer_than_today
     errors.add(:completed_date, "は未来の日付は入れられません") if completed_date.present? && Date.parse(completed_date) > Date.current
   end
 
-  def if_date_blank_then_today(status)
+  # 完了日または中止にした日が空なら今日の日付を入れる
+  def date_blank_then_today(status)
     if status == "completed"
       if self.status == "completed" && self.completed_date.blank?
         self.update_attribute(:completed_date, Date.current.strftime("%Y-%m-%d"))
