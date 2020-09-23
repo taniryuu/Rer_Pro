@@ -42,7 +42,7 @@ class ApplicationController < ActionController::Base
     root_path
   end
 
-  # ログインユーザーを管理者かどうか識別し管理者以外ならtopに戻しflash表示
+  # ログインユーザーを管理者か識別し管理者以外時実行されるアクセス制限
   def current_user_admin?
     unless user_signed_in? && current_user.admin?
       redirect_to current_user
@@ -50,8 +50,8 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  # 自分の所属する企業と違うユーザーの場合のみ
-  def same_company_id
+  # @userの企業IDとログイン中のユーザーの企業IDを識別し違った場合実行されるアクセス制限
+  def only_same_company_id?
     unless @user.company_id == current_user.company_id
       redirect_to current_user
       flash[:danger] = "無効なアクセスが確認されました。"
@@ -61,7 +61,6 @@ class ApplicationController < ActionController::Base
   protected
 
     def configure_permitted_parameters
-      # devise_parameter_sanitizer.permit(:sign_up, keys: [:name, :email, :login_id, :status, :superior, :admin, :superior_id, :company_id])
       devise_parameter_sanitizer.permit(:sign_in, keys: [:login_id])
       devise_parameter_sanitizer.permit(:account_update, keys: [:name, :superior, :status, :superior_id, :email, :notified_num, :password, :password_confirmation, :current_password])
     end
