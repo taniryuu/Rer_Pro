@@ -56,15 +56,15 @@
 
   <!-- change step_status -->
 <% if @step.status == "not_yet" %>
-  <%= render 'steps/step_statuses/start', step: @step, completed_id: nil, button_name: "開始" %>
-  <%= render 'steps/step_statuses/cancel', step: @step %>
+  <%= render 'leads/step_statuses/start', step: @step, completed_id: nil, button_name: "開始" %>
+  <%= render 'leads/step_statuses/cancel', step: @step %>
 <% elsif @step.status == "inactive" %>
-  <%= render 'steps/step_statuses/start', step: @step, completed_id: nil, button_name: "再開" %>
+  <%= render 'leads/step_statuses/start', step: @step, completed_id: nil, button_name: "再開" %>
 <% elsif @step.status == "in_progress" %>
-  <%= render 'steps/step_statuses/cancel', step: @step %>
+  <%= render 'leads/step_statuses/cancel', step: @step %>
   <button type="button" class="btn btn-info" data-toggle="modal" data-target="#step-complete" data-name="<%= @step.name %>" data-id="<%= @step.id %>">完了</button>
 <% elsif @step.status == "completed" %>
-  <%= render 'steps/step_statuses/start', step: @step, completed_id: nil, button_name: "再開" %>
+  <%= render 'leads/step_statuses/start', step: @step, completed_id: nil, button_name: "再開" %>
 <% elsif @step.status == "template" %>
   <button type="button" class="btn btn-info">このテンプレートを使用して新規作成</button>
 <% end %>
@@ -87,7 +87,7 @@
               <tr>
                 <td>Step<%= step.order %></td>
                 <% if step.status == "not_yet" %>
-                  <td><%= render 'steps/step_statuses/start', step: step, completed_id: @step.id, button_name: "完了予定日を設定して開始する" %></td>
+                  <td><%= render 'leads/step_statuses/start', step: step, completed_id: @step.id, button_name: "完了予定日を設定して開始する" %></td>
                 <% elsif step.status == "inactive" %>
                   <td>
                     <p>
@@ -97,7 +97,7 @@
                     </p>
                     <div id="collapseStep<%= step.id %>" class="collapse">
                     	<div class="well">
-                        <%= render 'steps/step_statuses/start', step: step, completed_id: @step.id, button_name: "完了予定日を再設定して再開する" %>
+                        <%= render 'leads/step_statuses/start', step: step, completed_id: @step.id, button_name: "完了予定日を再設定して再開する" %>
                     	</div>
                     </div>
                   </td>
@@ -112,7 +112,7 @@
                     </p>
                     <div id="collapseStep<%= step.id %>" class="collapse">
                     	<div class="well">
-                        <%= render 'steps/step_statuses/start', step: step, completed_id: @step.id, button_name: "完了予定日を再設定して再開する" %>
+                        <%= render 'leads/step_statuses/start', step: step, completed_id: @step.id, button_name: "完了予定日を再設定して再開する" %>
                     	</div>
                     </div>
                   </td>

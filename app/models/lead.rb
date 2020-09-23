@@ -22,4 +22,9 @@ class Lead < ApplicationRecord
   end
   enum status:[:in_progress, :completed, :inactive] # 案件ステータス
   
+  # 案件検索機能。
+  def Lead.search(search)
+    return Lead.all unless search
+    Lead.where(['customer_name LIKE ?', "%#{search}%"])
+  end
 end

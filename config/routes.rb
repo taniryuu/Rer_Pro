@@ -16,17 +16,17 @@ Rails.application.routes.draw do
     match 'users/:id', to: 'users/registrations#update', via: [:patch, :put], as: :other_user_registration
   end
   
-  resources :leads, shallow: true do
+  resources :leads, shallow: true, module: 'leads' do
     member do
       get 'edit_user_id'
       patch 'update_user_id'
     end
     resources :steps do
       member do
-        get 'edit_status' => 'steps/step_statuses#edit', as: :edit_statuses_of
-        patch 'complete/:completed_id' => 'steps/step_statuses#complete', as: :complete
-        patch 'start' => 'steps/step_statuses#start', as: :start
-        patch 'cancel' => 'steps/step_statuses#cancel', as: :cancel
+        get 'edit_status' => 'steps_statuses#edit', as: :edit_statuses_of
+        patch 'complete/:completed_id' => 'steps_statuses#complete', as: :complete
+        patch 'start' => 'steps_statuses#start', as: :start
+        patch 'cancel' => 'steps_statuses#cancel', as: :cancel
       end
       member do
         get 'tasks/edit_add_delete_list'

@@ -1,4 +1,4 @@
-class StepsController < Leads::ApplicationController
+class Leads::StepsController < Leads::ApplicationController
   # オブジェクトの準備
   before_action :set_step, except: %i(index new create)
   before_action :set_lead_and_user_by_lead_id, only: %i(index new create)
