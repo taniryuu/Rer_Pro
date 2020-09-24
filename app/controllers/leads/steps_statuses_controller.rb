@@ -1,4 +1,4 @@
-class Steps::StepStatusesController < StepsController
+class Leads::StepsStatusesController < Leads::StepsController
   
   def edit
   end

@@ -1,4 +1,4 @@
-class LeadsController < Leads::ApplicationController
+class Leads::LeadsController < Leads::ApplicationController
   # オブジェクトの準備
   before_action :set_lead_and_user, except: %i(index new create)
   # フィルター（アクセス権限）
@@ -10,7 +10,7 @@ class LeadsController < Leads::ApplicationController
   # GET /leads
   # GET /leads.json
   def index
-    @leads = Lead.where(user_id: User.where(company_id: current_user.company_id).pluck(:id))
+    @leads = Lead.where(user_id: User.where(company_id: current_user.company_id).pluck(:id)).search(params[:searchword])
   end
 
   # GET /leads/1
