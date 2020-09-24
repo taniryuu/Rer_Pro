@@ -7,7 +7,7 @@ class Task < ApplicationRecord
   
   # 完了日に現在の日付より未来の日付を入れる場合はアラート
   validate :not_newer_than_today
-  
+
   def not_newer_than_today
     errors.add(:completed_date, "は未来の日付は入れられません") if completed_date.present? && Date.parse(completed_date) > Date.current
   end
