@@ -4,3 +4,10 @@
 
 <%= link_to 'Show', @lead %> |
 <%= link_to 'Back', leads_path %>
+<br>
+<%= link_to "本案件を完全に削除", 
+  lead_path(lead), 
+  method: :delete, 
+  data: {confirm: "本案件の情報を全て削除します。よろしいですか？"}, 
+  class: "btn btn-primary"
+%>
