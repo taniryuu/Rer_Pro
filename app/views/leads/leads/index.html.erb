@@ -1,6 +1,27 @@
+<% provide(:title, 'Admin') %>
+
 <p id="notice"><%= notice %></p>
 
 <h1>Leads</h1>
+
+<div class="container">
+  <h1></h1>
+  <h2></h2>
+  <div class="row">
+    <div class="col-md-3 col-md-offset-9">
+      <%= form_with url: leads_path, method: :get, local: true do |f| %>
+        <%= f.label "お客様名前検索", class: "label-serch" %>
+        <div style="display:inline-flex">
+          <%= f.search_field :searchword, class: "form-control-serch", placeholder: "キーワードを入力..." %>
+          <%= f.submit "検索", class: "btn btn-primary btn-serch" %>
+        </div>
+      <% end %>
+      <%= form_with url: leads_path, method: :get, local: true do |f| %>
+        <%= f.submit "検索結果をリセット（全表示）", class: "btn btn-primary btn-serch" %>
+      <% end %>
+    </div>
+  </div>
+</div>
 
 <table>
   <thead>

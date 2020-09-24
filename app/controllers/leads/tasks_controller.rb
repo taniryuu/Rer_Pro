@@ -1,4 +1,4 @@
-class TasksController < Leads::ApplicationController
+class Leads::TasksController < Leads::ApplicationController
   # オブジェクトの準備
   before_action :set_task, only: %i(show edit update destroy add_canceled_list 
                                     edit_revive_from_canceled_list update_revive_from_canceled_list)
