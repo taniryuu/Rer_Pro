@@ -10,7 +10,7 @@
   <div class="row">
     <div class="col-md-3 col-md-offset-9">
       <%= form_with url: leads_path, method: :get, local: true do |f| %>
-        <%= f.submit "検索結果をリセット（全表示）", class: "btn btn-primary btn-serch" %>
+        <%= f.submit "検索結果をリセット（全表示）", class: "btn btn-default btn-search" %>
       <% end %>
     </div>
     <br>
@@ -18,35 +18,51 @@
       <%#= will_paginate @users %>
       <table class="table table-hover" id="table-users">
         <thead>
-          <tr>
-            <th colspan="1">担当者名</th>
-            <th colspan="1">物件名/部屋番号</th>
-            <th colspan="1">お客様名
-              <%= form_with url: leads_path, method: :get, local: true do |f| %>
+          <%= form_with url: leads_path, method: :get, local: true do |f| %>
+            <tr>
+              <th colspan="1">
+                <%= f.submit "絞る", class: "btn btn-primary btn-search" %>
+              </th>
+              <th colspan="1">
                 <div style="display:inline-flex">
-                  <%= f.search_field :searchword, class: "form-control-serch", placeholder: "キーワードを入力...", value: params[:searchword] %>
-                  <%= f.submit "絞る", class: "btn btn-primary btn-serch" %>
+                  担当者名<%= link_to ' ▼ ', leads_path(sort: "user_id") %><%= link_to ' ▲ ', leads_path(sort: "user_id desc") %>
                 </div>
-              <% end %>
-            </th>
-            <th colspan="1">入居予定日</th>
-            <th colspan="1">入金予定日</th>
-            <th colspan="1">進捗状況</th>
-            <th colspan="1"></th>
-            <th colspan="1"></th>
-          </tr>
+                <%= f.select :user_searchword, @users, class: "form-control-search", multiple: true, include_blank: true, value: params[:user_searchword] %>
+              </th>
+              <th colspan="1">
+                <div style="display:inline-flex">
+                  物件名/部屋番号<%= link_to ' ▼ ', leads_path(sort: "room_name") %><%= link_to ' ▲ ', leads_path(sort: "room_name desc") %>
+                </div>
+                <%= f.search_field :room_searchword, class: "form-control-search", placeholder: "ｷｰﾜｰﾄﾞを入力...", value: params[:room_searchword], size: "8×10" %>
+              </th>
+              <th colspan="1">
+                <div style="display:inline-flex">
+                  お客様名<%= link_to ' ▼ ', leads_path(sort: "customer_name") %><%= link_to ' ▲ ', leads_path(sort: "customer_name desc") %>
+                </div>
+                <%= f.search_field :customer_searchword, class: "form-control-search", placeholder: "ｷｰﾜｰﾄﾞを入力...", value: params[:customer_searchword], size: "8×10" %>
+              </th>
+              <th colspan="1">入居予定日</th>
+              <th colspan="1">入金予定日</th>
+              <th colspan="1">進捗状況</th>
+              <th colspan="2"></th>
+            </tr>
+          <% end %>
         </thead>
         <tbody>
           <% @leads.each do |lead| %>
             <tr>
+              <td><%= lead.id %></td>
               <td><%= User.find(lead.user_id).name %></td>
               <td><%= "#{lead.room_name} / #{lead.room_num}号室" %></td>
               <td><%= lead.customer_name %></td>
-              <td><%= lead.scheduled_resident_date %></td>
-              <td><%= lead.scheduled_payment_date %></td>
+              <td><%= l(Time.parse(lead.scheduled_resident_date), format: :shortdate) %></td>
+              <td><%= l(Time.parse(lead.scheduled_payment_date), format: :shortdate) %></td>
               <td>
                 <%= lead.status_i18n %><br>
-                <%= lead.steps.find_by(status: "in_progress").name if lead.steps.find_by(status: "in_progress").present? %>
+                <% if lead.steps.find_by(status: "in_progress").present? %>
+                  <%= lead.steps.find_by(status: "in_progress").name %><br>
+                  <%= "#{lead.steps_rate}%" %>
+                <% end %>
               </td>
               <td><%= link_to 'Show', lead %></td>
               <td><%= link_to 'Edit', edit_lead_path(lead) %></td>

@@ -9,6 +9,7 @@ class Step < ApplicationRecord
                     numericality: {only_integer: true, greater_than_or_equal_to: 1}
   validate :order_is_serial_number
   validates :status, presence: true
+  validate :keep_status_in_progress
   validates :scheduled_complete_date, presence: true, length: { in: 0..32 }, if: -> { status == "in_progress" }
   validates :completed_date, presence: true, length: { in: 0..32 }, if: -> { status == "completed" }
   validate :completed_date_prohibit_future
@@ -27,10 +28,9 @@ class Step < ApplicationRecord
   
   # :statusは、進捗中にin_progressの少なくともどちらかがひとつ以上必要
   def keep_status_in_progress
-    if Lead.find(self.lead_id).status == "in_progress"
-      if Step.where(status: ["inactive", "in_progress"]).blank?
-        errors.add(:order, "進捗中の案件には、進捗中の進捗が少なくとも一つ以上必要です。")
-      end
+    lead = Lead.find(self.lead_id)
+    if lead.status == "in_progress" && lead.steps.where(status: "not_yet").present?
+      errors.add(:order, "進捗中の案件には、進捗中の進捗が少なくとも一つ以上必要です。") if lead.steps.where(status: "in_progress").blank?
     end
   end
   

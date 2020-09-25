@@ -10,7 +10,25 @@ class Leads::LeadsController < Leads::ApplicationController
   # GET /leads
   # GET /leads.json
   def index
-    @leads = Lead.where(user_id: User.where(company_id: current_user.company_id).pluck(:id)).search(params[:searchword])
+    @users = []
+    User.where(company_id: current_user.company_id).each do |user|
+      @users.push(["#{user.name}", user.id])
+    end
+    user_ids_all = User.where(company_id: current_user.company_id).pluck(:id)
+    user_ids = params[:user_searchword].present? ? params[:user_searchword] : user_ids_all
+    params_sort = params[:sort].present? ? params[:sort] : "created_date desc"
+    @leads = Lead.where(user_id: user_ids)
+                  .search("room_name", params[:room_searchword])
+                  .search("customer_name", params[:customer_searchword])
+                  .order(params_sort)
+    case leads_count = @leads.count
+      when 0
+        flash.now[:danger] = "該当する案件はありません。検索条件を見直しください。"
+      when Lead.where(user_id: user_ids_all).count
+        flash.now[:success] = "#{leads_count}件（全件）表示中"
+      else
+        flash.now[:success] = "#{leads_count}件ヒットしました。"
+    end
   end
 
   # GET /leads/1
