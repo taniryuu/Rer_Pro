@@ -29,8 +29,8 @@ class Step < ApplicationRecord
   # :statusは、進捗中にin_progressの少なくともどちらかがひとつ以上必要
   def keep_status_in_progress
     lead = Lead.find(self.lead_id)
-    if lead.status == "in_progress" && lead.steps.where(status: "not_yet").present?
-      errors.add(:order, "進捗中の案件には、進捗中の進捗が少なくとも一つ以上必要です。") if lead.steps.where(status: "in_progress").blank?
+    if lead.status == "in_progress" && lead.steps.find_by(status: "not_yet").present? && lead.steps.find_by(status: "in_progress").blank?
+      errors.add(:status, ":進捗中の案件には、進捗中の進捗が少なくとも一つ以上必要です。")
     end
   end
   

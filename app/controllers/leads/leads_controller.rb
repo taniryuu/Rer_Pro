@@ -1,6 +1,7 @@
 class Leads::LeadsController < Leads::ApplicationController
   # オブジェクトの準備
   before_action :set_lead_and_user, except: %i(index new create)
+  PER = 2 # ページネーションの表示件数。とりあえずここに記載しますが、要リファクタリング。
   # フィルター（アクセス権限）
   before_action :only_same_company_id?, except: %i(index new create)
   before_action :correct_user, only: %i(edit update)
@@ -25,10 +26,11 @@ class Leads::LeadsController < Leads::ApplicationController
       when 0
         flash.now[:danger] = "該当する案件はありません。検索条件を見直しください。"
       when Lead.where(user_id: user_ids_all).count
-        flash.now[:success] = "#{leads_count}件（全件）表示中"
+        flash.now[:success] = "全件表示中（全#{leads_count}件）"
       else
         flash.now[:success] = "#{leads_count}件ヒットしました。"
     end
+    @leads = @leads.page(params[:page])#.per(PER)
   end
 
   # GET /leads/1
