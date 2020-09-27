@@ -1,19 +1,25 @@
 module ApplicationHelper
-  # 自分以外且つ上長を取得しリスト作成。自分が上長の場合@users全員且つ自分以外をリスト作成
-  def superior_list(users, login_user)
-    superior_id = []
-    if login_user.superior?
+  # 引数のusersで取ってきた複数のユーザーをmember_listにpushしてリストを作成
+  def member_list(users)
+    member_list = []
+    if users.present?
       users.each do |user|
-        if user != login_user
-          superior_id.push(["#{user.name}", user.id])
-        end
+        member_list.push(["#{user.name}", user.id])
       end
     else
-      users.each do |user|
-        superior_id.push(["#{user.name}", user.id]) if user != login_user && user.superior?
-      end
+      member_list.push(["該当する社員がいません"])
     end
-    return superior_id
+    return member_list
+  end
+
+  # set_membersをbefore_actionしていて引数のusersに@usersを充てる
+  # 引数が上長==trueなら自分以外&&アクティブユーザーを取得、違う場合自分以外&&アクティブな上長の全員を取得する
+  def superior_users(users, login_user)
+    if login_user.superior?
+      users.where.not(id: login_user.id).where(status: "active")
+    else
+      users.where.not(id: login_user.id).where(superior: true).where(status: "active")
+    end
   end
 
   # 企業名を取得
