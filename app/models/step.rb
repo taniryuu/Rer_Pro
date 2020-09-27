@@ -30,11 +30,11 @@ class Step < ApplicationRecord
   def match_status_with_lead
     lead = Lead.find(self.lead_id)
     if lead.status == "in_progress" && lead.steps.find_by(status: "in_progress").blank?
-      errors.add(:status, ":進捗中の案件には、進捗中の進捗が少なくとも一つ以上必要です。") unless self.status = "in_progress"
+      errors.add(:status, ":進捗中の案件には、進捗中の進捗が少なくとも一つ以上必要です。") unless self.status == "in_progress"
     elsif lead.status == "completed" && lead.steps.find_by(status: "completed").blank?
-      errors.add(:status, ":完了済の案件には、完了済の進捗が少なくとも一つ以上必要です。") unless self.status = "completed"
+      errors.add(:status, ":完了済の案件には、完了済の進捗が少なくとも一つ以上必要です。") unless self.status == "completed"
     elsif lead.status == "inactive" && lead.steps.find_by(status: "inactive").blank?
-      errors.add(:status, ":凍結中の案件には、凍結中の進捗が必要です。") unless self.status = "inactive"
+      errors.add(:status, ":凍結中の案件には、凍結中の進捗が必要です。") unless self.status == "inactive"
     end
   end
   
