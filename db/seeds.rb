@@ -94,20 +94,20 @@ puts "Userテスト用サンプルレコード作成完了"
       #  scheduled_contract_date: 契約予定日
       #  steps_rate: 進捗率
       )
+      Step.create!(
+        lead_id: 1 + i + 7*j,
+        name: "進捗#{1 + i + 7*j}-1",
+        memo: "進捗#{1 + i + 7*j}-1のメモ",
+        status: "in_progress",
+        order: 1,
+        scheduled_complete_date: "#{Date.current + 3}",
+      )
     end
     puts "「サンプル太郎(#{j})」の案件作成完了"
   end
 end
 
 # Stepレコード作成
-Step.create!(
-  lead_id: 1,
-  name: "進捗1",
-  memo: "進捗1のメモ",
-  status: 2,
-  order: 1,
-  scheduled_complete_date: "#{Date.current + 3}",
-)
 6.times do |i|
   Step.create!(
     lead_id: 1,
