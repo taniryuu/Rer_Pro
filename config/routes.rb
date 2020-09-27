@@ -4,9 +4,7 @@ Rails.application.routes.draw do
   resources :companies
   
   # ユーザーフォルダ群（Users::ApplicationControllerを継承）user, devise関連
-  devise_for :users, skip: [:sessions, :registrations], controllers: {
-    registrations: "users/registrations"
-  }
+  devise_for :users, skip: [:sessions, :registrations], controllers: { registrations: "users/registrations" }
   resources :users, :only => [:index, :new, :create, :show, :destroy]
   devise_scope :user do
     root :to => "devise/sessions#new"

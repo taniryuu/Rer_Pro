@@ -37,7 +37,7 @@ class User < ApplicationRecord
   end
 
   # 同じ会社内の全ユーザー一覧を取得する
-  def company_of_user
+  def users_in_company
     User.where(company_id: self.company_id).order(id)
   end
 end

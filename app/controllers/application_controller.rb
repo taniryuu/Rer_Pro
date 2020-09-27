@@ -4,7 +4,7 @@ class ApplicationController < ActionController::Base
 
   # ログインしているユーザーがいる企業の社員全員取得
   def set_members
-    @users = current_user.company_of_user
+    @users = current_user.users_in_company
   end
 
   # @userが現在ログインしているユーザーである場合のみアクセス可
