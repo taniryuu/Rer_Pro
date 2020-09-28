@@ -1,7 +1,6 @@
 class Lead < ApplicationRecord
   belongs_to :user
   has_many :steps, dependent: :destroy
-  default_scope -> { order(created_date: :desc) }
   
   validates :created_date, presence: true
   validates :completed_date, presence: true, if: -> { status == "completed" }
@@ -23,8 +22,8 @@ class Lead < ApplicationRecord
   enum status:[:in_progress, :completed, :inactive] # 案件ステータス
   
   # 案件検索機能。
-  def Lead.search(search)
-    return Lead.all unless search
-    Lead.where(['customer_name LIKE ?', "%#{search}%"])
+  def Lead.search(search_column, search_word)
+    return Lead.all unless search_word
+    Lead.where(["#{search_column} LIKE ?", "%#{search_word}%"])
   end
 end

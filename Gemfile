@@ -48,6 +48,9 @@ gem 'jquery-rails'
 # enum
 gem 'enum'
 gem 'enum_help'
+# ページネーション
+gem 'kaminari'
+gem 'kaminari-bootstrap'
 
 
 group :development, :test do

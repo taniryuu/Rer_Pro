@@ -1,78 +1,87 @@
-<% provide(:title, 'Admin') %>
+<% search_message = "ｷｰﾜｰﾄﾞを入力..." %>
 
 <p id="notice"><%= notice %></p>
 
-<h1>Leads</h1>
-
 <div class="container">
-  <h1></h1>
-  <h2></h2>
+  <% if params[:user_searchword].blank? %>
+    <h1>案件一覧</h1>
+  <% else %>
+    <h1>担当案件一覧</h1>
+  <% end %>
   <div class="row">
     <div class="col-md-3 col-md-offset-9">
       <%= form_with url: leads_path, method: :get, local: true do |f| %>
-        <%= f.label "お客様名前検索", class: "label-serch" %>
-        <div style="display:inline-flex">
-          <%= f.search_field :searchword, class: "form-control-serch", placeholder: "キーワードを入力..." %>
-          <%= f.submit "検索", class: "btn btn-primary btn-serch" %>
-        </div>
+        <%= f.submit "検索結果をリセット（全表示）", class: "btn btn-default btn-search" if params[:user_searchword].present? || params[:room_searchword].present? || params[:customer_searchword].present? %>
       <% end %>
-      <%= form_with url: leads_path, method: :get, local: true do |f| %>
-        <%= f.submit "検索結果をリセット（全表示）", class: "btn btn-primary btn-serch" %>
-      <% end %>
+    </div>
+    <br>
+    <div class="col-md-12 col-md-offset-1">
+      <%= paginate @leads %>
+      <table class="table table-hover" id="table-users">
+        <thead>
+          <%= form_with url: leads_path, method: :get, local: true do |f| %>
+            <tr>
+              <th colspan="1">
+                <%= f.submit "絞る(ｿｰﾄﾘｾｯﾄ)", class: "btn btn-primary btn-search" %>
+              </th>
+              <th colspan="1">担当者名
+                <%= render "index_sort", mark: " ▼ ", sort: "user_id" %>
+                <%= render "index_sort", mark: " ▲ ", sort: "user_id desc" %>
+                <%= f.select :user_searchword, @users, selected: params[:user_searchword].to_i, class: "form-control-search", multiple: true, include_blank: true %>
+              </th>
+              <th colspan="1">物件名/部屋番号
+                <%= render "index_sort", mark: " ▼ ", sort: "room_name" %>
+                <%= render "index_sort", mark: " ▲ ", sort: "room_name desc" %>
+                <%= f.search_field :room_searchword, class: "form-control-search", placeholder: search_message, value: params[:room_searchword], size: "10×10" %>
+              </th>
+              <th colspan="1">お客様名
+                <%= render "index_sort", mark: " ▼ ", sort: "customer_name" %>
+                <%= render "index_sort", mark: " ▲ ", sort: "customer_name desc" %>
+                <%= f.search_field :customer_searchword, class: "form-control-search", placeholder: search_message, value: params[:customer_searchword], size: "10×10" %>
+              </th>
+              <th colspan="1">入居予定日
+                <%= render "index_sort", mark: " ▼ ", sort: "scheduled_resident_date" %>
+                <%= render "index_sort", mark: " ▲ ", sort: "scheduled_resident_date desc" %>
+              </th>
+              <th colspan="1">入金予定日
+                <%= render "index_sort", mark: " ▼ ", sort: "scheduled_payment_date" %>
+                <%= render "index_sort", mark: " ▲ ", sort: "scheduled_payment_date desc" %>
+              </th>
+              <th colspan="1">進捗状況
+                <%= render "index_sort", mark: " ▼ ", sort: "steps_rate" %>
+                <%= render "index_sort", mark: " ▲ ", sort: "steps_rate desc" %>
+              </th>
+              <th colspan="1">
+                <%= link_to '新規作成', new_lead_path, class: "btn btn-primary btn-lg" %>
+              </th>
+            </tr>
+          <% end %>
+        </thead>
+        <tbody>
+          <% @leads.each do |lead| %>
+            <tr>
+              <td>(ここに遅延状況を表示)</td>
+              <td><%= User.find(lead.user_id).name %></td>
+              <td><%= "#{lead.room_name} / #{lead.room_num}号室" %></td>
+              <td><%= lead.customer_name %></td>
+              <td><%= l(Time.parse(lead.scheduled_resident_date), format: :shortdate) %></td>
+              <td><%= l(Time.parse(lead.scheduled_payment_date), format: :shortdate) %></td>
+              <td>
+                <%= "#{latest_step_in(lead).name}:#{latest_step_in(lead).status_i18n}" %><br>
+                <%= "(#{lead.steps_rate}%)" %>
+              </td>
+              <td>
+                <div class = "tooltip-lead-index-show">
+                  <p>詳細表示</p>
+                  <div class = "description-lead-index-show"><%= render "index_show", lead: lead %></div>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+      <%= paginate @leads %>
     </div>
   </div>
 </div>
 
-<table>
-  <thead>
-    <tr>
-      <th>User</th>
-      <th>Created date</th>
-      <th>Completed date</th>
-      <th>Customer name</th>
-      <th>Room name</th>
-      <th>Room num</th>
-      <th>Template</th>
-      <th>Template name</th>
-      <th>Memo</th>
-      <th>Status</th>
-      <th>Notice created</th>
-      <th>Notice change limit</th>
-      <th>Scheduled resident date</th>
-      <th>Scheduled payment date</th>
-      <th>Scheduled contract date</th>
-      <th>Steps rate</th>
-      <th colspan="3"></th>
-    </tr>
-  </thead>
-
-  <tbody>
-    <% @leads.each do |lead| %>
-      <tr>
-        <td><%= lead.user_id %></td>
-        <td><%= lead.created_date %></td>
-        <td><%= lead.completed_date %></td>
-        <td><%= lead.customer_name %></td>
-        <td><%= lead.room_name %></td>
-        <td><%= lead.room_num %></td>
-        <td><%= lead.template %></td>
-        <td><%= lead.template_name %></td>
-        <td><%= lead.memo %></td>
-        <td><%= lead.status %></td>
-        <td><%= lead.notice_created %></td>
-        <td><%= lead.notice_change_limit %></td>
-        <td><%= lead.scheduled_resident_date %></td>
-        <td><%= lead.scheduled_payment_date %></td>
-        <td><%= lead.scheduled_contract_date %></td>
-        <td><%= lead.steps_rate %></td>
-        <td><%= link_to 'Show', lead %></td>
-        <td><%= link_to 'Edit', edit_lead_path(lead) %></td>
-        <td><%= link_to 'Destroy', lead, method: :delete, data: { confirm: 'Are you sure?' } %></td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
-
-<br>
-
-<%= link_to 'New Lead', new_lead_path %>

@@ -1,0 +1,28 @@
+<h5><%= "#{lead.room_name}に入居予定の#{lead.customer_name}様の案件" %></h5>
+<div class="row">
+  <div class="col-md-12 col-md-offset-1">
+    <table id="table-lead-index-show">
+      <thead>
+        <tr>
+          <th colspan="1">申込日</th>
+          <th colspan="1">最後に進捗を完了した日</th>
+          <th colspan="1">現在の進捗（進捗率）</th>
+          <th colspan="1">入居予定日</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><%= l(Time.parse(lead.created_date), format: :shortdate) %></td>
+          <td><%= l(Time.parse(last_update_date(lead)), format: :shortdate) %></td>
+          <td>
+            <%= latest_step_in(lead).name %>
+            <%= "(#{lead.steps_rate}%)" %>
+          </td>
+          <td><%= l(Time.parse(lead.scheduled_resident_date), format: :shortdate) %></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<%= link_to '本案件のメインページへ', lead, class: "btn btn-primary btn-sm" %>
+<%= link_to '編集', edit_lead_path(lead), class: "btn btn-primary btn-sm" if lead.user_id == current_user.id %>
