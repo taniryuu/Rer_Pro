@@ -20,6 +20,13 @@ class Leads::StepsController < Leads::ApplicationController
   def show
     @steps_except_self = @lead.steps.where.not(id: @step.id)
     @steps_from_now_on = @steps_except_self.where(status: ["not_yet", "in_progress"])
+    # タスクステータスが「未」のリスト
+    @tasks = @step.tasks.where(status: "not_yet").order(:scheduled_complete_date)
+    # タスクステータスが「完了」のリスト
+    @completed_tasks_array = @step.tasks.where(status: "completed").order(:completed_date)
+    # タスクステータスが「中止」のリスト
+    @canceled_tasks_array = @step.tasks.where(status: "canceled").order(:canceled_date)
+    @task = @step.tasks.new
   end
 
   # GET /steps/new
