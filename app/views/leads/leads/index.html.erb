@@ -6,7 +6,8 @@
   <% if params[:user_searchword].blank? %>
     <h1>案件一覧</h1>
   <% else %>
-    <h1>担当案件一覧</h1>
+    <% @user = User.find(params[:user_searchword]) %>
+    <h1><%= link_to @user.name, user_path(@user) %>担当案件一覧</h1>
   <% end %>
   <div class="row">
     <div class="col-md-3 col-md-offset-9">
