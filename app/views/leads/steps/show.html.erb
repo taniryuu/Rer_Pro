@@ -22,7 +22,6 @@
 </div>
 <div id="collapse-step-status-edit" class="collapse">
   <div class="well">
-    <!-- change step_status -->
     <% case @step.status %>
     <% when "not_yet" %>
       <%= render 'leads/step_statuses/start', step: @step, completed_id: nil, button_name: "開始" %>
@@ -47,7 +46,7 @@
 <br>////////////////////////////////////////////////////////////////////////////////////////////////////////////<br>
 
 
-
+ページはここまで。
 <br>////////////////////////////////////////////////////////////////////////////////////////////////////////////<br>
 以下はメモです。（最終プルリク上げる前に削除）
 <div class="row">
