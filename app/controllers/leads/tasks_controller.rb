@@ -204,7 +204,9 @@ class Leads::TasksController < Leads::ApplicationController
         update_steps_rate(@lead)
         redirect_to check_status_and_get_url
       else
-        render :edit_change_status_or_complete_task
+        flash[:danger] = @step.errors.full_messages.first
+        #render :edit_change_status_or_complete_task
+        redirect_to check_status_and_get_url
       end
     #進捗を「進捗中」としたとき
     when "in_progress"
