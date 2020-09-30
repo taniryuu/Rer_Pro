@@ -12,14 +12,16 @@ class Leads::StepsController < Leads::ApplicationController
   # GET /steps
   # GET /steps.json
   def index
-    @steps = @lead.steps.all
+    @steps = @lead.steps.all.order(:order)
   end
 
   # GET /steps/1
   # GET /steps/1.json
   def show
-    @steps_except_self = @lead.steps.where.not(id: @step.id)
-    @steps_from_now_on = @steps_except_self.where(status: ["not_yet", "in_progress"])
+    @steps = @lead.steps.all.order(:order)
+    @steps_except_self = @lead.steps.where.not(id: @step.id).order(:order)
+    @steps_from_now_on = @steps_except_self.where(status: ["not_yet", "in_progress"]).order(:order)
+    
     # タスクステータスが「未」のリスト
     @tasks = @step.tasks.where(status: "not_yet").order(:scheduled_complete_date)
     # タスクステータスが「完了」のリスト

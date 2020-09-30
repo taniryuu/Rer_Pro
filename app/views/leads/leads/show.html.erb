@@ -23,7 +23,7 @@
 <%= link_to "担当者を変更する", edit_user_id_lead_path(@lead) if current_user.superior? %>
 
 
-<%= link_to 'Step-index', lead_steps_path(@lead) %> |
+<%= link_to '本案件のメインページへ', lead_steps_path(@lead), class: "btn btn-primary btn-sm" %> |
 <%= link_to 'Edit', edit_lead_path(@lead) %> |
 <%= link_to 'Back', leads_path %>
 <br>//////////////////////////////////////////////////////////////////////<br>
