@@ -113,32 +113,58 @@
 
 <% end %>
 
-<p>済 リスト</p>
-<table>
-  <tbody>
-    <% @completed_tasks_array.each do |task| %>
-      <tr>
-        <td><%= link_to "#{task.name}", task_path(task) %></td>
-        <td><%= task.completed_date %></td>
-        <td><%= link_to '削除', task_path(task), method: :delete, data: { confirm: "「#{task.name}」を削除してよろしいですか？" } %></td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
+<!--p>済 リスト</p-->
+<div class="panel-group" id="accordion">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <p class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#collapse3">済 リスト</a>
+      </p>
+    </div>
+    <div id="collapse3" class="panel-collapse collapse in">
+      <div class="panel-body">
+        <!--p>済 リスト</p-->
+        <table>
+          <tbody>
+            <% @completed_tasks_array.each do |task| %>
+              <tr>
+                <td><%= link_to "#{task.name}", task_path(task) %></td>
+                <td><%= task.completed_date %></td>
+                <td><%= link_to '削除', task_path(task), method: :delete, data: { confirm: "「#{task.name}」を削除してよろしいですか？" } %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="panel panel-default">
+      <div class="panel-heading">
+        <p class="panel-title">
+          <a data-toggle="collapse" data-parent="#accordion" href="#collapse4">中止 リスト</a>
+        </h4>
+      </div>
+      <div id="collapse4" class="panel-collapse collapse">
+        <div class="panel-body">
+          <!--p>中止 リスト</p-->
+          <table>
+            <tbody>
+              <% @canceled_tasks_array.each do |task| %>
+                <tr>
+                  <td><%= link_to "#{task.name}", task_path(task) %></td>
+                  <td><%= task.canceled_date %></td>
+                  <td><%= link_to '復活', edit_revive_from_canceled_list_task_path(task), data: { confirm: "「#{task.name}」を復活してよろしいですか？"} %>
+                  <td><%= link_to '削除', task_path(task), method: :delete, data: { confirm: "「#{task.name}」を削除してよろしいですか？" } %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
-<p>中止 リスト</p>
-<table>
-  <tbody>
-    <% @canceled_tasks_array.each do |task| %>
-      <tr>
-        <td><%= link_to "#{task.name}", task_path(task) %></td>
-        <td><%= task.canceled_date %></td>
-        <td><%= link_to '復活', edit_revive_from_canceled_list_task_path(task), data: { confirm: "「#{task.name}」を復活してよろしいですか？"} %>
-        <td><%= link_to '削除', task_path(task), method: :delete, data: { confirm: "「#{task.name}」を削除してよろしいですか？" } %></td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
 <!--%= link_to 'Task-index', step_tasks_path(@step) %> |-->
 <%= link_to 'Edit', edit_step_path(@step) %> |
 <%= link_to 'Back', lead_steps_path(@lead) %>

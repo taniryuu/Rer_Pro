@@ -127,10 +127,9 @@ puts "「SampleUser0」の案件「お客様1」の進捗作成完了"
     name: "task#{i+1}",
     memo: "memo#{i+1}",
     status: 0,
-    scheduled_complete_date: "#{Date.current + 3}",
+    scheduled_complete_date: (I18n.l Date.current + 3, format: :standard),
   )
 end
-puts "「SampleUser0」の案件「お客様１」の「進捗１」の「未」タスク作成完了"
 
 # status「完了」のtaskレコード作成
 3.times do |i|
@@ -139,11 +138,10 @@ puts "「SampleUser0」の案件「お客様１」の「進捗１」の「未」
     name: "task#{i+4}",
     memo: "memo#{i+4}",
     status: 1,
-    scheduled_complete_date: "#{Date.current + 4}",
-    completed_date: "#{Date.current}",
+    scheduled_complete_date: (I18n.l Date.current + 4, format: :standard),
+    completed_date: (I18n.l Date.current, format: :standard),
   )
 end
-puts "「SampleUser0」の案件「お客様１」の「進捗１」の「完了」タスク作成完了"
 
 # status「中止」のtaskレコード作成
 3.times do |i|
@@ -152,9 +150,9 @@ puts "「SampleUser0」の案件「お客様１」の「進捗１」の「完了
     name: "task#{i+7}",
     memo: "memo#{i+7}",
     status: 2,
-    scheduled_complete_date: "#{Date.current + 5}",
-    canceled_date: "#{Date.current - 1}",
+    scheduled_complete_date: (I18n.l Date.current + 5, format: :standard),
+    canceled_date: (I18n.l Date.current - 1, format: :standard),
   )
 end
-puts "「SampleUser0」の案件「お客様１」の「進捗１」の「中止」タスク作成完了"
+puts "「SampleUser0」の案件「お客様１」の「進捗１」のタスク作成完了"
 
