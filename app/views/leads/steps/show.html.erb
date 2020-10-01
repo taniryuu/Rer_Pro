@@ -39,19 +39,21 @@
 </div>
 <div id="collapse-step-status-edit" class="collapse">
   <div class="well">
-    <% case @step.status %>
-    <% when "not_yet" %>
-      <%= render 'leads/step_statuses/start', step: @step, completed_id: nil, button_name: "開始" %>
-    <% when "inactive" %>
-      <%= render 'leads/step_statuses/start', step: @step, completed_id: nil, button_name: "再開" %>
-    <% when "in_progress" %>
-      <button type="button" class="btn btn-info" data-toggle="modal" data-target="#step-complete" data-name="<%= @step.name %>" data-id="<%= @step.id %>">完了</button>
-      <%= render 'leads/step_statuses/cancel', step: @step %>
-    <% when "completed" %>
-      <%= render 'leads/step_statuses/start', step: @step, completed_id: nil, button_name: "再開" %>
-    <% when "template" %>
-      <button type="button" class="btn btn-info">このテンプレートを使用して新規作成</button>
-    <% end %>
+    <h5 style="display:inline;">
+      <% case @step.status %>
+      <% when "not_yet" %>
+        <%= render 'leads/step_statuses/start', step: @step, completed_id: nil, button_name: "開始" %>
+      <% when "inactive" %>
+        <%= render 'leads/step_statuses/start', step: @step, completed_id: nil, button_name: "再開" %>
+      <% when "in_progress" %>
+        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#step-complete" data-name="<%= @step.name %>" data-id="<%= @step.id %>">完了</button>
+        <%= render 'leads/step_statuses/cancel', step: @step %>
+      <% when "completed" %>
+        <%= render 'leads/step_statuses/start', step: @step, completed_id: nil, button_name: "再開" %>
+      <% when "template" %>
+        <button type="button" class="btn btn-info">このテンプレートを使用して新規作成</button>
+      <% end %>
+    </h5>
     <h5 style="display:inline;"><%= link_to '直接編集', edit_step_path(@step) %></h5>
   </div>
 </div>

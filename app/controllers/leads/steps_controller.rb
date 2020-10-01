@@ -86,12 +86,7 @@ class Leads::StepsController < Leads::ApplicationController
   # DELETE /steps/1
   # DELETE /steps/1.json
   def destroy
-    @step.destroy
-    check_status_completed_or_not(@lead, nil)
-    respond_to do |format|
-      format.html { redirect_to lead_steps_url(@lead), notice: 'Step was successfully destroyed.' }
-      format.json { head :no_content }
-    end
+    destroy_step(@lead, @step)
   end
 
   private
