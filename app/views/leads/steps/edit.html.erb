@@ -3,4 +3,5 @@
 <%= render 'form', lead: nil, step: @step %>
 
 <%= link_to 'Show', @step %> |
+<%= link_to 'Destroy', step_path(@step), method: :delete, data: { confirm: 'Are you sure?' } %> |
 <%= link_to 'Back', lead_steps_path(@lead) %>

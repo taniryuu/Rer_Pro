@@ -1,4 +1,25 @@
 class Leads::ApplicationController < Users::ApplicationController
+  include LeadsHelper
+  
+  # 進捗の削除処理を実行
+  def destroy_step(lead, step)
+    # 本来ならモデルでvalidateしたい内容だが、削除後にバリデーションを通して失敗したらrollback、という実装に時間がかかりそうなので、とりあえずfatコントローラで対応した。
+    steps_except_self = lead.steps.where.not(id: step.id).order(:order)
+    if steps_except_self.blank?
+      flash[:danger] = "#{step.name}を削除できません。案件には、進捗が少なくとも一つ以上必要です。"
+    elsif lead.status == "in_progress" && steps_except_self.find_by(status: "in_progress").blank?
+      flash[:danger] = "#{step.name}を削除できません。進捗中の案件には、進捗中の進捗が少なくとも一つ以上必要です。"
+    elsif lead.status == "completed" && steps_except_self.find_by(status: "completed").blank?
+      flash[:danger] = "#{step.name}を削除できません。終了済の案件には、完了済の進捗が少なくとも一つ以上必要です。"
+    elsif lead.status == "inactive" && steps_except_self.find_by(status: "inactive").blank?
+      flash[:danger] = "#{step.name}を削除できません。凍結中の案件には、中止した進捗が少なくとも一つ以上必要です。"
+    else
+      step.destroy
+      check_status_completed_or_not(lead, nil)
+      flash[:success] = "#{step.name}を削除しました。"
+    end
+    redirect_to Step.find_by(id: step.id).present? ? step : working_step_in(lead)
+  end
   
   # 本日付で案件の完了処理を実行
   def complete_lead(lead)
