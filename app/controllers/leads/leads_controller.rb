@@ -54,10 +54,9 @@ class Leads::LeadsController < Leads::ApplicationController
   # POST /leads.json
   def create
     @lead = current_user.leads.new(lead_params)
-
     respond_to do |format|
       if @lead.save && update_steps_rate(@lead)
-        format.html { redirect_to @lead, notice: 'Lead was successfully created.' }
+        format.html { redirect_to new_lead_step_path(@lead), notice: '案件を作成しました。引き続き進捗を登録してください。' }
         format.json { render :show, status: :created, location: @lead }
       else
         format.html { render :new }
