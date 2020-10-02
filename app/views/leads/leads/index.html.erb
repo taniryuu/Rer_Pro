@@ -79,16 +79,10 @@
                   </div>
                 </td>
               <% elsif lead.user_id == current_user.id %>
-                <td>
-                  <%= link_to '進捗を作成', new_lead_step_path(lead), class: "btn btn-primary btn-sm" if lead.user_id == current_user.id %>
-                </td>
-                <td>
-                  <%= link_to '編集', edit_lead_path(lead), class: "btn btn-primary btn-sm" if lead.user_id == current_user.id %>
-                </td>
+                <td><%= link_to '進捗を作成', new_lead_step_path(lead), class: "btn btn-primary btn-sm" %></td>
+                <td><%= link_to '編集', edit_lead_path(lead), class: "btn btn-primary btn-sm" %></td>
               <% else %>
-                <td colspan="2">
-                  <%= "申込日：#{l(Time.parse(lead.created_date), format: :shortdate)}" %>
-                </td>
+                <td colspan="2"><%= "申込日：#{l(Time.parse(lead.created_date), format: :shortdate)}" %></td>
               <% end %>
             </tr>
           <% end %>
