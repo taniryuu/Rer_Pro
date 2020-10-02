@@ -108,5 +108,16 @@ class Leads::ApplicationController < Users::ApplicationController
   def calculate_rate(completed_num, not_yet_num)
     return completed_num == 0 ? 0 : 100 * completed_num / (completed_num + not_yet_num)
   end
+ 
+  def cancel_step(lead, step)
+    if step.update_attributes(status: "inactive", canceled_date: "#{Date.current}")
+      check_status_completed_or_not(lead, step)
+      flash[:success] = "#{step.name}を中止しました。以後、本進捗は通知対象になりません。"
+    else
+      flash[:danger] = step.errors.full_messages.first
+    end
+    redirect_to step
+  end
   
+ 
 end

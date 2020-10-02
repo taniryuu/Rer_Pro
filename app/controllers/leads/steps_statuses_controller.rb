@@ -51,13 +51,7 @@ class Leads::StepsStatusesController < Leads::StepsController
   end
   
   def cancel
-    if @step.update_attributes(status: "inactive", canceled_date: "#{Date.current}")
-      check_status_completed_or_not(@lead, @step)
-      flash[:success] = "#{@step.name}を中止しました。以後、本進捗は通知対象になりません。"
-    else
-      flash[:danger] = "#{@step.name}の中止処理に失敗しました。システム管理者にご連絡ください。"
-    end
-    redirect_to @step
+    cancel_step(@lead, @step)
   end
   
 end
