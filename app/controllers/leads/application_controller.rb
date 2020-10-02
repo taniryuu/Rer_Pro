@@ -93,7 +93,6 @@ class Leads::ApplicationController < Users::ApplicationController
       check_status_completed_or_not(lead, step)
       flash[:success] = "#{step.name}を中止しました。以後、本進捗は通知対象になりません。"
     else
-      # flash[:danger] = "#{step.name}の中止処理に失敗しました。システム管理者にご連絡ください。"
       flash[:danger] = step.errors.full_messages.first
     end
     redirect_to step

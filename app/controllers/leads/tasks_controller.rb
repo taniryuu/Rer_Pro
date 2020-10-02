@@ -100,7 +100,7 @@ class Leads::TasksController < Leads::ApplicationController
         deleted_tasks.each do |deleted_task|
           deleted_task.update_attribute(:status, "completed")
           update_completed_tasks_rate(@step)
-          deleted_task.update_attribute(:completed_date, (l Date.current, format: :standard))
+          deleted_task.update_attribute(:completed_date, (l Date.current))
         end
       end
     end
@@ -111,7 +111,7 @@ class Leads::TasksController < Leads::ApplicationController
   def add_canceled_list
     @task.update_attribute(:status, "canceled")
     update_completed_tasks_rate(@step)
-    @task.update_attribute(:canceled_date, (l Date.current, format: :standard))
+    @task.update_attribute(:canceled_date, (l Date.current))
     redirect_to check_status_and_get_url
   end
 
@@ -140,7 +140,7 @@ class Leads::TasksController < Leads::ApplicationController
     #進捗を継続を選択したとき
     if params[:continue_or_destroy] == "continue"
       #この進捗に「完了予定日」が本日で、statusが「未」の新しいタスクを追加し、現在の進捗を「進捗中」とする
-      new_task = Task.new(step_id: @step.id ,name: "new_task", status: 0, scheduled_complete_date: (l Date.current, format: :standard))
+      new_task = Task.new(step_id: @step.id ,name: "new_task", status: 0, scheduled_complete_date: (l Date.current))
       if new_task.save && update_completed_tasks_rate(@step)
         @step.update_attribute(:status, "in_progress")
         update_steps_rate(@lead)
@@ -179,7 +179,7 @@ class Leads::TasksController < Leads::ApplicationController
     # 進捗中を選択したとき
     else
       #この進捗に「完了予定日」が本日で、statusが「未」の新しいタスクを追加し、現在の進捗を「進捗中」とする
-      new_task = Task.new(step_id: @step.id ,name: "new_task", status: 0, scheduled_complete_date: (l Date.current, format: :standard))
+      new_task = Task.new(step_id: @step.id ,name: "new_task", status: 0, scheduled_complete_date: (l Date.current))
       if new_task.save && update_completed_tasks_rate(@step)
         @step.update_attribute(:status, "in_progress")
         update_steps_rate(@lead)
@@ -218,13 +218,10 @@ class Leads::TasksController < Leads::ApplicationController
     when "inactive"
       #現在の進捗を「保留」とする
       cancel_step(@lead, @step)
-      #@step.update_attribute(:status, "inactive")
-      #update_steps_rate(@lead)
-      #redirect_to check_status_and_get_url
     #「未」のタスクをすべて「完了」を選択したとき
     else
       #現在の進捗の「未」のタスクをすべて「完了」とし、「完了日」を本日とし、その後complete_or_continueのurlへ飛ぶ
-      @step.tasks.where(status: "not_yet").update_all(status: "completed", completed_date: (l Date.current, format: :standard))
+      @step.tasks.where(status: "not_yet").update_all(status: "completed", completed_date: (l Date.current))
       update_completed_tasks_rate(@step)
       redirect_to check_status_and_get_url
     end
