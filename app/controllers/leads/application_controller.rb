@@ -1,7 +1,47 @@
 class Leads::ApplicationController < Users::ApplicationController
   include LeadsHelper
   
-  # 進捗の削除処理を実行
+  # 進捗の開始処理を実行し詳細ページへ遷移
+  def start_step(lead, step)
+    @success_message = "" # transaction内で代入した値を使うため、インスタンス変数を用いている。""を代入してリセットしている。
+    ActiveRecord::Base.transaction do
+      case step.status
+        when "not_yet"
+          @success_message = "#{step.name}を開始しました。" if step.update_attributes(status: "in_progress", scheduled_complete_date: params[:step][:scheduled_complete_date])
+        when "inactive"
+          @success_message = "#{step.name}を再開しました。" if step.update_attributes(status: "in_progress", scheduled_complete_date: params[:step][:scheduled_complete_date], canceled_date: "")
+        when "in_progress"
+          @success_message = "#{step.name}は既に進捗中です。"
+        when "completed"
+          @success_message = "#{step.name}を再開しました。" if step.update_attributes(status: "in_progress", scheduled_complete_date: params[:step][:scheduled_complete_date], completed_date: "")
+      end
+      if params[:completed_id].present?
+        completed_step = Step.find(params[:completed_id])
+        complete_step(lead, completed_step)
+        @success_message = "#{completed_step.name}を完了し、#{step.name}を開始しました。"
+      end
+      check_status_completed_or_not(lead, step)
+      raise ActiveRecord::Rollback if lead.errors.present? || step.errors.present?
+    end
+    
+    flash[:danger] = lead.errors.full_messages.first if lead.errors.present?
+    flash[:danger] = step.errors.full_messages.first if step.errors.present?
+    flash[:success] = @success_message if @success_message.present?
+    redirect_to step
+  end
+  
+  # 進捗の中止処理を実行し詳細ページへ遷移
+  def cancel_step(lead, step)
+    if step.update_attributes(status: "inactive", canceled_date: "#{Date.current}")
+      check_status_completed_or_not(lead, step)
+      flash[:success] = "#{step.name}を中止しました。以後、本進捗は通知対象になりません。"
+    else
+      flash[:danger] = step.errors.full_messages.first
+    end
+    redirect_to step
+  end
+  
+  # 進捗の削除処理を実行し詳細ページへ遷移
   def destroy_step(lead, step)
     # 本来ならモデルでvalidateしたい内容だが、削除後にバリデーションを通して失敗したらrollback、という実装に時間がかかりそうなので、とりあえずfatコントローラで対応した。
     steps_except_self = lead.steps.where.not(id: step.id).order(:order)
@@ -108,16 +148,5 @@ class Leads::ApplicationController < Users::ApplicationController
   def calculate_rate(completed_num, not_yet_num)
     return completed_num == 0 ? 0 : 100 * completed_num / (completed_num + not_yet_num)
   end
- 
-  def cancel_step(lead, step)
-    if step.update_attributes(status: "inactive", canceled_date: "#{Date.current}")
-      check_status_completed_or_not(lead, step)
-      flash[:success] = "#{step.name}を中止しました。以後、本進捗は通知対象になりません。"
-    else
-      flash[:danger] = step.errors.full_messages.first
-    end
-    redirect_to step
-  end
-  
  
 end

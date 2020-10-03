@@ -67,16 +67,23 @@
               <td><%= lead.customer_name %></td>
               <td><%= l(Time.parse(lead.scheduled_resident_date), format: :shortdate) %></td>
               <td><%= l(Time.parse(lead.scheduled_payment_date), format: :shortdate) %></td>
-              <td>
-                <%= "#{latest_step_in(lead).name}:#{latest_step_in(lead).status_i18n}" %><br>
-                <%= "(#{lead.steps_rate}%)" %>
-              </td>
-              <td>
-                <div class = "tooltip-lead-index-show">
-                  <p class = "btn btn-primary btn-lg">詳細表示</p>
-                  <div class = "description-lead-index-show"><%= render "index_show", lead: lead %></div>
-                </div>
-              </td>
+              <% if lead.steps.first.present? %>
+                <td>
+                  <%= "#{latest_step_in(lead).name}:#{latest_step_in(lead).status_i18n}" %><br>
+                  <%= "(#{lead.steps_rate}%)" %>
+                </td>
+                <td>
+                  <div class = "tooltip-lead-index-show">
+                    <p class = "btn btn-primary btn-lg">詳細表示</p>
+                    <div class = "description-lead-index-show"><%= render "index_show", lead: lead %></div>
+                  </div>
+                </td>
+              <% elsif lead.user_id == current_user.id %>
+                <td><%= link_to '進捗を作成', new_lead_step_path(lead), class: "btn btn-primary btn-sm" %></td>
+                <td><%= link_to '編集', edit_lead_path(lead), class: "btn btn-primary btn-sm" %></td>
+              <% else %>
+                <td colspan="2"><%= "申込日：#{l(Time.parse(lead.created_date), format: :shortdate)}" %></td>
+              <% end %>
             </tr>
           <% end %>
         </tbody>
