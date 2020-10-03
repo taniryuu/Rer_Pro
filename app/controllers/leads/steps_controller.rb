@@ -12,22 +12,22 @@ class Leads::StepsController < Leads::ApplicationController
   # GET /steps
   # GET /steps.json
   def index
-    @steps = @lead.steps.all.order(:order)
+    @steps = @lead.steps.all.ord
   end
 
   # GET /steps/1
   # GET /steps/1.json
   def show
-    @steps = @lead.steps.all.order(:order)
-    @steps_except_self = @lead.steps.where.not(id: @step.id).order(:order)
-    @steps_from_now_on = @steps_except_self.where(status: ["not_yet", "in_progress"]).order(:order)
+    @steps = @lead.steps.all.ord
+    @steps_except_self = @steps.not_self(@step)
+    @steps_from_now_on = @steps_except_self.todo
     
     # タスクステータスが「未」のリスト
-    @tasks = @step.tasks.where(status: "not_yet").order(:scheduled_complete_date)
+    @tasks = @step.tasks.not_yet.order(:scheduled_complete_date)
     # タスクステータスが「完了」のリスト
-    @completed_tasks_array = @step.tasks.where(status: "completed").order(:completed_date)
+    @completed_tasks_array = @step.tasks.completed.order(:completed_date)
     # タスクステータスが「中止」のリスト
-    @canceled_tasks_array = @step.tasks.where(status: "canceled").order(:canceled_date)
+    @canceled_tasks_array = @step.tasks.canceled.order(:canceled_date)
     @task = @step.tasks.new
   end
 
@@ -50,7 +50,7 @@ class Leads::StepsController < Leads::ApplicationController
       if save_and_errors_of(@step).blank?
         @completed_step = Step.find(completed_id) # save_and_errors_ofメソッドの後で定義する。さもないと、上の行で順序が変更になった際にcompleteメソッドでエラーを吐く。
         complete_step(@lead, @completed_step)
-        flash[:success] = "#{@completed_step.name}を完了し、#{@step.name}を開始しました。"
+        flash[:success] = "#{flash[:success]}#{@completed_step.name}を完了し、#{@step.name}を開始しました。"
         redirect_to @step
       else
         @completed_step = Step.find(completed_id) # 完了処理が終わっていないので改めてオブジェクトを渡す。
