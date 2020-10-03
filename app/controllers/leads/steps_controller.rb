@@ -49,7 +49,7 @@ class Leads::StepsController < Leads::ApplicationController
       flash[:success] = "#{flash[:success]}#{@step.name}を作成しました。"
       redirect_to @step
     else
-#      flash[:success].destroy
+      flash.delete(:success)
       flash.now[:danger] = "#{@lead.errors.full_messages.first}#{@completed_step.errors.full_messages.first}"
       render :new
     end
@@ -62,6 +62,7 @@ class Leads::StepsController < Leads::ApplicationController
       flash[:success] = "#{flash[:success]}#{@step.name}を更新しました。"
       redirect_to @step
     else
+      flash.delete(:success)
       flash.now[:danger] = @lead.errors.full_messages.first
       render :edit
     end
@@ -96,18 +97,18 @@ class Leads::StepsController < Leads::ApplicationController
     def save_and_errors_of(lead, step)
       errors = []
       ActiveRecord::Base.transaction do
+        # 作成処理
         prepare_order(lead.steps.count + 1, step.order)
         errors << step.errors.full_messages unless step.save
-        
+        # 完了する進捗がある場合の処理
         completed_id = params[:step][:completed_id]
         if completed_id.present?
           @completed_step = Step.find(completed_id) # 完了処理に失敗したら、改めてオブジェクトを渡す必要があるのでインスタンス変数を使用。
           errors << @completed_step.errors.full_messages unless complete_step(lead, @completed_step)
         end
-        
+        # 矛盾を解消
         check_status_completed_or_not(lead, step)
-        
-        # 更新処理後にバリデーション確認
+        # バリデーション確認
         errors << lead.errors.full_messages if lead.invalid?(:check_steps_status)
         errors << step.errors.full_messages if step.invalid?(:check_order)
         raise ActiveRecord::Rollback if errors.present?
@@ -119,10 +120,12 @@ class Leads::StepsController < Leads::ApplicationController
     def update_and_errors_of(lead, step)
       errors = []
       ActiveRecord::Base.transaction do
+        # 更新処理
         prepare_order(step.order, params[:step][:order].to_i)
         step.update(step_params)
+        # 矛盾を解消
         check_status_completed_or_not(lead, step)
-        # 更新処理後にバリデーション確認
+        # バリデーション確認
         errors << lead.errors.full_messages if lead.invalid?(:check_steps_status)
         errors << step.errors.full_messages if step.invalid?(:check_order)
         raise ActiveRecord::Rollback if errors.present?
