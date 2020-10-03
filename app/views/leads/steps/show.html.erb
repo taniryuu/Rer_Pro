@@ -15,6 +15,7 @@
   <% step_button_color = (step.id == @step.id) ? "danger" : "info" %>
   <%= link_to "#{step.order}", step_path(step), class: "btn btn-#{step_button_color} btn-lg" %>
 <% end %>
+<%= link_to "追加", new_lead_step_path(@lead), class: "btn btn-default btn-lg" %>
 
 <br>////////////////////////////////////////////////////////////////////////////////////////////////////////////<br>
 
@@ -34,7 +35,7 @@
     <% when "template" %>
     <% end %>
   <a class="btn btn-default" data-toggle="collapse" href="#collapse-step-status-edit">
-    編集
+    編集▼
   </a>
 </div>
 <div id="collapse-step-status-edit" class="collapse">

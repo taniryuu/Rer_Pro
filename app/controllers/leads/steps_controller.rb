@@ -50,7 +50,8 @@ class Leads::StepsController < Leads::ApplicationController
       redirect_to @step
     else
       flash.delete(:success)
-      flash.now[:danger] = "#{@lead.errors.full_messages.first}#{@completed_step.errors.full_messages.first}"
+      flash.now[:danger] = "#{@lead.errors.full_messages.first}" if @lead.errors.present?
+      flash.now[:danger] = "#{flash.now[:danger]}#{@completed_step.errors.full_messages.first}" if @completed_step.present? && @completed_step.errors.present?
       render :new
     end
   end
@@ -63,7 +64,7 @@ class Leads::StepsController < Leads::ApplicationController
       redirect_to @step
     else
       flash.delete(:success)
-      flash.now[:danger] = @lead.errors.full_messages.first
+      flash.now[:danger] = @lead.errors.full_messages.first if @lead.errors.present?
       render :edit
     end
   end
@@ -97,16 +98,16 @@ class Leads::StepsController < Leads::ApplicationController
     def save_and_errors_of(lead, step)
       errors = []
       ActiveRecord::Base.transaction do
-        # 作成処理
+        # 作成処理（バリデーションなし）
         prepare_order(lead.steps.count + 1, step.order)
         errors << step.errors.full_messages unless step.save
         # 完了する進捗がある場合の処理
-        completed_id = params[:step][:completed_id]
-        if completed_id.present?
-          @completed_step = Step.find(completed_id) # 完了処理に失敗したら、改めてオブジェクトを渡す必要があるのでインスタンス変数を使用。
+        if params[:step][:completed_id].present?
+          @completed_step = Step.find(params[:step][:completed_id]) # 完了処理に失敗したら、改めてオブジェクトを渡す必要があるのでインスタンス変数を使用。
           errors << @completed_step.errors.full_messages unless complete_step(lead, @completed_step)
         end
         # 矛盾を解消
+        check_status_inactive_or_not(step)
         check_status_completed_or_not(lead, step)
         # バリデーション確認
         errors << lead.errors.full_messages if lead.invalid?(:check_steps_status)
@@ -120,10 +121,11 @@ class Leads::StepsController < Leads::ApplicationController
     def update_and_errors_of(lead, step)
       errors = []
       ActiveRecord::Base.transaction do
-        # 更新処理
+        # 更新処理（バリデーションなし）
         prepare_order(step.order, params[:step][:order].to_i)
         step.update(step_params)
         # 矛盾を解消
+        check_status_inactive_or_not(step)
         check_status_completed_or_not(lead, step)
         # バリデーション確認
         errors << lead.errors.full_messages if lead.invalid?(:check_steps_status)
@@ -157,7 +159,6 @@ class Leads::StepsController < Leads::ApplicationController
     # 順番をチェックし、空があったら詰める処理
     def sort_order
       if @lead.steps.find_by(order: @lead.steps.count + 1).present?
-#        debugger
         (1..@lead.steps.count).each do |order_num|
           if @lead.steps.find_by(order: order_num).blank?
             step = @lead.steps.find_by(order: order_num + 1)
