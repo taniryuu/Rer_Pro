@@ -45,41 +45,25 @@ class Leads::StepsController < Leads::ApplicationController
   # POST /steps.json
   def create
     @step = @lead.steps.new(step_params)
-    completed_id = params[:step][:completed_id]
-    if completed_id.present?
-      if save_and_errors_of(@step).blank?
-        @completed_step = Step.find(completed_id) # save_and_errors_ofメソッドの後で定義する。さもないと、上の行で順序が変更になった際にcompleteメソッドでエラーを吐く。
-        complete_step(@lead, @completed_step)
-        flash[:success] = "#{flash[:success]}#{@completed_step.name}を完了し、#{@step.name}を開始しました。"
-        redirect_to @step
-      else
-        @completed_step = Step.find(completed_id) # 完了処理が終わっていないので改めてオブジェクトを渡す。
-        render :new
-      end
+    if save_and_errors_of(@lead, @step).blank?
+      flash[:success] = "#{flash[:success]}#{@step.name}を作成しました。"
+      redirect_to @step
     else
-      respond_to do |format|
-        if save_and_errors_of(@step).blank?
-          format.html { redirect_to @step, notice: 'Step was successfully created.' }
-          format.json { render :show, status: :created, location: @step }
-        else
-          format.html { render :new }
-          format.json { render json: @step.errors, status: :unprocessable_entity }
-        end
-      end
+#      flash[:success].destroy
+      flash.now[:danger] = "#{@lead.errors.full_messages.first}#{@completed_step.errors.full_messages.first}"
+      render :new
     end
   end
 
   # PATCH/PUT /steps/1
   # PATCH/PUT /steps/1.json
   def update
-    respond_to do |format|
-      if update_and_errors_of(@step).blank?
-        format.html { redirect_to @step, notice: 'Step was successfully updated.' }
-        format.json { render :show, status: :ok, location: @step }
-      else
-        format.html { render :edit }
-        format.json { render json: @step.errors, status: :unprocessable_entity }
-      end
+    if update_and_errors_of(@lead, @step).blank?
+      flash[:success] = "#{flash[:success]}#{@step.name}を更新しました。"
+      redirect_to @step
+    else
+      flash.now[:danger] = @lead.errors.full_messages.first
+      render :edit
     end
   end
 
@@ -109,32 +93,38 @@ class Leads::StepsController < Leads::ApplicationController
     end
     
     # クリエイト処理
-    def save_and_errors_of(step)
+    def save_and_errors_of(lead, step)
       errors = []
       ActiveRecord::Base.transaction do
-        prepare_order(@lead.steps.count + 1, step.order)
-        unless step.save
-          errors << step.errors.full_messages
+        prepare_order(lead.steps.count + 1, step.order)
+        errors << step.errors.full_messages unless step.save
+        
+        completed_id = params[:step][:completed_id]
+        if completed_id.present?
+          @completed_step = Step.find(completed_id) # 完了処理に失敗したら、改めてオブジェクトを渡す必要があるのでインスタンス変数を使用。
+          errors << @completed_step.errors.full_messages unless complete_step(lead, @completed_step)
         end
-        check_status_completed_or_not(@lead, step)
-        errors << @lead.errors.full_messages if @lead.errors.present?
-        errors << step.errors.full_messages if step.errors.present?
+        
+        check_status_completed_or_not(lead, step)
+        
+        # 更新処理後にバリデーション確認
+        errors << lead.errors.full_messages if lead.invalid?(:check_steps_status)
+        errors << step.errors.full_messages if step.invalid?(:check_order)
         raise ActiveRecord::Rollback if errors.present?
       end
       errors.presence || nil
     end
     
     # アップデート処理
-    def update_and_errors_of(step)
+    def update_and_errors_of(lead, step)
       errors = []
       ActiveRecord::Base.transaction do
         prepare_order(step.order, params[:step][:order].to_i)
-        unless step.update(step_params)
-          errors << step.errors.full_messages
-        end
-        check_status_completed_or_not(@lead, step)
-        errors << @lead.errors.full_messages if @lead.errors.present?
-        errors << step.errors.full_messages if step.errors.present?
+        step.update(step_params)
+        check_status_completed_or_not(lead, step)
+        # 更新処理後にバリデーション確認
+        errors << lead.errors.full_messages if lead.invalid?(:check_steps_status)
+        errors << step.errors.full_messages if step.invalid?(:check_order)
         raise ActiveRecord::Rollback if errors.present?
       end
       errors.presence || nil
