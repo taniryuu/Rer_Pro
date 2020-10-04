@@ -17,7 +17,7 @@ class Leads::ApplicationController < Users::ApplicationController
       end
       if params[:completed_id].present?
         completed_step = Step.find(params[:completed_id])
-        @success_message = "#{flash[:success]}#{step.name}を開始しました。" if complete_step(lead, completed_step)
+        @success_message = "#{flash[:success]}#{step.name}を開始しました。" if complete_step(lead, completed_step, "#{Date.current}")
       end
       check_status_completed_or_not(lead, step)
       raise ActiveRecord::Rollback if lead.invalid?(:check_steps_status) || step.errors.present?
@@ -74,8 +74,8 @@ class Leads::ApplicationController < Users::ApplicationController
   end
   
   # 本日付で案件の完了処理を実行
-  def complete_lead(lead)
-    if lead.update_attributes(status: "completed", completed_date: "#{Date.current}")
+  def complete_lead(lead, completed_date)
+    if lead.update_attributes(status: "completed", completed_date: completed_date)
       flash[:success] = "全ての進捗が完了し、本案件は終了済となりました。おつかれさまでした。"
       true
     else
@@ -85,8 +85,8 @@ class Leads::ApplicationController < Users::ApplicationController
   end
   
   # 本日付で進捗の完了処理を実行
-  def complete_step(lead, step)
-    if step.update_attributes(status: "completed", completed_date: "#{Date.current}", completed_tasks_rate: 100)
+  def complete_step(lead, step, completed_date)
+    if step.update_attributes(status: "completed", completed_date: completed_date, completed_tasks_rate: 100)
       update_steps_rate(lead)
       flash[:success] = "#{step.name}を完了しました。"
       true
