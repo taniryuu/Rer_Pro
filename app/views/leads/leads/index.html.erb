@@ -69,7 +69,7 @@
               <td><%= l(Time.parse(lead.scheduled_payment_date), format: :shortdate) %></td>
               <% if lead.steps.first.present? %>
                 <td>
-                  <%= "#{latest_step_in(lead).name}:#{latest_step_in(lead).status_i18n}" %><br>
+                  <%= "#{latest_step_in(lead).status_i18n}" %><br>
                   <%= "(#{lead.steps_rate}%)" %>
                 </td>
                 <td>

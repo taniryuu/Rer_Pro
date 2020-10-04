@@ -12,22 +12,22 @@ class Leads::StepsController < Leads::ApplicationController
   # GET /steps
   # GET /steps.json
   def index
-    @steps = @lead.steps.all.order(:order)
+    @steps = @lead.steps.all.ord
   end
 
   # GET /steps/1
   # GET /steps/1.json
   def show
-    @steps = @lead.steps.all.order(:order)
-    @steps_except_self = @lead.steps.where.not(id: @step.id).order(:order)
-    @steps_from_now_on = @steps_except_self.where(status: ["not_yet", "in_progress"]).order(:order)
+    @steps = @lead.steps.all.ord
+    @steps_except_self = @steps.not_self(@step)
+    @steps_from_now_on = @steps_except_self.todo
     
     # タスクステータスが「未」のリスト
-    @tasks = @step.tasks.where(status: "not_yet").order(:scheduled_complete_date)
+    @tasks = @step.tasks.not_yet.order(:scheduled_complete_date)
     # タスクステータスが「完了」のリスト
-    @completed_tasks_array = @step.tasks.where(status: "completed").order(:completed_date)
+    @completed_tasks_array = @step.tasks.completed.order(:completed_date)
     # タスクステータスが「中止」のリスト
-    @canceled_tasks_array = @step.tasks.where(status: "canceled").order(:canceled_date)
+    @canceled_tasks_array = @step.tasks.canceled.order(:canceled_date)
     @task = @step.tasks.new
   end
 
@@ -45,41 +45,27 @@ class Leads::StepsController < Leads::ApplicationController
   # POST /steps.json
   def create
     @step = @lead.steps.new(step_params)
-    completed_id = params[:step][:completed_id]
-    if completed_id.present?
-      if save_and_errors_of(@step).blank?
-        @completed_step = Step.find(completed_id) # save_and_errors_ofメソッドの後で定義する。さもないと、上の行で順序が変更になった際にcompleteメソッドでエラーを吐く。
-        complete_step(@lead, @completed_step)
-        flash[:success] = "#{@completed_step.name}を完了し、#{@step.name}を開始しました。"
-        redirect_to @step
-      else
-        @completed_step = Step.find(completed_id) # 完了処理が終わっていないので改めてオブジェクトを渡す。
-        render :new
-      end
+    if save_and_errors_of(@lead, @step).blank?
+      flash[:success] = "#{flash[:success]}#{@step.name}を作成しました。"
+      redirect_to @step
     else
-      respond_to do |format|
-        if save_and_errors_of(@step).blank?
-          format.html { redirect_to @step, notice: 'Step was successfully created.' }
-          format.json { render :show, status: :created, location: @step }
-        else
-          format.html { render :new }
-          format.json { render json: @step.errors, status: :unprocessable_entity }
-        end
-      end
+      flash.delete(:success)
+      flash.now[:danger] = "#{@lead.errors.full_messages.first}" if @lead.errors.present?
+      flash.now[:danger] = "#{flash.now[:danger]}#{@completed_step.errors.full_messages.first}" if @completed_step.present? && @completed_step.errors.present?
+      render :new
     end
   end
 
   # PATCH/PUT /steps/1
   # PATCH/PUT /steps/1.json
   def update
-    respond_to do |format|
-      if update_and_errors_of(@step).blank?
-        format.html { redirect_to @step, notice: 'Step was successfully updated.' }
-        format.json { render :show, status: :ok, location: @step }
-      else
-        format.html { render :edit }
-        format.json { render json: @step.errors, status: :unprocessable_entity }
-      end
+    if update_and_errors_of(@lead, @step).blank?
+      flash[:success] = "#{flash[:success]}#{@step.name}を更新しました。"
+      redirect_to @step
+    else
+      flash.delete(:success)
+      flash.now[:danger] = @lead.errors.full_messages.first if @lead.errors.present?
+      render :edit
     end
   end
 
@@ -109,32 +95,41 @@ class Leads::StepsController < Leads::ApplicationController
     end
     
     # クリエイト処理
-    def save_and_errors_of(step)
+    def save_and_errors_of(lead, step)
       errors = []
       ActiveRecord::Base.transaction do
-        prepare_order(@lead.steps.count + 1, step.order)
-        unless step.save
-          errors << step.errors.full_messages
+        # 作成処理（バリデーションなし）
+        prepare_order(lead.steps.count + 1, step.order)
+        errors << step.errors.full_messages unless step.save
+        # 完了する進捗がある場合の処理
+        if params[:step][:completed_id].present?
+          @completed_step = Step.find(params[:step][:completed_id]) # 完了処理に失敗したら、改めてオブジェクトを渡す必要があるのでインスタンス変数を使用。
+          errors << @completed_step.errors.full_messages unless complete_step(lead, @completed_step)
         end
-        check_status_completed_or_not(@lead, step)
-        errors << @lead.errors.full_messages if @lead.errors.present?
-        errors << step.errors.full_messages if step.errors.present?
+        # 矛盾を解消
+        check_status_inactive_or_not(step)
+        check_status_completed_or_not(lead, step)
+        # バリデーション確認
+        errors << lead.errors.full_messages if lead.invalid?(:check_steps_status)
+        errors << step.errors.full_messages if step.invalid?(:check_order)
         raise ActiveRecord::Rollback if errors.present?
       end
       errors.presence || nil
     end
     
     # アップデート処理
-    def update_and_errors_of(step)
+    def update_and_errors_of(lead, step)
       errors = []
       ActiveRecord::Base.transaction do
+        # 更新処理（バリデーションなし）
         prepare_order(step.order, params[:step][:order].to_i)
-        unless step.update(step_params)
-          errors << step.errors.full_messages
-        end
-        check_status_completed_or_not(@lead, step)
-        errors << @lead.errors.full_messages if @lead.errors.present?
-        errors << step.errors.full_messages if step.errors.present?
+        step.update(step_params)
+        # 矛盾を解消
+        check_status_inactive_or_not(step)
+        check_status_completed_or_not(lead, step)
+        # バリデーション確認
+        errors << lead.errors.full_messages if lead.invalid?(:check_steps_status)
+        errors << step.errors.full_messages if step.invalid?(:check_order)
         raise ActiveRecord::Rollback if errors.present?
       end
       errors.presence || nil
@@ -164,7 +159,6 @@ class Leads::StepsController < Leads::ApplicationController
     # 順番をチェックし、空があったら詰める処理
     def sort_order
       if @lead.steps.find_by(order: @lead.steps.count + 1).present?
-#        debugger
         (1..@lead.steps.count).each do |order_num|
           if @lead.steps.find_by(order: order_num).blank?
             step = @lead.steps.find_by(order: order_num + 1)
