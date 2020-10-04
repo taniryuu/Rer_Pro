@@ -48,7 +48,7 @@ module LeadsHelper
   def step_button_color(step)
     case step.status
     when "not_yet"
-      "btn-primary"
+      "btn-default"
     when "inactive"
       "btn-danger"
     when "in_progress"
@@ -57,5 +57,13 @@ module LeadsHelper
       "btn-secondary"
     end
   end
-    
+  
+  def check_between_scheduled_complete_date?(checked_date, step)
+    if Date.parse(checked_date) >= Date.parse(step.scheduled_complete_date)
+      step.next_step.blank? ? true : Date.parse(checked_date) < Date.parse(step.next_step.scheduled_complete_date)
+    else
+      false
+    end
+  end
+  
 end

@@ -25,4 +25,9 @@ class Step < ApplicationRecord
     end
   end
   
+  # 次の順番の進捗を取得
+  def next_step
+    Step.find_by(lead_id: self.lead_id, order: self.order + 1)
+  end
+  
 end

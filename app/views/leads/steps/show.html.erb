@@ -1,3 +1,4 @@
+<% arrow_mark = "▽" %>
 <p id="notice"><%= notice %></p>
 
 <h4><%= "#{@lead.customer_name} 様：「" %><%= link_to @lead.room_name, leads_path(room_searchword: @lead.room_name) %><%= "(#{@lead.room_num})」に入居予定" %></h4>
@@ -11,15 +12,41 @@
 <h2 style="display:inline;"><%= " (現在：<STEP#{working_step_in(@lead).order}> #{working_step_in(@lead).name})" %></h2>
 <br>
 
-<h5>
-  申込
-  <%= link_to ">", new_lead_step_path(@lead, order_num: 1) %>
-  <% @steps.each do |step| %>
-    <%= link_to "#{step.order}", step_path(step), class: "btn #{step_button_color(step)} #{step_button_size(@step, step)}" %>
-    <%= link_to ">", new_lead_step_path(@lead, order_num: step.order + 1) %>
-  <% end %>
-  完了！
-</h5>
+<table>
+  <tr>
+    <td colspan="2"><%= l(Time.parse(@lead.created_date), format: :date) %></td>
+    <% @steps.each do |step| %>
+      <td colspan="2">
+        <%= l(Time.parse(@lead.scheduled_resident_date), format: :shortdate) if check_between_scheduled_complete_date?(@lead.scheduled_resident_date, step) %>
+        <%= l(Time.parse(@lead.scheduled_payment_date), format: :shortdate) if check_between_scheduled_complete_date?(@lead.scheduled_payment_date, step) %>
+        <%= l(Time.parse(@lead.scheduled_contract_date), format: :shortdate) if @lead.scheduled_contract_date.present? && check_between_scheduled_complete_date?(@lead.scheduled_contract_date, step) %>
+      </td>
+    <% end %>
+    <td></td>
+  </td>
+  <tr>
+    <td></td>
+    <td><%= arrow_mark %></td>
+    <% @steps.each do |step| %>
+      <td></td>
+      <td>
+        <%= arrow_mark if check_between_scheduled_complete_date?(@lead.scheduled_resident_date, step) %>
+        <%= arrow_mark if check_between_scheduled_complete_date?(@lead.scheduled_payment_date, step) %>
+        <%= arrow_mark if @lead.scheduled_contract_date.present? && check_between_scheduled_complete_date?(@lead.scheduled_contract_date, step) %>
+      </td>
+    <% end %>
+    <td></td>
+  </td>
+  <tr>
+    <td>申込</td>
+    <td><%= link_to ">", new_lead_step_path(@lead, order_num: 1) %></td>
+    <% @steps.each do |step| %>
+      <td><%= link_to "#{step.order}", step_path(step), class: "btn #{step_button_color(step)} #{step_button_size(@step, step)}" %></td>
+      <td><%= link_to ">", new_lead_step_path(@lead, order_num: step.order + 1) %></td>
+    <% end %>
+    <td>完了！</td>
+  </td>
+</table>
 
 <br>////////////////////////////////////////////////////////////////////////////////////////////////////////////<br>
 
