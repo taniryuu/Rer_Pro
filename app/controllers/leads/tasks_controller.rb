@@ -153,13 +153,6 @@ class Leads::TasksController < Leads::ApplicationController
       end
     #進捗を削除を選択したとき
     else
-      #この進捗を削除する
-      #lead_id = @step.lead_id
-      #@step.destroy
-      #update_steps_rate(@lead)
-      #redirect_to step_url(@step), method: :detete
-      # steps#indexにリダイレクト
-      #redirect_to lead_steps_url(lead_id)
       destroy_step(@lead, @step)
     end
   end
@@ -173,7 +166,7 @@ class Leads::TasksController < Leads::ApplicationController
     if params[:complete_or_continue] == "completed"
       #stautsが「完了」のタスクの中でもっとも遅い「完了日」をこの進捗の完了日とし、現在の進捗を「完了」とする
       latest_date = @step.tasks.where(status: "completed").maximum(:completed_date)
-      @step.update_attributes(completed_date: latest_date, status: "completed")
+      @step.update_attributes(completed_date: latest_date, status: "completed", completed_tasks_rate: 100)
       update_steps_rate(@lead)
       # steps#showにリダイレクト
       redirect_to step_url(@step)
@@ -215,6 +208,7 @@ class Leads::TasksController < Leads::ApplicationController
       @step.update_attribute(:status, "in_progress")
       update_steps_rate(@lead)
       redirect_to check_status_and_get_url
+      #start_step(@lead, @step)
     #進捗を「保留」としたとき
     when "inactive"
       #現在の進捗を「保留」とする
