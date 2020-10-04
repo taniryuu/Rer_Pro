@@ -1,14 +1,10 @@
 module LeadsHelper
   
-  # 最後に更新した「進捗中」の進捗を取得
+  # 最後に更新した「進捗中」の進捗を取得（ない場合は、最後に終了した進捗を取得）
   def working_step_in(lead)
     if lead.present?
-      working_steps = lead.steps.where(status: "in_progress")
-      if working_steps.present?
-        working_steps.order(:updated_at).last
-      else
-        latest_step_in(lead)
-      end
+      working_steps = lead.steps.in_progress
+      return working_steps.present? ? working_steps.order(:updated_at).last : latest_step_in(lead)
     end
   end
   
@@ -26,15 +22,25 @@ module LeadsHelper
     end
   end
   
-  # 最後に終了した進捗を取得
+  # 最後に終了した進捗を取得（ない場合は、最後に更新した「進捗中」の進捗を取得）
   def latest_step_in(lead)
     if lead.present?
-      inactive_step = lead.steps.find_by(status: "inactive")
-      if inactive_step.present?
-        inactive_step
+      completed_steps = lead.steps.completed
+      completed_step = completed_steps.order(:completed_date).last if completed_steps.present?
+      inactive_steps = lead.steps.inactive
+      inactive_step = inactive_steps.order(:canceled_date).last if inactive_step.present?
+      if completed_step.present? && inactive_step.present?
+        if completed_step.completed_date >= inactive_step.canceled_date
+          return completed_step
+        else
+          return inactive_step
+        end
+      elsif completed_step.present?
+          return completed_step
+      elsif inactive_step.present?
+          return inactive_step
       else
-        completed_steps = lead.steps.where(status: "completed")
-        completed_steps.present? ? completed_steps.order(:completed_date).last : lead.steps.where(status: "in_progress").order(:created_at).last
+        return lead.steps.in_progress.order(:created_at).last
       end
     end
   end
