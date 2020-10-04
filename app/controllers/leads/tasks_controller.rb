@@ -154,12 +154,13 @@ class Leads::TasksController < Leads::ApplicationController
     #進捗を削除を選択したとき
     else
       #この進捗を削除する
-      lead_id = @step.lead_id
-      @step.destroy
-      update_steps_rate(@lead)
+      #lead_id = @step.lead_id
+      #@step.destroy
+      #update_steps_rate(@lead)
       #redirect_to step_url(@step), method: :detete
       # steps#indexにリダイレクト
-      redirect_to lead_steps_url(lead_id)
+      #redirect_to lead_steps_url(lead_id)
+      destroy_step(@lead, @step)
     end
   end
 
