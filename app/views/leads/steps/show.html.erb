@@ -58,6 +58,8 @@
   </div>
 </div>
 
+<%= render 'leads/tasks/tasks_index' %>
+
 <% provide(:class_text, 'task--new') %>
 <% provide(:button_text, '作成') %>
 <p>タスク一覧 </p>
@@ -207,7 +209,6 @@
   </div>
 </div>
 <%= link_to '編集', edit_lead_path(@lead), class: "btn btn-primary btn-sm" if @lead.user_id == current_user.id %>
-
 
 
 <%= "あなたの案件です。" if @lead.user_id == current_user.id %>
