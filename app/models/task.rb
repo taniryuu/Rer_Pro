@@ -16,11 +16,11 @@ class Task < ApplicationRecord
   def date_blank_then_today(status)
     if status == "completed"
       if self.status == "completed" && self.completed_date.blank?
-        self.update_attribute(:completed_date, (l Date.current))
+        self.update_attribute(:completed_date, (I18n.l Date.current))
       end
     elsif status == "canceled"
       if self.status == "canceled" && self.canceled_date.blank?
-        self.update_attribute(:canceled_date, (l Date.current))
+        self.update_attribute(:canceled_date, (I18n.l Date.current))
       end
     end
   end
