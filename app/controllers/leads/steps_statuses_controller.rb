@@ -5,13 +5,15 @@ class Leads::StepsStatusesController < Leads::StepsController
   
   def complete
     if params[:completed_id].present?
-      completed_step = Step.find(params[:completed_id])
-      complete_step(@lead, completed_step)
-      if @lead.steps_rate < 100
-        flash[:success] = "#{completed_step.name}を完了しました。引き続き、#{@step.name}に取り組んでください。"
-      else
-        complete_lead(@lead)
-        flash[:success] = "全ての進捗が完了し、本案件は終了済となりました。おつかれさまでした。"
+      ActiveRecord::Base.transaction do
+        completed_step = Step.find(params[:completed_id])
+        complete_step(@lead, completed_step)
+        if @lead.steps_rate < 100
+          flash[:success] = "#{flash[:success]}#{completed_step.name}を完了しました。引き続き、#{@step.name}に取り組んでください。"
+        else
+          complete_lead(@lead)
+        end
+        raise ActiveRecord::Rollback if @lead.invalid?(:check_steps_status)
       end
       redirect_to @step
     end
