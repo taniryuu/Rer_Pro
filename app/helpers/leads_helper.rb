@@ -39,4 +39,23 @@ module LeadsHelper
     end
   end
   
+  # 進捗一覧のシンボルサイズ
+  def step_button_size(step_now, step)
+    step_now.id == step.id ? "btn-lg" : "btn-sm"
+  end
+  
+  # 進捗一覧のシンボルの色
+  def step_button_color(step)
+    case step.status
+    when "not_yet"
+      "btn-primary"
+    when "inactive"
+      "btn-danger"
+    when "in_progress"
+      "btn-info"
+    when "completed"
+      "btn-secondary"
+    end
+  end
+    
 end
