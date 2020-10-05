@@ -104,7 +104,7 @@ class Leads::StepsController < Leads::ApplicationController
         # 完了する進捗がある場合の処理
         if params[:step][:completed_id].present?
           @completed_step = Step.find(params[:step][:completed_id]) # 完了処理に失敗したら、改めてオブジェクトを渡す必要があるのでインスタンス変数を使用。
-          errors << @completed_step.errors.full_messages unless complete_step(lead, @completed_step)
+          errors << @completed_step.errors.full_messages unless complete_step(lead, @completed_step, "#{Date.current}")
         end
         # 矛盾を解消
         check_status_inactive_or_not(step)
