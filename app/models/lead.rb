@@ -30,11 +30,11 @@ class Lead < ApplicationRecord
   
   # 進捗の:statusは、案件のstatusに対応するstatusが必要。@lead.valid?(:check_steps_status)したときのみバリデーションを実行。
   def match_steps_status
-    if self.status == "in_progress" && self.steps.in_progress.blank?
+    if self.status?("in_progress") && self.steps.in_progress.blank?
       errors.add(:status, ":進捗中の案件には、進捗中の進捗が少なくとも一つ以上必要です。")
-    elsif self.status == "completed" && self.steps.completed.blank?
+    elsif self.status?("completed") && self.steps.completed.blank?
       errors.add(:status, ":完了済の案件には、完了済の進捗が少なくとも一つ以上必要です。")
-    elsif self.status == "inactive" && self.steps.inactive.blank?
+    elsif self.status?("inactive") && self.steps.inactive.blank?
       errors.add(:status, ":凍結中の案件には、凍結中の進捗が必要です。")
     end
   end

@@ -16,4 +16,9 @@ class ApplicationRecord < ActiveRecord::Base
     end
   end
   
+  # statusを確認して真偽値を出力
+  def status?(status_name)
+    self.status == status_name
+  end
+ 
 end

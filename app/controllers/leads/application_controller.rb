@@ -17,7 +17,7 @@ class Leads::ApplicationController < Users::ApplicationController
       end
       if params[:completed_id].present?
         completed_step = Step.find(params[:completed_id])
-        @success_message = "#{flash[:success]}#{step.name}を開始しました。" if complete_step(lead, completed_step)
+        @success_message = "#{flash[:success]}#{step.name}を開始しました。" if complete_step(lead, completed_step, "#{Date.current}")
       end
       check_status_completed_or_not(lead, step)
       raise ActiveRecord::Rollback if lead.invalid?(:check_steps_status) || step.errors.present?
@@ -50,9 +50,9 @@ class Leads::ApplicationController < Users::ApplicationController
   
   # 進捗の中止状態を確認し、他カラムとの整合性を担保
   def check_status_inactive_or_not(step)
-    if step.status == "inactive" && step.canceled_date.blank?
+    if step.status?("inactive") && step.canceled_date.blank?
       step.update_attribute(:canceled_date, "#{Date.current}")
-    elsif step.status != "inactive" && step.canceled_date.present?
+    elsif !step.status?("inactive") && step.canceled_date.present?
       step.update_attribute(:canceled_date, "")
     end
   end
@@ -74,8 +74,8 @@ class Leads::ApplicationController < Users::ApplicationController
   end
   
   # 本日付で案件の完了処理を実行
-  def complete_lead(lead)
-    if lead.update_attributes(status: "completed", completed_date: "#{Date.current}")
+  def complete_lead(lead, completed_date)
+    if lead.update_attributes(status: "completed", completed_date: completed_date)
       flash[:success] = "全ての進捗が完了し、本案件は終了済となりました。おつかれさまでした。"
       true
     else
@@ -85,8 +85,8 @@ class Leads::ApplicationController < Users::ApplicationController
   end
   
   # 本日付で進捗の完了処理を実行
-  def complete_step(lead, step)
-    if step.update_attributes(status: "completed", completed_date: "#{Date.current}", completed_tasks_rate: 100)
+  def complete_step(lead, step, completed_date)
+    if step.update_attributes(status: "completed", completed_date: completed_date, completed_tasks_rate: 100)
       update_steps_rate(lead)
       flash[:success] = "#{step.name}を完了しました。"
       true
@@ -103,7 +103,7 @@ class Leads::ApplicationController < Users::ApplicationController
     if step.present?
       update_completed_tasks_rate(step)
       if step.completed_date.present? && step.completed_tasks_rate < 100 # ここから未完了に揃える処理
-        if step.status == "completed"
+        if step.status?("completed")
           if step.scheduled_complete_date.blank?
             step.update_attributes(completed_date: "", status: "in_progress", scheduled_complete_date: "#{Date.current}")
           else
@@ -112,7 +112,7 @@ class Leads::ApplicationController < Users::ApplicationController
         else
           step.update_attributes(completed_date: "")
         end
-      elsif step.status != "completed" && step.completed_tasks_rate == 100 # ここから完了状態に揃える処理
+      elsif !step.status?("completed") && step.completed_tasks_rate == 100 # ここから完了状態に揃える処理
         if step.completed_date.blank?
           step.update_attributes(status: "completed", completed_date: "#{Date.current}")
         else
@@ -124,12 +124,12 @@ class Leads::ApplicationController < Users::ApplicationController
     # leadの整合性を担保
     update_steps_rate(lead)
     if lead.completed_date.present? && lead.steps_rate < 100 # ここから未完了に揃える処理
-      if lead.status == "completed"
+      if lead.status?("completed")
         lead.update_attributes(status: "in_progress", completed_date: "")
       else 
         lead.update_attributes(status: "in_progress")
       end
-    elsif lead.status != "completed" && lead.steps_rate == 100 # ここから完了状態に揃える処理
+    elsif !lead.status?("completed") && lead.steps_rate == 100 # ここから完了状態に揃える処理
       if lead.completed_date.blank?
         lead.update_attributes(status: "completed", completed_date: "#{Date.current}")
       else
@@ -141,17 +141,13 @@ class Leads::ApplicationController < Users::ApplicationController
   
   # leadの進捗率を更新
   def update_steps_rate(lead)
-    not_yet_steps_num = lead.steps.todo.count
-    completed_steps_num = lead.steps.completed.count
-    lead.update_attribute(:steps_rate, calculate_rate(completed_steps_num, not_yet_steps_num))
+    lead.update_attribute(:steps_rate, calculate_rate(lead.steps.completed.count, lead.steps.todo.count))
   end
   
   # stepのタスク達成率を更新
   def update_completed_tasks_rate(step)
     if step.id.present?
-      not_yet_tasks_num = step.tasks.not_yet.count
-      completed_tasks_num = step.tasks.completed.count
-      new_rate = (step.completed_date.present? && step.status == "completed" && step.tasks.blank?) ? 100 : calculate_rate(completed_tasks_num, not_yet_tasks_num)
+      new_rate = (step.completed_date.present? && step.status?("completed") && step.tasks.blank?) ? 100 : calculate_rate(step.tasks.completed.count, step.tasks.not_yet.count)
       step.update_attribute(:completed_tasks_rate, new_rate)
     end
   end
