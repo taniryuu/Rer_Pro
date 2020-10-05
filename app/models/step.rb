@@ -25,7 +25,26 @@ class Step < ApplicationRecord
     end
   end
   
-  # 次の順番の進捗を取得
+  
+  # メソッド
+  
+  # statusに応じた終了日を取得（ない場合は""）
+  def finish_date
+    case self.status
+    when "not_yet"
+      self.next_step.present? ? self.next_step.finish_date : ""
+    when "in_progress"
+      self.scheduled_complete_date
+    when "inactive"
+      self.canceled_date
+    when "completed"
+      self.completed_date
+    when "template"
+      ""
+    end
+  end
+  
+  # 次の順番の進捗を取得（ない場合はnil）
   def next_step
     Step.find_by(lead_id: self.lead_id, order: self.order + 1)
   end

@@ -1,4 +1,3 @@
-<% arrow_mark = "▽" %>
 <p id="notice"><%= notice %></p>
 
 <h4><%= "#{@lead.customer_name} 様：「" %><%= link_to @lead.room_name, leads_path(room_searchword: @lead.room_name) %><%= "(#{@lead.room_num})」に入居予定" %></h4>
@@ -12,38 +11,38 @@
 <h2 style="display:inline;"><%= " (現在：<STEP#{working_step_in(@lead).order}> #{working_step_in(@lead).name})" %></h2>
 <br>
 
+<% arrow_mark = "▽" %>
+<% flag_scheduled_resident_date = true %>
+<% flag_scheduled_payment_date = true %>
+<% flag_scheduled_contract_date = true %>
 <table>
   <tr>
-    <td colspan="2"><%= l(Time.parse(@lead.created_date), format: :date) %></td>
-    <% @steps.each do |step| %>
-      <td colspan="2">
-        <%= l(Time.parse(@lead.scheduled_resident_date), format: :shortdate) if check_between_scheduled_complete_date?(@lead.scheduled_resident_date, step) %>
-        <%= l(Time.parse(@lead.scheduled_payment_date), format: :shortdate) if check_between_scheduled_complete_date?(@lead.scheduled_payment_date, step) %>
-        <%= l(Time.parse(@lead.scheduled_contract_date), format: :shortdate) if @lead.scheduled_contract_date.present? && check_between_scheduled_complete_date?(@lead.scheduled_contract_date, step) %>
-      </td>
-    <% end %>
     <td></td>
-  </td>
-  <tr>
-    <td></td>
-    <td><%= arrow_mark %></td>
+    <td>
+      申込<br>
+      <%= l(Time.parse(@lead.created_date), format: :date) %><br>
+      <%= arrow_mark %>
+    </td>
     <% @steps.each do |step| %>
-      <td></td>
       <td>
-        <%= arrow_mark if check_between_scheduled_complete_date?(@lead.scheduled_resident_date, step) %>
-        <%= arrow_mark if check_between_scheduled_complete_date?(@lead.scheduled_payment_date, step) %>
-        <%= arrow_mark if @lead.scheduled_contract_date.present? && check_between_scheduled_complete_date?(@lead.scheduled_contract_date, step) %>
+        <% if flag_scheduled_resident_date && @lead.scheduled_resident_date < step.finish_date %>
+          入居<br>
+          <%= l(Time.parse(@lead.scheduled_resident_date), format: :date) %><br>
+          <%= arrow_mark %>
+          <% flag_scheduled_resident_date = false %>
+        <% end %>
       </td>
+      <td></td>
     <% end %>
     <td></td>
   </td>
   <tr>
     <td>申込</td>
-    <td><%= link_to ">", new_lead_step_path(@lead, order_num: 1) %></td>
     <% @steps.each do |step| %>
+      <td><%= link_to ">", new_lead_step_path(@lead, order_num: step.order) %></td>
       <td><%= link_to "#{step.order}", step_path(step), class: "btn #{step_button_color(step)} #{step_button_size(@step, step)}" %></td>
-      <td><%= link_to ">", new_lead_step_path(@lead, order_num: step.order + 1) %></td>
     <% end %>
+    <td><%= link_to ">", new_lead_step_path(@lead, order_num: @lead.steps.count + 1) %></td>
     <td>完了！</td>
   </td>
 </table>
@@ -80,7 +79,7 @@
       <% when "inactive" %>
         <%= render 'leads/step_statuses/start', step: @step, completed_id: nil, button_name: "再開" %>
       <% when "in_progress" %>
-        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#step-complete" data-name="<%= @step.name %>" data-id="<%= @step.id %>">完了</button>
+        <%= render 'leads/step_statuses/complete' %>
         <%= render 'leads/step_statuses/cancel', step: @step %>
       <% when "completed" %>
         <%= render 'leads/step_statuses/start', step: @step, completed_id: nil, button_name: "再開" %>
@@ -322,87 +321,4 @@
   <strong>Completed tasks rate:</strong>
   <%= @step.completed_tasks_rate %>
 </p>
-
-
-
-<!-- Modal -->
-<div class="modal fade" id="step-complete" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="step-completeLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="step-completeLabel"><span class="step-name"></span>を完了します。次の操作を選択してください。</h5>
-        <button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        進捗一覧<br>
-        <table class="table table-hover" id="table-shops">
-          <tbody>
-            <% @steps_except_self.each do |step| %>
-              <tr>
-                <td>Step<%= step.order %></td>
-                <% if step.status?("not_yet") %>
-                  <td><%= render 'leads/step_statuses/start', step: step, completed_id: @step.id, button_name: "完了予定日を設定して開始する" %></td>
-                <% elsif step.status?("inactive") %>
-                  <td>
-                    <p>
-                      <a class="btn btn-default btn-xs" data-toggle="collapse" href="#collapseStep<%= step.id %>">
-                    	  <%= "(#{step.status_i18n})" %>
-                      </a>
-                    </p>
-                    <div id="collapseStep<%= step.id %>" class="collapse">
-                    	<div class="well">
-                        <%= render 'leads/step_statuses/start', step: step, completed_id: @step.id, button_name: "完了予定日を再設定して再開する" %>
-                    	</div>
-                    </div>
-                  </td>
-                <% elsif step.status?("in_progress") %>
-                  <td><%= link_to "＜#{step.status_i18n}＞#{step.name}を継続", complete_step_path(step, @step), method: :patch, class: "btn btn-info btn-sm" %></td>
-                <% elsif step.status?("completed") %>
-                  <td>
-                    <p>
-                      <a class="btn btn-default btn-xs" data-toggle="collapse" href="#collapseStep<%= step.id %>">
-                    	  <%= step.status_i18n %>
-                      </a>
-                    </p>
-                    <div id="collapseStep<%= step.id %>" class="collapse">
-                    	<div class="well">
-                        <%= render 'leads/step_statuses/start', step: step, completed_id: @step.id, button_name: "完了予定日を再設定して再開する" %>
-                    	</div>
-                    </div>
-                  </td>
-                <% end %>
-                <td><%= link_to "詳細確認", step_path(step), target: :_blank %></td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
-        <% if @steps_from_now_on.present? %>
-          <%= link_to "新しく作成する場合はこちら", new_lead_step_path(@lead, completed_id: @step.id), class: "pull-right" %>
-        <% else %>
-          <%= link_to "新たに次の進捗を作成して進む", new_lead_step_path(@lead, completed_id: @step.id), class: "btn btn-primary btn-lg" %>
-          <br><br>
-          <%= link_to "全ての進捗を完了＋案件自体を完了にする", complete_step_path(@step, @step), method: :patch, 
-            data: { confirm: '本案件を全て完了とします。本当によろしいですか？（終了済の扱いになります。）' }, class: "btn btn-info btn-lg pull-right" %>
-        <% end %>
-      </div>
-      <div class="modal-footer">
-        <%= "* まだこの時点では#{@step.name}は完了していません。" %>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script> 
-  $('#step-complete').on('show.bs.modal', function (event) {
-    var button = $(event.relatedTarget);
-    var id = button.data('id');
-    var name = button.data('name');
-    
-    var modal = $(this);
-    modal.find('.step-id').val(id);
-    modal.find('.step-name').text(name);
-  });
-</script>
 
