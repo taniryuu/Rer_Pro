@@ -140,26 +140,10 @@ class Leads::TasksController < Leads::ApplicationController
     #進捗を継続を選択したとき
     if params[:continue_or_destroy] == "continue"
       #この進捗に「完了予定日」が本日で、statusが「未」の新しいタスクを追加し、現在の進捗を「進捗中」とする
-      new_task = Task.new(step_id: @step.id ,name: "new_task", status: 0, scheduled_complete_date: (l Date.current))
-      if new_task.save && update_completed_tasks_rate(@step)
-        @step.update_attribute(:status, "in_progress")
-        update_steps_rate(@lead)
-        # steps#showにリダイレクト
-        redirect_to step_url(@step)
-      else
-        flash[:danger] = "新しいタスクの追加に失敗しました"
-        # steps#showにリダイレクト
-        redirect_to step_url(@step)
-      end
+      create_new_task_step_in_progress(@lead, @step)
     #進捗を削除を選択したとき
     else
-      #この進捗を削除する
-      lead_id = @step.lead_id
-      @step.destroy
-      update_steps_rate(@lead)
-      #redirect_to step_url(@step), method: :detete
-      # steps#indexにリダイレクト
-      redirect_to lead_steps_url(lead_id)
+      destroy_step(@lead, @step)
     end
   end
 
@@ -172,22 +156,14 @@ class Leads::TasksController < Leads::ApplicationController
     if params[:complete_or_continue] == "completed"
       #stautsが「完了」のタスクの中でもっとも遅い「完了日」をこの進捗の完了日とし、現在の進捗を「完了」とする
       latest_date = @step.tasks.where(status: "completed").maximum(:completed_date)
-      @step.update_attributes(completed_date: latest_date, status: "completed")
-      update_steps_rate(@lead)
+      #redirect_to step_statuses_complete_step_url(@step, latest_date) and return
+      complete_step(@lead, @step, latest_date)
       # steps#showにリダイレクト
       redirect_to step_url(@step)
     # 進捗中を選択したとき
     else
       #この進捗に「完了予定日」が本日で、statusが「未」の新しいタスクを追加し、現在の進捗を「進捗中」とする
-      new_task = Task.new(step_id: @step.id ,name: "new_task", status: 0, scheduled_complete_date: (l Date.current))
-      if new_task.save && update_completed_tasks_rate(@step)
-        @step.update_attribute(:status, "in_progress")
-        update_steps_rate(@lead)
-      else
-        flash[:danger] = "新しいタスクの追加に失敗しました"
-      end
-      # steps#showにリダイレクト
-      redirect_to step_url(@step)
+      create_new_task_step_in_progress(@lead, @step)     
     end
   end
 
@@ -211,9 +187,7 @@ class Leads::TasksController < Leads::ApplicationController
     #進捗を「進捗中」としたとき
     when "in_progress"
       #現在の進捗を「進捗中」とする
-      @step.update_attribute(:status, "in_progress")
-      update_steps_rate(@lead)
-      redirect_to check_status_and_get_url
+      redirect_to step_statuses_start_step_url(@step) and return
     #進捗を「保留」としたとき
     when "inactive"
       #現在の進捗を「保留」とする
@@ -282,4 +256,8 @@ class Leads::TasksController < Leads::ApplicationController
       end 
     end
 
+    def create_new_task_step_in_progress(lead, step)
+      Task.create!(step_id: step.id ,name: "new_task", status: 0, scheduled_complete_date: (l Date.current))
+      redirect_to step_statuses_start_step_url(@step)
+    end
 end
