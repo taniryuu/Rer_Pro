@@ -159,7 +159,7 @@ class Leads::TasksController < Leads::ApplicationController
       redirect_to step_statuses_complete_step_url(@step, latest_date) and return
       #complete_step(@lead, @step, latest_date)
       # steps#showにリダイレクト
-      redirect_to step_url(@step)
+      #redirect_to step_url(@step)
     # 進捗中を選択したとき
     else
       #この進捗に「完了予定日」が本日で、statusが「未」の新しいタスクを追加し、現在の進捗を「進捗中」とする
