@@ -186,7 +186,7 @@ class Leads::TasksController < Leads::ApplicationController
     #進捗を「進捗中」としたとき
     when "in_progress"
       #現在の進捗を「進捗中」とする
-      start_step(@lead, @step)
+      redirect_to step_statuses_start_step_url(@step) and return
     #進捗を「保留」としたとき
     when "inactive"
       #現在の進捗を「保留」とする
@@ -257,6 +257,6 @@ class Leads::TasksController < Leads::ApplicationController
 
     def create_new_task_step_in_progress(lead, step)
       Task.create!(step_id: step.id ,name: "new_task", status: 0, scheduled_complete_date: (l Date.current))
-      start_step(lead, step)
+      redirect_to step_statuses_start_step_url(@step)
     end
 end
