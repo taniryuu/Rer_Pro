@@ -5,7 +5,7 @@ class Leads::ApplicationController < Users::ApplicationController
   def start_step(lead, step)
     @success_message = "" # transaction内で代入した値を使うため、インスタンス変数を用いている。""を代入してリセットしている。
     ActiveRecord::Base.transaction do
-        scheduled_complete_date = params[:step].present? ? params[:step][:scheduled_complete_date] : (l Date.current)
+        scheduled_complete_date = params[:step].present? ? params[:step][:scheduled_complete_date] : "#{Date.current}"
         case step.status
         when "not_yet"
           @success_message = "#{step.name}を開始しました。" if step.update_attributes(status: "in_progress", scheduled_complete_date: scheduled_complete_date)

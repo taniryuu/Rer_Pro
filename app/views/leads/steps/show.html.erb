@@ -8,7 +8,7 @@
 </h5>
 
 <h2 style="display:inline;"><%= "進捗率：#{@lead.steps_rate}%" %></h2>
-<h2 style="display:inline;"><%= " (現在：<STEP#{working_step_in(@lead).order}> #{working_step_in(@lead).name})" %></h2>
+<h2 style="display:inline;"><%= " (現在：<STEP#{working_step_in(@lead).order}> #{@lead.status?("in_progress") ? working_step_in(@lead).name : @lead.status_i18n})" %></h2>
 <br>
 
 <% arrow_mark = "▽" %>
@@ -20,6 +20,7 @@
     <td colspan="1"><%= l(Time.parse(@lead.created_date), format: :date) %><br><%= arrow_mark %></td>
     <% @steps.each do |step| %>
       <td>
+        <%# debugger %>
         <% if flag_scheduled_resident_date && @lead.scheduled_resident_date < step.finish_date %>
           <br>入居<br><%= l(Time.parse(@lead.scheduled_resident_date), format: :shortdate) %><br><%= arrow_mark %>
           <% flag_scheduled_resident_date = false %>

@@ -100,7 +100,7 @@ class Leads::TasksController < Leads::ApplicationController
         deleted_tasks.each do |deleted_task|
           deleted_task.update_attribute(:status, "completed")
           update_completed_tasks_rate(@step)
-          deleted_task.update_attribute(:completed_date, (l Date.current))
+          deleted_task.update_attribute(:completed_date, "#{Date.current}")
         end
       end
     end
@@ -111,7 +111,7 @@ class Leads::TasksController < Leads::ApplicationController
   def add_canceled_list
     @task.update_attribute(:status, "canceled")
     update_completed_tasks_rate(@step)
-    @task.update_attribute(:canceled_date, (l Date.current))
+    @task.update_attribute(:canceled_date, "#{Date.current}")
     redirect_to check_status_and_get_url
   end
 
@@ -195,7 +195,7 @@ class Leads::TasksController < Leads::ApplicationController
     #「未」のタスクをすべて「完了」を選択したとき
     else
       #現在の進捗の「未」のタスクをすべて「完了」とし、「完了日」を本日とし、その後complete_or_continueのurlへ飛ぶ
-      @step.tasks.where(status: "not_yet").update_all(status: "completed", completed_date: (l Date.current))
+      @step.tasks.where(status: "not_yet").update_all(status: "completed", completed_date: "#{Date.current}")
       update_completed_tasks_rate(@step)
       redirect_to check_status_and_get_url
     end
@@ -257,7 +257,7 @@ class Leads::TasksController < Leads::ApplicationController
     end
 
     def create_new_task_step_in_progress(lead, step)
-      Task.create!(step_id: step.id ,name: "new_task", status: 0, scheduled_complete_date: (l Date.current))
+      Task.create!(step_id: step.id ,name: "new_task", status: 0, scheduled_complete_date: "#{Date.current}")
       redirect_to step_statuses_start_step_url(@step)
     end
 end
