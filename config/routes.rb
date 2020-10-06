@@ -26,6 +26,8 @@ Rails.application.routes.draw do
         patch 'complete/:completed_id' => 'steps_statuses#complete', as: :complete
         patch 'start' => 'steps_statuses#start', as: :start
         patch 'cancel' => 'steps_statuses#cancel', as: :cancel
+        get 'step_statuses_start'
+        get 'step_statuses_complete'
       end
       member do
         get 'tasks/edit_add_delete_list'
