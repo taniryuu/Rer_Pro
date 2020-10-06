@@ -156,7 +156,8 @@ class Leads::TasksController < Leads::ApplicationController
     if params[:complete_or_continue] == "completed"
       #stautsが「完了」のタスクの中でもっとも遅い「完了日」をこの進捗の完了日とし、現在の進捗を「完了」とする
       latest_date = @step.tasks.where(status: "completed").maximum(:completed_date)
-      complete_step(@lead, @step, latest_date)
+      redirect_to step_statuses_complete_step_url(@step, latest_date) and return
+      #complete_step(@lead, @step, latest_date)
       # steps#showにリダイレクト
       redirect_to step_url(@step)
     # 進捗中を選択したとき
