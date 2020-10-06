@@ -54,10 +54,17 @@ class Leads::LeadsController < Leads::ApplicationController
   # POST /leads.json
   def create
     @lead = current_user.leads.new(lead_params)
-
     respond_to do |format|
       if @lead.save && update_steps_rate(@lead)
-        format.html { redirect_to @lead, notice: 'Lead was successfully created.' }
+        # 将来的には、上長の設定したテンプレートの進捗が自動生成されるようにしたい。
+        # （ある程度決まったプロセスなのに一から進捗をつくるのはUXとして非現実的。）↓は仮。
+        @step = @lead.steps.create!(
+          name: "進捗(仮)",
+          status: 2,
+          order: 1,
+          scheduled_complete_date: "#{Date.current}",
+        )
+        format.html { redirect_to edit_step_path(@step), notice: '案件を作成しました。引き続き進捗を登録してください。' }
         format.json { render :show, status: :created, location: @lead }
       else
         format.html { render :new }

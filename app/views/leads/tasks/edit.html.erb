@@ -42,4 +42,5 @@
   <%= f.hidden_field :step_id, class: "form-control", value: @step.id %>
 
 <% end %>
-<%= button_to '戻る', step_tasks_path(@step), method: :get, class: "btn-#{yield(:class_text)}" %>
+<!-- tasks#showに戻る -->
+<%= button_to '戻る', task_path(@step), method: :get, class: "btn-#{yield(:class_text)}" %>

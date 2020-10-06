@@ -7,7 +7,7 @@ class Task < ApplicationRecord
   
   # 完了日に現在の日付より未来の日付を入れる場合はアラート
   validate :not_newer_than_today
-  
+
   def not_newer_than_today
     errors.add(:completed_date, "は未来の日付は入れられません") if completed_date.present? && Date.parse(completed_date) > Date.current
   end
@@ -16,11 +16,11 @@ class Task < ApplicationRecord
   def date_blank_then_today(status)
     if status == "completed"
       if self.status == "completed" && self.completed_date.blank?
-        self.update_attribute(:completed_date, Date.current.strftime("%Y-%m-%d"))
+        self.update_attribute(:completed_date, (l Date.current))
       end
     elsif status == "canceled"
       if self.status == "canceled" && self.canceled_date.blank?
-        self.update_attribute(:canceled_date, Date.current.strftime("%Y-%m-%d"))
+        self.update_attribute(:canceled_date, (l Date.current))
       end
     end
   end

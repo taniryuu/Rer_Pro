@@ -1,5 +1,250 @@
 <p id="notice"><%= notice %></p>
 
+<h4><%= "#{@lead.customer_name} 様：「" %><%= link_to @lead.room_name, leads_path(room_searchword: @lead.room_name) %><%= "(#{@lead.room_num})」に入居予定" %></h4>
+<h5>
+  <%= "(担当：" %><%= link_to @user.name, leads_path(user_searchword: @user.id) %><%= "）" %>
+  <%= "：あなたの案件です。" if @lead.user_id == current_user.id %>
+  <%= link_to "：担当者を変更する", edit_user_id_lead_path(@lead) if current_user.superior? %>
+</h5>
+
+<h2 style="display:inline;"><%= "進捗率：#{@lead.steps_rate}%" %></h2>
+<h2 style="display:inline;"><%= " (現在：<STEP#{working_step_in(@lead).order}> #{working_step_in(@lead).name})" %></h2>
+<br>
+
+<% @steps.each do |step| %>
+  <% step_button_color = (step.id == @step.id) ? "danger" : "info" %>
+  <%= link_to "#{step.order}", step_path(step), class: "btn btn-#{step_button_color} btn-lg" %>
+<% end %>
+<%= link_to "追加", new_lead_step_path(@lead), class: "btn btn-default btn-lg" %>
+
+<br>////////////////////////////////////////////////////////////////////////////////////////////////////////////<br>
+
+<div>
+  <h1 style="display:inline;"><%= "<STEP#{@step.order}> #{@step.name}" %></h1>
+  <h2 style="display:inline;">
+    <% case @step.status %>
+    <% when "not_yet" %>
+      <%= "<<未開始>>" %>
+    <% when "inactive" %>
+      <%= "<<#{l(Time.parse(@step.canceled_date), format: :shortdate)}に凍結済>>" %>
+    <% when "in_progress" %>
+      <%= "<<進捗中>>完了予定日：#{l(Time.parse(@step.scheduled_complete_date), format: :shortdate)}" %>
+      <%= "(#{@step.completed_tasks_rate}%)" %>
+    <% when "completed" %>
+      <%= "<<#{l(Time.parse(@step.completed_date), format: :shortdate)}に完了済>>" %>
+    <% when "template" %>
+    <% end %>
+  <a class="btn btn-default" data-toggle="collapse" href="#collapse-step-status-edit">
+    編集▼
+  </a>
+</div>
+<div id="collapse-step-status-edit" class="collapse">
+  <div class="well">
+    <h5 style="display:inline;">
+      <% case @step.status %>
+      <% when "not_yet" %>
+        <%= render 'leads/step_statuses/start', step: @step, completed_id: nil, button_name: "開始" %>
+      <% when "inactive" %>
+        <%= render 'leads/step_statuses/start', step: @step, completed_id: nil, button_name: "再開" %>
+      <% when "in_progress" %>
+        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#step-complete" data-name="<%= @step.name %>" data-id="<%= @step.id %>">完了</button>
+        <%= render 'leads/step_statuses/cancel', step: @step %>
+      <% when "completed" %>
+        <%= render 'leads/step_statuses/start', step: @step, completed_id: nil, button_name: "再開" %>
+      <% when "template" %>
+        <button type="button" class="btn btn-info">このテンプレートを使用して新規作成</button>
+      <% end %>
+    </h5>
+    <h5 style="display:inline;"><%= link_to '直接編集', edit_step_path(@step) %></h5>
+  </div>
+</div>
+
+<% provide(:class_text, 'task--new') %>
+<% provide(:button_text, '作成') %>
+<p>タスク一覧 </p>
+<p>To Do リスト</p>
+<table>
+  <tbody>
+    <%= form_with(model: @tasks, url: tasks_update_add_delete_list_step_path(@step), local: true, mothod: :post) do |f| %>
+      <% @tasks.each do |task| %>
+        <tr>
+          <td><%= f.check_box(:delete_task, { multiple: true, class: "check_box"}, checked_value = "true", unchecked_value = "false") %></td>
+          <td><%= link_to "#{task.name}", task_path(task) %></td>
+          <td><%= l(Time.parse(task.scheduled_complete_date), format: :shortdate) %></td>
+          <td><%= link_to '中止', add_canceled_list_task_path(task), data: { confirm: "「#{task.name}」を中止リストに移動してよろ>しいですか？" } %></td>
+          <td><%= link_to '削除', task_path(task), method: :delete, data: { confirm: "「#{task.name}」を削除してよろしいですか？" } %></td>
+        </tr>
+      <% end %>
+      <tr>
+        <td>
+        <%= f.submit "更新" %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<!-- 入力フォーム -->
+
+<%= form_with(model: @task, url: step_tasks_path(step_id: @step), method: :post, local: true) do |f| %>
+
+  <%= render 'devise/shared/error_messages', resource: @task %>
+
+  <div class="row">
+    <div class="col-2">
+      <div class="form-group">
+        <%= f.label :name, class: "label-#{yield(:class_text)}"%>
+        <%= f.text_field :name, class: "form-control" %>
+      </div>
+    </div>
+    <div class="col-2">
+      <div class="form-group">
+        <%= f.label :scheduled_complete_date, class: "label-#{yield(:class_text)}" %>
+        <%= f.date_field :scheduled_complete_date, class: 'form-control' %>
+      </div>
+    </div>
+
+    <div class="col-2 align-self-end">
+      <div class="form-group">
+        <%= f.submit yield(:button_text), class: "btn-#{yield(:class_text)}" %>
+      </div>
+    </div>
+
+    <%= f.hidden_field :step_id, class: "form-control", value: @step.id %>
+
+  </div>
+
+<% end %>
+
+<!--p>済 リスト</p-->
+<div class="panel-group" id="accordion">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <p class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#collapse3">済 リスト</a>
+      </p>
+    </div>
+    <div id="collapse3" class="panel-collapse collapse in">
+      <div class="panel-body">
+        <!--p>済 リスト</p-->
+        <table>
+          <tbody>
+            <% @completed_tasks_array.each do |task| %>
+              <tr>
+                <td><%= link_to "#{task.name}", task_path(task) %></td>
+                <td><%= l(Time.parse(task.completed_date), format: :shortdate) %></td>
+                <td><%= link_to '削除', task_path(task), method: :delete, data: { confirm: "「#{task.name}」を削除してよろしいですか？" } %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="panel panel-default">
+      <div class="panel-heading">
+        <p class="panel-title">
+          <a data-toggle="collapse" data-parent="#accordion" href="#collapse4">中止 リスト</a>
+        </h4>
+      </div>
+      <div id="collapse4" class="panel-collapse collapse">
+        <div class="panel-body">
+          <!--p>中止 リスト</p-->
+          <table>
+            <tbody>
+              <% @canceled_tasks_array.each do |task| %>
+                <tr>
+                  <td><%= link_to "#{task.name}", task_path(task) %></td>
+                  <td><%= l(Time.parse(task.canceled_date), format: :shortdate) %></td>
+                  <td><%= link_to '復活', edit_revive_from_canceled_list_task_path(task), data: { confirm: "「#{task.name}」を復活してよろしいですか？"} %>
+                  <td><%= link_to '削除', task_path(task), method: :delete, data: { confirm: "「#{task.name}」を削除してよろしいですか？" } %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--%= link_to 'Task-index', step_tasks_path(@step) %> |-->
+<%= link_to 'Edit', edit_step_path(@step) %> |
+<%= link_to 'Back', lead_steps_path(@lead) %>
+
+
+<br>
+<br>
+
+<br>////////////////////////////////////////////////////////////////////////////////////////////////////////////<br>
+
+
+ページはここまで。
+<br>////////////////////////////////////////////////////////////////////////////////////////////////////////////<br>
+以下はメモです。（最終プルリク上げる前に削除）
+<div class="row">
+  <div class="col-md-12 col-md-offset-1">
+    <table id="table-lead-index-show">
+      <thead>
+        <tr>
+          <th colspan="1">申込日</th>
+          <th colspan="1">最後に進捗を完了した日</th>
+          <th colspan="1">現在の進捗（進捗率）</th>
+          <th colspan="1">入居予定日</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><%= l(Time.parse(@lead.created_date), format: :shortdate) %></td>
+          <td><%= l(Time.parse(last_update_date(@lead)), format: :shortdate) %></td>
+          <td>
+            <%= latest_step_in(@lead).name %>
+            <%= "(#{@lead.steps_rate}%)" %>
+          </td>
+          <td><%= l(Time.parse(@lead.scheduled_resident_date), format: :shortdate) %></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<%= link_to '編集', edit_lead_path(@lead), class: "btn btn-primary btn-sm" if @lead.user_id == current_user.id %>
+
+
+
+<%= "あなたの案件です。" if @lead.user_id == current_user.id %>
+<%= @lead.customer_name %>様→
+<%= @lead.room_name %><%= @lead.room_num %>号室
+（担当：<%= link_to "#{@user.name}", user_path(@user) %>）
+<p>
+  <strong>入居予定日:</strong>
+  <%= @lead.scheduled_resident_date %>
+</p>
+
+<p>
+  <strong>入金予定日:</strong>
+  <%= @lead.scheduled_payment_date %>
+</p>
+
+<p>
+  <strong>契約予定日:</strong>
+  <%= @lead.scheduled_contract_date %>
+</p>
+
+
+<%= link_to "担当者を変更する", edit_user_id_lead_path(@lead) if current_user.superior? %>
+
+
+<%= link_to 'Step-index', lead_steps_path(@lead) %> |
+<%= link_to 'Edit', edit_lead_path(@lead) %> |
+<%= link_to 'Back', leads_path %>
+
+
+
+<br>
+
+
+
+
 <p>
   <strong>Lead:</strong>
   <%= @step.lead_id %>
@@ -45,29 +290,7 @@
   <%= @step.completed_tasks_rate %>
 </p>
 
-<%= link_to 'Task-index', step_tasks_path(@step) %> |
-<%= link_to 'Edit', edit_step_path(@step) %> |
-<%= link_to 'Back', lead_steps_path(@lead) %>
 
-
-<br>
-<br>
-
-
-  <!-- change step_status -->
-<% if @step.status == "not_yet" %>
-  <%= render 'leads/step_statuses/start', step: @step, completed_id: nil, button_name: "開始" %>
-  <%= render 'leads/step_statuses/cancel', step: @step %>
-<% elsif @step.status == "inactive" %>
-  <%= render 'leads/step_statuses/start', step: @step, completed_id: nil, button_name: "再開" %>
-<% elsif @step.status == "in_progress" %>
-  <%= render 'leads/step_statuses/cancel', step: @step %>
-  <button type="button" class="btn btn-info" data-toggle="modal" data-target="#step-complete" data-name="<%= @step.name %>" data-id="<%= @step.id %>">完了</button>
-<% elsif @step.status == "completed" %>
-  <%= render 'leads/step_statuses/start', step: @step, completed_id: nil, button_name: "再開" %>
-<% elsif @step.status == "template" %>
-  <button type="button" class="btn btn-info">このテンプレートを使用して新規作成</button>
-<% end %>
 
 <!-- Modal -->
 <div class="modal fade" id="step-complete" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="step-completeLabel" aria-hidden="true">
@@ -86,9 +309,9 @@
             <% @steps_except_self.each do |step| %>
               <tr>
                 <td>Step<%= step.order %></td>
-                <% if step.status == "not_yet" %>
+                <% if step.status?("not_yet") %>
                   <td><%= render 'leads/step_statuses/start', step: step, completed_id: @step.id, button_name: "完了予定日を設定して開始する" %></td>
-                <% elsif step.status == "inactive" %>
+                <% elsif step.status?("inactive") %>
                   <td>
                     <p>
                       <a class="btn btn-default btn-xs" data-toggle="collapse" href="#collapseStep<%= step.id %>">
@@ -101,9 +324,9 @@
                     	</div>
                     </div>
                   </td>
-                <% elsif step.status == "in_progress" %>
+                <% elsif step.status?("in_progress") %>
                   <td><%= link_to "＜#{step.status_i18n}＞#{step.name}を継続", complete_step_path(step, @step), method: :patch, class: "btn btn-info btn-sm" %></td>
-                <% elsif step.status == "completed" %>
+                <% elsif step.status?("completed") %>
                   <td>
                     <p>
                       <a class="btn btn-default btn-xs" data-toggle="collapse" href="#collapseStep<%= step.id %>">

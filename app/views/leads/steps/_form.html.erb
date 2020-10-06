@@ -2,12 +2,12 @@
   <%= render 'devise/shared/error_messages', resource: @step %>
 
   <div class="field">
-    <%= form.label :name %>
+    <%= form.label :name %>＜入力必須＞
     <%= form.text_field :name, autofocus: true %>
   </div>
 
   <div class="field">
-    <%= form.label :order %>
+    <%= form.label :order %>＜入力必須＞
     <% plus = step.new_record? ? 1 : 0 %>
     <%= form.number_field :order, min: 1, max: @lead.steps.count + plus %>
   </div>
@@ -29,9 +29,8 @@
     </div>
   
     <div class="field">
-      <%= form.label :scheduled_complete_date %>
+      <%= form.label :scheduled_complete_date %>＜入力必須＞
       <%= form.date_field :scheduled_complete_date, value: step.scheduled_complete_date %>
-      （入力必須）
     </div>
   
   <% else %>
@@ -43,13 +42,13 @@
   
     <div class="field">
       <%= form.label :scheduled_complete_date %>
-      <%= form.date_field :scheduled_complete_date, value: step.scheduled_complete_date %>
+      <%= form.date_field :scheduled_complete_date, value: step.scheduled_complete_date %><br>
       ↑ 進捗中の進捗の場合、入力必須<br>
     </div>
   
     <div class="field">
       <%= form.label :completed_date %>
-      <%= form.date_field :completed_date, value: step.completed_date %>
+      <%= form.date_field :completed_date, value: step.completed_date %><br>
       ↑ 完了済の進捗の場合、入力必須<br>
     </div>
     
