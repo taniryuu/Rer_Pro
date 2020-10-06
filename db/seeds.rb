@@ -115,7 +115,7 @@ end
     memo: "進捗#{i+2}のメモ",
     status: 0,
     order: i+2,
-    scheduled_complete_date: "#{Date.current + 3 + i}",
+    scheduled_complete_date: "#{Date.current + 3 + 3*i}",
   )
 end
 puts "「SampleUser0」の案件「お客様1」の進捗作成完了"

@@ -17,9 +17,8 @@
 <% flag_scheduled_contract_date = @lead.scheduled_contract_date.present? %>
 <table>
   <tr>
-    <td colspan="2"><%= l(Time.parse(@lead.created_date), format: :date) %><br><%= arrow_mark %></td>
+    <td colspan="1"><%= l(Time.parse(@lead.created_date), format: :date) %><br><%= arrow_mark %></td>
     <% @steps.each do |step| %>
-      <td></td>
       <td>
         <% if flag_scheduled_resident_date && @lead.scheduled_resident_date < step.finish_date %>
           <br>入居<br><%= l(Time.parse(@lead.scheduled_resident_date), format: :shortdate) %><br><%= arrow_mark %>
@@ -33,8 +32,20 @@
           <br>契約<br><%= l(Time.parse(@lead.scheduled_contract_date), format: :shortdate) %><br><%= arrow_mark %>
           <% flag_scheduled_contract_date = false %>
         <% end %>
+      <td></td>
       </td>
     <% end %>
+    <td>
+      <% if flag_scheduled_resident_date %>
+        <br>入居<br><%= l(Time.parse(@lead.scheduled_resident_date), format: :shortdate) %><br><%= arrow_mark %>
+      <% end %>
+      <% if flag_scheduled_payment_date %>
+        <br>入金<br><%= l(Time.parse(@lead.scheduled_payment_date), format: :shortdate) %><br><%= arrow_mark %>
+      <% end %>
+      <% if flag_scheduled_contract_date %>
+        <br>契約<br><%= l(Time.parse(@lead.scheduled_contract_date), format: :shortdate) %><br><%= arrow_mark %>
+      <% end %>
+    </td>
     <td></td>
   </tr>
   <tr>
