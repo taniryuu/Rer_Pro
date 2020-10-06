@@ -28,11 +28,11 @@ class Step < ApplicationRecord
   
   # メソッド
   
-  # statusに応じた終了日を取得（ない場合は""）
+  # statusに応じた終了日を取得（ない場合はFloat::INFINITY）
   def finish_date
     case self.status
     when "not_yet"
-      self.next_step.present? ? self.next_step.finish_date : ""
+      self.next_step.present? ? self.next_step.finish_date : ""#Float::INFINITY
     when "in_progress"
       self.scheduled_complete_date
     when "inactive"
@@ -40,7 +40,7 @@ class Step < ApplicationRecord
     when "completed"
       self.completed_date
     when "template"
-      ""
+      ""#Float::INFINITY
     end
   end
   
@@ -49,4 +49,9 @@ class Step < ApplicationRecord
     Step.find_by(lead_id: self.lead_id, order: self.order + 1)
   end
   
+  # stautsが「完了」のタスクの中でもっとも遅い「完了日」を取得（なければ本日の日付）
+  def latest_date
+    self.tasks.completed.present? ? self.tasks.completed.maximum(:completed_date) : "#{Date.current}"
+  end
+    
 end

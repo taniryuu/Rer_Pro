@@ -17,7 +17,7 @@ class Leads::ApplicationController < Users::ApplicationController
       end
       if params[:completed_id].present?
         completed_step = Step.find(params[:completed_id])
-        @success_message = "#{flash[:success]}#{step.name}を開始しました。" if complete_step(lead, completed_step, "#{Date.current}")
+        @success_message = "#{flash[:success]}#{step.name}を開始しました。" if complete_step(lead, completed_step, completed_step.latest_date)
       end
       check_status_completed_or_not(lead, step)
       raise ActiveRecord::Rollback if lead.invalid?(:check_steps_status) || step.errors.present?
@@ -158,4 +158,13 @@ class Leads::ApplicationController < Users::ApplicationController
     return completed_num == 0 ? 0 : 100 * completed_num / (completed_num + not_yet_num)
   end
   
+  
+  private
+    # 進捗一覧を取得
+    def set_steps
+      @steps = @lead.steps.all.ord
+      @steps_except_self = @steps.not_self(@step)
+      @steps_from_now_on = @steps_except_self.todo
+    end
+    
 end

@@ -14,28 +14,29 @@
 <% arrow_mark = "▽" %>
 <% flag_scheduled_resident_date = true %>
 <% flag_scheduled_payment_date = true %>
-<% flag_scheduled_contract_date = true %>
+<% flag_scheduled_contract_date = @lead.scheduled_contract_date.present? %>
 <table>
   <tr>
-    <td></td>
-    <td>
-      申込<br>
-      <%= l(Time.parse(@lead.created_date), format: :date) %><br>
-      <%= arrow_mark %>
-    </td>
+    <td colspan="2"><%= l(Time.parse(@lead.created_date), format: :date) %><br><%= arrow_mark %></td>
     <% @steps.each do |step| %>
+      <td></td>
       <td>
         <% if flag_scheduled_resident_date && @lead.scheduled_resident_date < step.finish_date %>
-          入居<br>
-          <%= l(Time.parse(@lead.scheduled_resident_date), format: :date) %><br>
-          <%= arrow_mark %>
+          <br>入居<br><%= l(Time.parse(@lead.scheduled_resident_date), format: :shortdate) %><br><%= arrow_mark %>
           <% flag_scheduled_resident_date = false %>
         <% end %>
+        <% if flag_scheduled_payment_date && @lead.scheduled_payment_date < step.finish_date %>
+          <br>入金<br><%= l(Time.parse(@lead.scheduled_payment_date), format: :shortdate) %><br><%= arrow_mark %>
+          <% flag_scheduled_payment_date = false %>
+        <% end %>
+        <% if flag_scheduled_contract_date && @lead.scheduled_contract_date < step.finish_date %>
+          <br>契約<br><%= l(Time.parse(@lead.scheduled_contract_date), format: :shortdate) %><br><%= arrow_mark %>
+          <% flag_scheduled_contract_date = false %>
+        <% end %>
       </td>
-      <td></td>
     <% end %>
     <td></td>
-  </td>
+  </tr>
   <tr>
     <td>申込</td>
     <% @steps.each do |step| %>
@@ -79,7 +80,7 @@
       <% when "inactive" %>
         <%= render 'leads/step_statuses/start', step: @step, completed_id: nil, button_name: "再開" %>
       <% when "in_progress" %>
-        <%= render 'leads/step_statuses/complete' %>
+        <%= render 'leads/step_statuses/complete', step: @step, button_name: "完了" %>
         <%= render 'leads/step_statuses/cancel', step: @step %>
       <% when "completed" %>
         <%= render 'leads/step_statuses/start', step: @step, completed_id: nil, button_name: "再開" %>
