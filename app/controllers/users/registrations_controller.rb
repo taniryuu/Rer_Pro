@@ -3,7 +3,7 @@
 class Users::RegistrationsController < Devise::RegistrationsController
   prepend_before_action :authenticate_scope!, only: %i(edit update)
   prepend_before_action :set_minimum_password_length, only: %i(edit)
-  before_action :set_members, only: %i(edit update)
+  before_action :set_member, only: %i(edit update)
   before_action :only_same_company_id?, only: %i(edit update)
   before_action :configure_account_update_params, only: [:update]
 

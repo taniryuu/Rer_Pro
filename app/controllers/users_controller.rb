@@ -1,9 +1,9 @@
-class UsersController < Users::ApplicationController
+class UsersController < NotificationsController
   include UsersHelper
 
   # オブジェクトの準備
   before_action :set_user, only: %i(show)
-  before_action :set_members, only: %i(index)
+  before_action :set_member, only: %i(index show)
   # アクセス制限
   before_action :current_user_admin?, only: %i(new create destroy)
 
@@ -27,6 +27,15 @@ class UsersController < Users::ApplicationController
   end
 
   def show
+    # 自分視点の通知
+    # 自分の案件の完了予定日に近づいてる案件の通知
+    @myleads_limit = []
+    myleads = @user.leads.where(status: "in_progress")
+    myleads.each do |lead|
+      if Date.current.to_s > lead.scheduled_contract_date
+        @myleads_limit.push(lead)
+      end
+    end
   end
 
   def destroy
