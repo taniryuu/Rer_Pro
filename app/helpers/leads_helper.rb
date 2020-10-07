@@ -28,7 +28,7 @@ module LeadsHelper
       completed_steps = lead.steps.completed
       completed_step = completed_steps.order(:completed_date).last if completed_steps.present?
       inactive_steps = lead.steps.inactive
-      inactive_step = inactive_steps.order(:canceled_date).last if inactive_step.present?
+      inactive_step = inactive_steps.order(:canceled_date).last if inactive_steps.present?
       if completed_step.present? && inactive_step.present?
         if completed_step.completed_date >= inactive_step.canceled_date
           return completed_step
