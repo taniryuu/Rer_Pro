@@ -1,2 +1,2 @@
-<%= link_to "凍結", cancel_step_path(step), method: :patch, 
-  data: { confirm: '本進捗を中止にします。本当によろしいですか？（通知対象から外れます。）' }, class: "btn btn-danger btn-xs" %>
+<%= link_to "#{button_name}", cancel_step_path(step), method: :patch, 
+  data: { confirm: '本進捗を保留にします。本当によろしいですか？（通知対象から外れます。）' }, class: "btn btn-danger btn-xs" %>

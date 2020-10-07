@@ -92,8 +92,8 @@
       <% when "inactive" %>
         <%= render 'leads/step_statuses/start', step: @step, completed_id: nil, button_name: "再開" %>
       <% when "in_progress" %>
-        <%= render 'leads/step_statuses/complete', step: @step, button_name: "完了" %>
-        <%= render 'leads/step_statuses/cancel', step: @step %>
+        <%= render 'leads/step_statuses/complete', completed_step: @step, button_name: "完了" %>
+        <%= render 'leads/step_statuses/cancel', step: @step, button_name: "保留" %>
       <% when "completed" %>
         <%= render 'leads/step_statuses/start', step: @step, completed_id: nil, button_name: "再開" %>
       <% when "template" %>

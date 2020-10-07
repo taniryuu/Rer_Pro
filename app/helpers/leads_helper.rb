@@ -64,12 +64,4 @@ module LeadsHelper
     end
   end
   
-  def check_between_scheduled_complete_date?(checked_date, step)
-    if Date.parse(checked_date) >= Date.parse(step.scheduled_complete_date)
-      step.next_step.blank? ? true : Date.parse(checked_date) < Date.parse(step.next_step.scheduled_complete_date)
-    else
-      false
-    end
-  end
-  
 end

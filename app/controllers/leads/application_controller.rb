@@ -42,7 +42,7 @@ class Leads::ApplicationController < Users::ApplicationController
       raise ActiveRecord::Rollback if lead.invalid?(:check_steps_status) || step.errors.present?
     end
     if lead.errors.blank? && step.errors.blank?
-      flash[:success] = "#{step.name}を中止しました。以後、本進捗は通知対象になりません。"
+      flash[:success] = "#{step.name}を保留にしました。以後、本進捗は通知対象になりません。"
     else
       flash[:danger] = step.errors.full_messages.first
       flash[:danger] = lead.errors.full_messages.first
