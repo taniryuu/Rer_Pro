@@ -209,6 +209,7 @@ ja:
       time: "%-H：%M"
       hour: "%-H"
       minute: "%-M"
+      date: "%Y/%-m/%-d"
       shortdate: "%-m/%-d"
     pm: 午後
   enums:

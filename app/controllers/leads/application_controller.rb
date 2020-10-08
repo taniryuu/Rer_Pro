@@ -5,7 +5,7 @@ class Leads::ApplicationController < Users::ApplicationController
   def start_step(lead, step)
     @success_message = "" # transaction内で代入した値を使うため、インスタンス変数を用いている。""を代入してリセットしている。
     ActiveRecord::Base.transaction do
-        scheduled_complete_date = params[:step].present? ? params[:step][:scheduled_complete_date] : (l Date.current)
+        scheduled_complete_date = params[:step].present? ? params[:step][:scheduled_complete_date] : "#{Date.current}"
         case step.status
         when "not_yet"
           @success_message = "#{step.name}を開始しました。" if step.update_attributes(status: "in_progress", scheduled_complete_date: scheduled_complete_date)
@@ -19,7 +19,7 @@ class Leads::ApplicationController < Users::ApplicationController
        
       if params[:completed_id].present?
         completed_step = Step.find(params[:completed_id])
-        @success_message = "#{flash[:success]}#{step.name}を開始しました。" if complete_step(lead, completed_step, "#{Date.current}")
+        @success_message = "#{flash[:success]}#{step.name}を開始しました。" if complete_step(lead, completed_step, completed_step.latest_date)
       end
       check_status_completed_or_not(lead, step)
       raise ActiveRecord::Rollback if lead.invalid?(:check_steps_status) || step.errors.present?
@@ -42,7 +42,7 @@ class Leads::ApplicationController < Users::ApplicationController
       raise ActiveRecord::Rollback if lead.invalid?(:check_steps_status) || step.errors.present?
     end
     if lead.errors.blank? && step.errors.blank?
-      flash[:success] = "#{step.name}を中止しました。以後、本進捗は通知対象になりません。"
+      flash[:success] = "#{step.name}を保留にしました。以後、本進捗は通知対象になりません。"
     else
       flash[:danger] = step.errors.full_messages.first
       flash[:danger] = lead.errors.full_messages.first
@@ -160,4 +160,13 @@ class Leads::ApplicationController < Users::ApplicationController
     return completed_num == 0 ? 0 : 100 * completed_num / (completed_num + not_yet_num)
   end
   
+  
+  private
+    # 進捗一覧を取得
+    def set_steps
+      @steps = @lead.steps.all.ord
+      @steps_except_self = @steps.not_self(@step)
+      @steps_from_now_on = @steps_except_self.todo
+    end
+    
 end
