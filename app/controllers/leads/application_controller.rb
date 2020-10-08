@@ -5,16 +5,18 @@ class Leads::ApplicationController < Users::ApplicationController
   def start_step(lead, step)
     @success_message = "" # transaction内で代入した値を使うため、インスタンス変数を用いている。""を代入してリセットしている。
     ActiveRecord::Base.transaction do
-      case step.status
-      when "not_yet"
-        @success_message = "#{step.name}を開始しました。" if step.update_attributes(status: "in_progress", scheduled_complete_date: params[:step][:scheduled_complete_date])
-      when "inactive"
-        @success_message = "#{step.name}を再開しました。" if step.update_attributes(status: "in_progress", scheduled_complete_date: params[:step][:scheduled_complete_date], canceled_date: "")
-      when "in_progress"
-        @success_message = "#{step.name}は既に進捗中です。"
-      when "completed"
-        @success_message = "#{step.name}を再開しました。" if step.update_attributes(status: "in_progress", scheduled_complete_date: params[:step][:scheduled_complete_date], completed_date: "")
-      end
+        scheduled_complete_date = params[:step].present? ? params[:step][:scheduled_complete_date] : (l Date.current)
+        case step.status
+        when "not_yet"
+          @success_message = "#{step.name}を開始しました。" if step.update_attributes(status: "in_progress", scheduled_complete_date: scheduled_complete_date)
+        when "inactive"
+          @success_message = "#{step.name}を再開しました。" if step.update_attributes(status: "in_progress", scheduled_complete_date: scheduled_complete_date, canceled_date: "")
+        when "in_progress"
+          @success_message = "#{step.name}は既に進捗中です。"
+        when "completed"
+          @success_message = "#{step.name}を再開しました。" if step.update_attributes(status: "in_progress", scheduled_complete_date: scheduled_complete_date, completed_date: "")
+        end
+       
       if params[:completed_id].present?
         completed_step = Step.find(params[:completed_id])
         @success_message = "#{flash[:success]}#{step.name}を開始しました。" if complete_step(lead, completed_step, "#{Date.current}")
