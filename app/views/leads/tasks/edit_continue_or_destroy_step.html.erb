@@ -1,12 +1,23 @@
 <% provide(:class_text, 'task--edit_continue_or_destroy_step') %>
 <% provide(:button_text, '選択') %>
+<% provide(:class_text, 'task--edit_continue_or_destroy_step') %>
+<% provide(:button_text, '選択') %>
+
 <p>この進捗にタスクを追加し、現在の進捗を「進捗中」とする</p>
+ <%= render 'leads/step_statuses/start', step: @step, completed_id: nil, new_task: true, button_name: "開始" %>
 
 
 
+<h3>どちらか選択してください </h3>
 
-<p>この進捗を削除する</p>   
-
-
-
+<%= form_with(url: tasks_update_continue_or_destroy_step_step_path(step_id: @step), method: :post, local: true) do |f| %>
+        
+  <%= f.radio_button :continue_or_destroy, :continue , checked: 'checked' %>
+  <%= f.label :continue_or_destroy, "この進捗にタスクを追加し、現在の進捗を「進捗中」とする", value: :continue %>
+  <br>
+  <%= f.radio_button :continue_or_destroy, :destroy %>
+  <%= f.label :continue_or_destroy, "この進捗を削除する", value: :destroy %>
+  <br>
+　<%= f.submit yield(:button_text), class: "btn-#{yield(:class_text)}" %>
+<% end %>
 
