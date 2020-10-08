@@ -7,6 +7,7 @@ class Leads::TasksController < Leads::ApplicationController
                                         :edit_complete_or_continue_step, :update_complete_or_continue_step, :edit_change_status_or_complete_task, :update_change_status_or_complete_task]
   # アクセス制限
   before_action :correct_user, except: %i(index show)
+  #after_action :sort_order, :update_continue_or_destroy_step
 
   
 

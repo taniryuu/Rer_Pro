@@ -67,6 +67,7 @@ class Leads::ApplicationController < Users::ApplicationController
       raise ActiveRecord::Rollback if lead.invalid?(:check_steps_status)
     end
     if lead.errors.blank?
+      sort_order
       flash[:success] = "#{step.name}を削除しました。"
       redirect_to working_step_in(lead)
     else
@@ -159,5 +160,18 @@ class Leads::ApplicationController < Users::ApplicationController
   def calculate_rate(completed_num, not_yet_num)
     return completed_num == 0 ? 0 : 100 * completed_num / (completed_num + not_yet_num)
   end
-  
+ 
+  # 順番をチェックし、空があったら詰める処理
+  def sort_order
+    if @lead.steps.find_by(order: @lead.steps.count + 1).present?
+      (1..@lead.steps.count).each do |order_num|
+        if @lead.steps.find_by(order: order_num).blank?
+          step = @lead.steps.find_by(order: order_num + 1)
+          step.update_attribute(:order, order_num)
+        end
+      end
+    end
+  end
+ 
+ 
 end
