@@ -72,6 +72,10 @@ class Leads::StepsController < Leads::ApplicationController
     destroy_step(@lead, @step)
   end
 
+  def or_destroy_step
+    destroy_step(@lead, @step)
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_step
