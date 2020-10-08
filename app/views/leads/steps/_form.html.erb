@@ -8,8 +8,11 @@
 
   <div class="field">
     <%= form.label :order %>＜入力必須＞
-    <% plus = step.new_record? ? 1 : 0 %>
-    <%= form.number_field :order, min: 1, max: @lead.steps.count + plus %>
+    <% if step.new_record? %>
+      <%= form.number_field :order, min: 1, max: @lead.steps.count + 1, value: params[:order_num].to_i %>
+    <% else %>
+      <%= form.number_field :order, min: 1, max: @lead.steps.count %>
+    <% end %>
   </div>
 
   <div class="field">

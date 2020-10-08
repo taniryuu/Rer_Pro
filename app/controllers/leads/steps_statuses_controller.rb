@@ -7,11 +7,11 @@ class Leads::StepsStatusesController < Leads::StepsController
     if params[:completed_id].present?
       ActiveRecord::Base.transaction do
         completed_step = Step.find(params[:completed_id])
-        complete_step(@lead, completed_step, "#{Date.current}")
+        complete_step(@lead, completed_step, completed_step.latest_date)
         if @lead.steps_rate < 100
           flash[:success] = "#{flash[:success]}#{completed_step.name}を完了しました。引き続き、#{@step.name}に取り組んでください。"
         else
-          complete_lead(@lead, "#{Date.current}")
+          complete_lead(@lead, completed_step.latest_date)
         end
         raise ActiveRecord::Rollback if @lead.invalid?(:check_steps_status)
       end

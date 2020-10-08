@@ -2,6 +2,7 @@ class Leads::StepsController < Leads::ApplicationController
   # オブジェクトの準備
   before_action :set_step, except: %i(index new create)
   before_action :set_lead_and_user_by_lead_id, only: %i(index new create)
+  before_action :set_steps, only: %i(show)
   # フィルター（アクセス権限）
   before_action :only_same_company_id?
   before_action :correct_user, except: %i(index show)
@@ -18,10 +19,6 @@ class Leads::StepsController < Leads::ApplicationController
   # GET /steps/1
   # GET /steps/1.json
   def show
-    @steps = @lead.steps.all.ord
-    @steps_except_self = @steps.not_self(@step)
-    @steps_from_now_on = @steps_except_self.todo
-    
     # タスクステータスが「未」のリスト
     @tasks = @step.tasks.not_yet.order(:scheduled_complete_date)
     # タスクステータスが「完了」のリスト
@@ -104,7 +101,7 @@ class Leads::StepsController < Leads::ApplicationController
         # 完了する進捗がある場合の処理
         if params[:step][:completed_id].present?
           @completed_step = Step.find(params[:step][:completed_id]) # 完了処理に失敗したら、改めてオブジェクトを渡す必要があるのでインスタンス変数を使用。
-          errors << @completed_step.errors.full_messages unless complete_step(lead, @completed_step, "#{Date.current}")
+          errors << @completed_step.errors.full_messages unless complete_step(lead, @completed_step, @completed_step.latest_date)
         end
         # 矛盾を解消
         check_status_inactive_or_not(step)

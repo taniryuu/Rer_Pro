@@ -28,7 +28,7 @@ module LeadsHelper
       completed_steps = lead.steps.completed
       completed_step = completed_steps.order(:completed_date).last if completed_steps.present?
       inactive_steps = lead.steps.inactive
-      inactive_step = inactive_steps.order(:canceled_date).last if inactive_step.present?
+      inactive_step = inactive_steps.order(:canceled_date).last if inactive_steps.present?
       if completed_step.present? && inactive_step.present?
         if completed_step.completed_date >= inactive_step.canceled_date
           return completed_step
@@ -36,12 +36,31 @@ module LeadsHelper
           return inactive_step
         end
       elsif completed_step.present?
-          return completed_step
+        return completed_step
       elsif inactive_step.present?
-          return inactive_step
+        return inactive_step
       else
         return lead.steps.in_progress.order(:created_at).last
       end
+    end
+  end
+  
+  # 進捗一覧のシンボルサイズ
+  def step_button_size(step_now, step)
+    step_now.id == step.id ? "btn-lg" : "btn-sm"
+  end
+  
+  # 進捗一覧のシンボルの色
+  def step_button_color(step)
+    case step.status
+    when "not_yet"
+      "btn-default"
+    when "inactive"
+      "btn-danger"
+    when "in_progress"
+      "btn-info"
+    when "completed"
+      "btn-secondary"
     end
   end
   

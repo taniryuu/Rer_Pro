@@ -100,7 +100,7 @@ puts "Userテスト用サンプルレコード作成完了"
         memo: "進捗#{1 + i + 7*j}-1のメモ",
         status: "in_progress",
         order: 1,
-        scheduled_complete_date: "#{Date.current + 3}",
+        scheduled_complete_date: (Date.current + 3).to_s,
       )
     end
     puts "「サンプル太郎(#{j})」の案件作成完了"
@@ -115,7 +115,7 @@ end
     memo: "進捗#{i+2}のメモ",
     status: 0,
     order: i+2,
-    scheduled_complete_date: "#{Date.current + 3 + i}",
+    scheduled_complete_date: (Date.current + 3 + 3*i).to_s,
   )
 end
 puts "「SampleUser0」の案件「お客様1」の進捗作成完了"
@@ -127,7 +127,7 @@ puts "「SampleUser0」の案件「お客様1」の進捗作成完了"
     name: "task#{i+1}",
     memo: "memo#{i+1}",
     status: 0,
-    scheduled_complete_date: (I18n.l Date.current + 3),
+    scheduled_complete_date: (Date.current + 3).to_s,
   )
 end
 
@@ -138,8 +138,8 @@ end
     name: "task#{i+4}",
     memo: "memo#{i+4}",
     status: 1,
-    scheduled_complete_date: (I18n.l Date.current + 4),
-    completed_date: (I18n.l Date.current),
+    scheduled_complete_date: (Date.current + 4).to_s,
+    completed_date: (Date.current).to_s,
   )
 end
 
@@ -150,8 +150,8 @@ end
     name: "task#{i+7}",
     memo: "memo#{i+7}",
     status: 2,
-    scheduled_complete_date: (I18n.l Date.current + 5),
-    canceled_date: (I18n.l Date.current - 1),
+    scheduled_complete_date: (Date.current + 5).to_s,
+    canceled_date: (Date.current - 1).to_s,
   )
 end
 puts "「SampleUser0」の案件「お客様１」の「進捗１」のタスク作成完了"
