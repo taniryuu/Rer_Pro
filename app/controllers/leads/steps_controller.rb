@@ -72,8 +72,34 @@ class Leads::StepsController < Leads::ApplicationController
     destroy_step(@lead, @step)
   end
 
+  # 進捗を削除する
   def statuses_destroy_step
     destroy_step(@lead, @step)
+  end
+
+  # 進捗を未にする
+  def statuses_make_step_not_yet
+    if @step.update_attributes(status: "not_yet")
+      update_steps_rate(@lead)
+      redirect_to check_status_and_get_url
+    else
+      flash[:danger] = @step.errors.full_messages.first
+      #render :edit_change_status_or_complete_task
+      redirect_to check_status_and_get_url
+    end
+  end
+
+  # 進捗を保留にする
+  def statuses_make_step_inactive
+    cancel_step(@lead, @step)
+  end
+
+  # すべてのタスクを未にする
+  def statuses_make_all_tasks_not_yet
+    #現在の進捗の「未」のタスクをすべて「完了」とし、「完了日」を本日とし、その後complete_or_continueのurlへ飛ぶ
+    @step.tasks.where(status: "not_yet").update_all(status: "completed", completed_date: "#{Date.current}")
+    update_completed_tasks_rate(@step)
+    redirect_to check_status_and_get_url
   end
 
   private

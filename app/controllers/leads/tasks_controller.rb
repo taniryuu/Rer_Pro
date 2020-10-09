@@ -235,29 +235,6 @@ class Leads::TasksController < Leads::ApplicationController
       day.blank? ? false : Date.parse(day) < Date.current
     end
 
-
-    def check_status_and_get_url
-      # タスク操作後、
-      
-      # 進捗に「未」のタスクが無く、かつ「完了」のタスクも無い場合、continue_or_destroy_stepのurlにリダイレクトする
-      if @step.tasks.find_by(status: "not_yet").nil? && @step.tasks.find_by(status: "completed").nil?
-        tasks_edit_continue_or_destroy_step_step_url(@step)
-        #redirect_to tasks_edit_continue_or_destroy_step_step_url(@step, format: "js")
-
-      #進捗に「未」のタスクが無く、かつ「完了」のタスクが１つ以上ある場合、complete_or_continue_stepのurlにリダイレクトする
-      elsif @step.tasks.find_by(status: "not_yet").nil? && @step.tasks.find_by(status: "completed").present?
-        tasks_edit_complete_or_continue_step_step_url(@step)
-
-      #進捗に「未」のタスクがあるにも関わらず、進捗のstatusが「完了」の場合、change_status_or_complete_taskのurlにリダイレクトする
-      elsif @step.tasks.find_by(status: "not_yet").present? && @step.status == "completed"
-        tasks_edit_change_status_or_complete_task_step_url(@step)
-      
-      #以上いずれでもない場合、steps#showにリダイレクトする
-      else
-        step_url(@step)
-      end 
-    end
-
     def create_new_task_step_in_progress(lead, step)
       Task.create!(step_id: step.id ,name: "new_task", status: 0, scheduled_complete_date: "#{Date.current}")
       redirect_to step_statuses_start_step_url(@step)

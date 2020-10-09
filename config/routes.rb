@@ -29,6 +29,9 @@ Rails.application.routes.draw do
         get 'step_statuses_start'
         get 'step_statuses_complete'
         get 'statuses_destroy_step'
+        get 'statuses_make_step_not_yet'
+        get 'statuses_make_step_inactive'
+        get 'statuses_make_all_tasks_not_yet'
       end
       member do
         get 'tasks/edit_add_delete_list'
