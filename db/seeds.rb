@@ -88,7 +88,7 @@ puts "Userテスト用サンプルレコード作成完了"
       #  memo: "",
       #  status: "進捗中"
       #  notice_created: 新規申込時通知
-      #  notice_change_limit: 期限変更時通知
+        notice_change_limit: true,
         scheduled_resident_date: (Date.current + 21 - i).to_s,
         scheduled_payment_date: (Date.current + 14 - i).to_s,
       #  scheduled_contract_date: 契約予定日
@@ -155,4 +155,3 @@ end
   )
 end
 puts "「SampleUser0」の案件「お客様１」の「進捗１」のタスク作成完了"
-

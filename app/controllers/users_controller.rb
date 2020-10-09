@@ -4,6 +4,7 @@ class UsersController < NotificationsController
   # オブジェクトの準備
   before_action :set_user, only: %i(show)
   before_action :set_member, only: %i(index show)
+  before_action :notice, only: :show
   # アクセス制限
   before_action :current_user_admin?, only: %i(new create destroy)
 
@@ -32,7 +33,7 @@ class UsersController < NotificationsController
     @myleads_limit = []
     myleads = @user.leads.where(status: "in_progress")
     myleads.each do |lead|
-      if Date.current.to_s > lead.scheduled_contract_date
+      if Date.current.to_s >= lead.scheduled_contract_date
         @myleads_limit.push(lead)
       end
     end
