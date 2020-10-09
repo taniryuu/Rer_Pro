@@ -5,6 +5,7 @@ class Leads::TasksController < Leads::ApplicationController
   before_action :set_step, only: %i(index new create)
   before_action :set_step_by_id, only: [:edit_add_delete_list, :update_add_delete_list, :edit_continue_or_destroy_step, :update_continue_or_destroy_step,
                                         :edit_complete_or_continue_step, :update_complete_or_continue_step, :edit_change_status_or_complete_task, :update_change_status_or_complete_task]
+  before_action :set_steps, only: :edit_complete_or_continue_step
   # アクセス制限
   before_action :correct_user, except: %i(index show)
   #after_action :sort_order, :update_continue_or_destroy_step

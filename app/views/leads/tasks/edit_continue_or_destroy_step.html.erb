@@ -1,8 +1,6 @@
-<% provide(:class_text, 'task--edit_continue_or_destroy_step') %>
-<% provide(:button_text, '選択') %>
-
-<h4>この進捗にタスクを追加し、現在の進捗を「進捗中」とする</h4>
+<h4>&#9312この進捗にタスクを追加し、現在の進捗を「進捗中」とする</h4>
  <%= render 'leads/step_statuses/start', step: @step, completed_id: nil, new_task: true, button_name: "開始" %>
-<h4>この進捗を削除する</h4>
- <%= button_to '削除', or_destroy_step_step_path(@step), method: :get %>
+<br>
+<h4>&#9313この進捗を削除する</h4>
+ <%= button_to '削除', statuses_destroy_step_step_path(@step), method: :get %>
 

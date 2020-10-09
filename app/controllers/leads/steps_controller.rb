@@ -72,7 +72,7 @@ class Leads::StepsController < Leads::ApplicationController
     destroy_step(@lead, @step)
   end
 
-  def or_destroy_step
+  def statuses_destroy_step
     destroy_step(@lead, @step)
   end
 
