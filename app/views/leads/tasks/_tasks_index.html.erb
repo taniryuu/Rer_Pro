@@ -1,7 +1,11 @@
 <% provide(:class_text, 'task--new') %>
 <% provide(:button_text, '作成') %>
-<p>タスク一覧 </p>
-<p>To Do リスト</p>
+<h3>タスク一覧 </h3>
+
+<h4 style="display:inline;"><%= "To Do リスト"%></h4><h5 style="display:inline;"><%= "<STEP#{@step.order}>完了まであと#{@tasks.count}件" %></h5>
+<br>
+<br>
+
 <table>
   <tbody>
     <%= form_with(model: @tasks, url: tasks_update_add_delete_list_step_path(@step), local: true, mothod: :post) do |f| %>
@@ -60,7 +64,8 @@
   <div class="panel panel-default">
     <div class="panel-heading">
       <p class="panel-title">
-        <a data-toggle="collapse" data-parent="#accordion" href="#collapse3">済 リスト</a>
+        <a data-toggle="collapse" data-parent="#accordion" href="#collapse3"><h4 style="display:inline;"><%= "済 リスト" %></h4></a>
+        <h5 style="display:inline;"><%= "(#{@completed_tasks_array.count}件)" %></h5>
       </p>
     </div>
     <div id="collapse3" class="panel-collapse collapse in">
@@ -83,7 +88,8 @@
   <div class="panel panel-default">
     <div class="panel-heading">
       <p class="panel-title">
-        <a data-toggle="collapse" data-parent="#accordion" href="#collapse4">中止 リスト</a>
+        <a data-toggle="collapse" data-parent="#accordion" href="#collapse4"><h4 style="display:inline;"><%= "中止 リスト" %></h4></a>
+        <h5 style="display:inline;"><%= "(#{@canceled_tasks_array.count}件)" %></h5>
       </p>
     </div>
     <div id="collapse4" class="panel-collapse collapse">
