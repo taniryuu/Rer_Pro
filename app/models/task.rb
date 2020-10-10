@@ -8,13 +8,13 @@ class Task < ApplicationRecord
   
   # 完了日または中止にした日が空なら今日の日付を入れる
   def date_blank_then_today(status)
-    if status == "completed"
-      if self.status == "completed" && self.completed_date.blank?
-        self.update_attribute(:completed_date, (I18n.l Date.current))
+    if self.status?("completed")
+      if self.status?("completed") && self.completed_date.blank?
+        self.update_attribute(:completed_date, "#{Date.current}")
       end
-    elsif status == "canceled"
-      if self.status == "canceled" && self.canceled_date.blank?
-        self.update_attribute(:canceled_date, (I18n.l Date.current))
+    elsif self.status?("canceled")
+      if self.status?("canceled") && self.canceled_date.blank?
+        self.update_attribute(:canceled_date, "#{Date.current}")
       end
     end
   end

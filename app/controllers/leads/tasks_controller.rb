@@ -15,11 +15,11 @@ class Leads::TasksController < Leads::ApplicationController
 
   def index
     # タスクステータスが「未」のリスト
-    @tasks = @step.tasks.where(status: "not_yet").order(:scheduled_complete_date)
+    @tasks = @step.tasks.not_yet.order(:scheduled_complete_date)
     # タスクステータスが「完了」のリスト
-    @completed_tasks_array = @step.tasks.where(status: "completed").order(:completed_date)
+    @completed_tasks_array = @step.tasks.completed.order(:completed_date)
     # タスクステータスが「中止」のリスト
-    @canceled_tasks_array = @step.tasks.where(status: "canceled").order(:canceled_date)
+    @canceled_tasks_array = @step.tasks.canceled.order(:canceled_date)
     @task = @step.tasks.new
   end
 
@@ -89,13 +89,13 @@ class Leads::TasksController < Leads::ApplicationController
     n1 = checkbox_array.size
     i2 = 0
     # タスクステータスが「完了」のリスト
-    @completed_tasks_array = @step.tasks.where(status: "completed").order(:completed_date)
+    @completed_tasks_array = @step.tasks.completed.order(:completed_date)
 
     n1.times do |i1|
       if checkbox_array[i1] == "true"
         # (i1-i2)番目のタスクステータスが「未」のタスクの１個の要素からなるActiveRecordAsociation?Relationがdeleted_tasks(配列のようなもの)
         # 下でタスクステータスを「未」から「完了」に変えているのでi2(checkbox=="true"の数)だけi1から引いている
-        deleted_tasks = @step.tasks.where(status: "not_yet").order(:scheduled_complete_date).limit(1).offset(i1 - i2)
+        deleted_tasks = @step.tasks.not_yet.order(:scheduled_complete_date).limit(1).offset(i1 - i2)
         i2 += 1
         # 1個の要素からなるActiveRecordAsociation?Relationから1個の要素deleted_taskを取り出して
         # タスクステータスを「完了」、「完了日」を本日に設定している
@@ -157,7 +157,7 @@ class Leads::TasksController < Leads::ApplicationController
     # 進捗を完了を選択したとき
     if params[:complete_or_continue] == "completed"
       #stautsが「完了」のタスクの中でもっとも遅い「完了日」をこの進捗の完了日とし、現在の進捗を「完了」とする
-      latest_date = @step.tasks.where(status: "completed").maximum(:completed_date)
+      latest_date = @step.tasks.completed.maximum(:completed_date)
       #redirect_to step_statuses_complete_step_url(@step, latest_date) and return
       complete_step(@lead, @step, latest_date)
       # steps#showにリダイレクト
@@ -197,7 +197,7 @@ class Leads::TasksController < Leads::ApplicationController
     #「未」のタスクをすべて「完了」を選択したとき
     else
       #現在の進捗の「未」のタスクをすべて「完了」とし、「完了日」を本日とし、その後complete_or_continueのurlへ飛ぶ
-      @step.tasks.where(status: "not_yet").update_all(status: "completed", completed_date: "#{Date.current}")
+      @step.tasks.not_yet.update_all(status: "completed", completed_date: "#{Date.current}")
       update_completed_tasks_rate(@step)
       redirect_to check_status_and_get_url
     end

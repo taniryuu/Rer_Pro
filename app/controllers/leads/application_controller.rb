@@ -191,7 +191,7 @@ class Leads::ApplicationController < Users::ApplicationController
       tasks_edit_complete_or_continue_step_step_url(@step)
 
     #進捗に「未」のタスクがあるにも関わらず、進捗のstatusが「完了」の場合、change_status_or_complete_taskのurlにリダイレクトする
-    elsif @step.tasks.find_by(status: "not_yet").present? && @step.status == "completed"
+    elsif @step.tasks.find_by(status: "not_yet").present? && @step.status?("completed")
       tasks_edit_change_status_or_complete_task_step_url(@step)
 
     #以上いずれでもない場合、steps#showにリダイレクトする

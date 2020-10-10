@@ -97,7 +97,7 @@ class Leads::StepsController < Leads::ApplicationController
   # すべてのタスクを未にする
   def statuses_make_all_tasks_not_yet
     #現在の進捗の「未」のタスクをすべて「完了」とし、「完了日」を本日とし、その後complete_or_continueのurlへ飛ぶ
-    @step.tasks.where(status: "not_yet").update_all(status: "completed", completed_date: "#{Date.current}")
+    @step.tasks.not_yet.update_all(status: "completed", completed_date: "#{Date.current}")
     update_completed_tasks_rate(@step)
     redirect_to check_status_and_get_url
   end
