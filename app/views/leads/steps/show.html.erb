@@ -11,6 +11,8 @@
 <h2 style="display:inline;"><%= " (現在：<STEP#{working_step_in(@lead).order}> #{@lead.status?("in_progress") ? working_step_in(@lead).name : @lead.status_i18n})" %></h2>
 <br>
 
+<%= render 'leads/leads_statuses/start', lead: @lead, button_name: "再開" %>
+
 <% arrow_mark = "▽" %>
 <% flag_scheduled_resident_date = true %>
 <% flag_scheduled_payment_date = true %>
@@ -20,7 +22,6 @@
     <td colspan="1"><%= l(Time.parse(@lead.created_date), format: :date) %><br><%= arrow_mark %></td>
     <% @steps.each do |step| %>
       <td>
-        <%# debugger %>
         <% if flag_scheduled_resident_date && @lead.scheduled_resident_date < step.finish_date %>
           <br>入居<br><%= l(Time.parse(@lead.scheduled_resident_date), format: :shortdate) %><br><%= arrow_mark %>
           <% flag_scheduled_resident_date = false %>
@@ -73,6 +74,7 @@
     <% when "in_progress" %>
       <%= "進捗中" %>
       <%= "：#{l(Time.parse(@step.scheduled_complete_date), format: :shortdate)}迄" %>
+      <%#= "（期限変更：上司未確認）" if @lead.notice_change_limit && @step.notice_change_limit %>
     <% when "completed" %>
       <%= "#{l(Time.parse(@step.completed_date), format: :shortdate)}に完了済" %>
     <% when "template" %>
@@ -86,11 +88,13 @@
 <div id="collapse-step-status-edit" class="collapse">
   <div class="well">
     <h5 style="display:inline;">
+      <%= @step.memo %><br>
       <% case @step.status %>
       <% when "not_yet" %>
         <%= render 'leads/step_statuses/start', step: @step, completed_id: nil, button_name: "開始" %>
       <% when "inactive" %>
         <%= render 'leads/step_statuses/start', step: @step, completed_id: nil, button_name: "再開" %>
+        <%= link_to "案件自体を凍結", cancel_lead_path(@lead), class: "btn btn-danger btn-sm", method: :patch %>
       <% when "in_progress" %>
         <%= render 'leads/step_statuses/complete', completed_step: @step, button_name: "完了" %>
         <%= render 'leads/step_statuses/cancel', step: @step, button_name: "保留" %>
@@ -106,9 +110,8 @@
 
 <%= render partial: 'leads/tasks/tasks_index' %>
 
-<!--%= link_to 'Task-index', step_tasks_path(@step) %> |-->
-<%= link_to 'Edit', edit_step_path(@step) %> |
-<%= link_to 'Back', lead_steps_path(@lead) %>
+<%= link_to '案件の編集', edit_lead_path(@lead) %> |
+<%= link_to '案件一覧へ戻る', leads_path %>
 
 
 <br>
@@ -120,6 +123,12 @@
 ページはここまで。
 <br>////////////////////////////////////////////////////////////////////////////////////////////////////////////<br>
 以下はメモです。（最終プルリク上げる前に削除）
+
+期限変更：<%= @lead.notice_change_limit %>
+<br>
+<%= link_to '進捗編集', edit_step_path(@step) %> |
+<%= link_to '進捗一覧', lead_steps_path(@lead) %>
+
 <div class="row">
   <div class="col-md-12 col-md-offset-1">
     <table id="table-lead-index-show">

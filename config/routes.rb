@@ -19,6 +19,9 @@ Rails.application.routes.draw do
     member do
       get 'edit_user_id'
       patch 'update_user_id'
+      get 'edit_status' => 'leads_statuses#edit', as: :edit_statuses_of
+      patch 'start/:step_id' => 'leads_statuses#start', as: :start
+      patch 'cancel' => 'leads_statuses#cancel', as: :cancel
     end
     resources :steps do
       member do
