@@ -26,8 +26,6 @@ Rails.application.routes.draw do
         patch 'complete/:completed_id' => 'steps_statuses#complete', as: :complete
         patch 'start' => 'steps_statuses#start', as: :start
         patch 'cancel' => 'steps_statuses#cancel', as: :cancel
-        get 'step_statuses_start'
-        get 'step_statuses_complete'
         get 'statuses_destroy_step'
         get 'statuses_make_step_not_yet'
         get 'statuses_make_step_inactive'
@@ -37,11 +35,8 @@ Rails.application.routes.draw do
         get 'tasks/edit_add_delete_list'
         post 'tasks/update_add_delete_list'
         get 'tasks/edit_continue_or_destroy_step'
-        post 'tasks/update_continue_or_destroy_step'
         get 'tasks/edit_complete_or_continue_step'
-        post 'tasks/update_complete_or_continue_step'
         get 'tasks/edit_change_status_or_complete_task'
-        post 'tasks/update_change_status_or_complete_task'
       end
       resources :tasks do
         member do

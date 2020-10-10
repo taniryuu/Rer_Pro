@@ -3,11 +3,11 @@ class Leads::ApplicationController < Users::ApplicationController
   
   # 進捗の開始処理を実行し詳細ページへ遷移
   def start_step(lead, step, new_task)
-    if new_task == "true"
-      Task.create!(step_id: step.id ,name: "new_task", status: 0, scheduled_complete_date: "#{Date.current}")
-    end
     @success_message = "" # transaction内で代入した値を使うため、インスタンス変数を用いている。""を代入してリセットしている。
     ActiveRecord::Base.transaction do
+        if new_task == "true"
+          Task.create!(step_id: step.id ,name: "new_task", status: 0, scheduled_complete_date: "#{Date.current}")
+        end
         scheduled_complete_date = params[:step].present? ? params[:step][:scheduled_complete_date] : "#{Date.current}"
         case step.status
         when "not_yet"

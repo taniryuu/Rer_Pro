@@ -79,14 +79,14 @@ class Leads::StepsController < Leads::ApplicationController
 
   # 進捗を未にする
   def statuses_make_step_not_yet
-    if @step.update_attributes(status: "not_yet")
+    errors = []
+    ActiveRecord::Base.transaction do
+      errors << @step.errors.full_messages unless @step.update_attributes(status: "not_yet")
       update_steps_rate(@lead)
-      redirect_to check_status_and_get_url
-    else
-      flash[:danger] = @step.errors.full_messages.first
-      #render :edit_change_status_or_complete_task
-      redirect_to check_status_and_get_url
+      errors << @lead.errors.full_messages if @lead.invalid?(:check_steps_status)
+      raise ActiveRecord::Rollback if errors.present?
     end
+    redirect_to check_status_and_get_url
   end
 
   # 進捗を保留にする
@@ -97,8 +97,12 @@ class Leads::StepsController < Leads::ApplicationController
   # すべてのタスクを未にする
   def statuses_make_all_tasks_not_yet
     #現在の進捗の「未」のタスクをすべて「完了」とし、「完了日」を本日とし、その後complete_or_continueのurlへ飛ぶ
-    @step.tasks.not_yet.update_all(status: "completed", completed_date: "#{Date.current}")
-    update_completed_tasks_rate(@step)
+    errors = []
+    ActiveRecord::Base.transaction do
+      errors << @step.errors.full_messages unless @step.tasks.not_yet.update_all(status: "completed", completed_date: "#{Date.current}")
+      update_completed_tasks_rate(@step)
+      raise ActiveRecord::Rollback if errors.present?
+    end
     redirect_to check_status_and_get_url
   end
 
