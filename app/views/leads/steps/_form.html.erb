@@ -6,12 +6,14 @@
     <%= form.text_field :name, autofocus: true %>
   </div>
 
+  <% steps_count = @lead.steps.count %>
   <div class="field">
     <%= form.label :order %>＜入力必須＞
     <% if step.new_record? %>
-      <%= form.number_field :order, min: 1, max: @lead.steps.count + 1, value: params[:order_num].to_i %>
+      <% order_num = params[:order_num].present? ? params[:order_num].to_i : steps_count + 1 %>
+      <%= form.number_field :order, min: 1, max: steps_count + 1, value: order_num %>
     <% else %>
-      <%= form.number_field :order, min: 1, max: @lead.steps.count %>
+      <%= form.number_field :order, min: 1, max: steps_count %>
     <% end %>
   </div>
 

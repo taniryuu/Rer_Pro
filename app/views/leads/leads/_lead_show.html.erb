@@ -1,0 +1,11 @@
+<h4><%= "#{@lead.customer_name} 様：「" %><%= link_to @lead.room_name, leads_path(room_searchword: @lead.room_name) %><%= "(#{@lead.room_num})」に入居予定" %></h4>
+<h5>
+  <%= "(担当：" %><%= link_to @user.name, leads_path(user_searchword: @user.id) %><%= "）" %>
+  <%= "：あなたの案件です。" if @lead.user_id == current_user.id %>
+  <%= link_to "：担当者を変更する", edit_user_id_lead_path(@lead) if current_user.superior? %>
+</h5>
+
+<h2 style="display:inline;"><%= "進捗率：#{@lead.steps_rate}%" %></h2>
+<h2 style="display:inline;"><%= " (現在：<STEP#{working_step_in(@lead).order}> #{@lead.status?("in_progress") ? working_step_in(@lead).name : @lead.status_i18n})" %></h2>
+<%= render 'leads/leads_statuses/start', lead: @lead, button_name: "再開" unless @lead.status?("in_progress") %>
+<br>

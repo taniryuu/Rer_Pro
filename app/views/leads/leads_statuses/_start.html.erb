@@ -1,4 +1,4 @@
-<!-- 本パーシャルを使用する場合は、before_actionとして、set_step及びset_stepsが必要。 -->
+<!-- 本パーシャルを使用する場合は、オブジェクトとしてlead, button_nameが必要。before_actionとして、set_step及びset_stepsが必要。 -->
 <button type="button" class="btn btn-info" data-toggle="modal" data-target="#lead-start" data-name="<%= lead.customer_name %>" data-id="<%= lead.id %>"><%= button_name %></button>
 
 <!-- Modal -->
@@ -12,7 +12,7 @@
         </button>
       </div>
       <div class="modal-body">
-        <%= render 'leads/step_statuses/index', completed_step: nil %>
+        <%= render 'leads/step_statuses/index', steps: @steps, completed_step: nil %>
         <%= link_to "新たに次の進捗を作成して進む", new_lead_step_path(@lead, start_lead_flag: true), class: "btn btn-primary btn-lg" %>
       </div>
       <div class="modal-footer">

@@ -1,9 +1,6 @@
 class Leads::LeadsStatusesController < Leads::LeadsController
   before_action :correct_user, only: %i(start cancel)
   
-  def edit
-  end
-
   def start
     if start_lead(@lead)
       redirect_to Step.find(params[:step_id])
@@ -14,5 +11,6 @@ class Leads::LeadsStatusesController < Leads::LeadsController
 
   def cancel
     cancel_lead(@lead)
+    redirect_to latest_step_in(@lead)
   end
 end

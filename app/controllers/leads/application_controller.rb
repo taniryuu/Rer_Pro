@@ -7,31 +7,30 @@ class Leads::ApplicationController < Users::ApplicationController
       flash[:success] = "#{flash[:success]}本案件を再開しました。"
       true
     else
-      flash[:danger] = "#{flash[:danger]}#{lead.errors.full_messages.first}"
+      flash[:danger] = "#{lead.errors.full_messages.first}#{flash[:danger]}"
       false
     end
   end
   
   # 進捗の開始処理を実行し詳細ページへ遷移
   def start_step(lead, step)
-    @success_message = "" # transaction内で代入した値を使うため、インスタンス変数を用いている。""を代入してリセットしている。
     ActiveRecord::Base.transaction do
-      # 開始処理
+      # 進捗開始処理
       scheduled_complete_date = params[:step].present? ? params[:step][:scheduled_complete_date] : "#{Date.current}"
       case step.status
       when "not_yet"
-        @success_message = "#{step.name}を開始しました。" if step.update_attributes(status: "in_progress", scheduled_complete_date: scheduled_complete_date)
+        flash[:success] = "#{step.name}を開始しました。" if step.update_attributes(status: "in_progress", scheduled_complete_date: scheduled_complete_date)
       when "inactive"
-        @success_message = "#{step.name}を再開しました。" if step.update_attributes(status: "in_progress", scheduled_complete_date: scheduled_complete_date, canceled_date: "")
+        flash[:success] = "#{step.name}を再開しました。" if step.update_attributes(status: "in_progress", scheduled_complete_date: scheduled_complete_date, canceled_date: "")
       when "in_progress"
-        @success_message = "#{step.name}は既に進捗中です。"
+        flash[:success] = "#{step.name}は既に進捗中です。"
       when "completed"
-        @success_message = "#{step.name}を再開しました。" if step.update_attributes(status: "in_progress", scheduled_complete_date: scheduled_complete_date, completed_date: "")
+        flash[:success] = "#{step.name}を再開しました。" if step.update_attributes(status: "in_progress", scheduled_complete_date: scheduled_complete_date, completed_date: "")
       end
       # 完了する進捗がある場合の処理
       if params[:completed_id].present?
         completed_step = Step.find(params[:completed_id])
-        @success_message = "#{step.name}を開始しました。" if complete_step(lead, completed_step, completed_step.latest_date)
+        flash[:success] = "#{flash[:success]}#{step.name}を開始しました。" if complete_step(lead, completed_step, completed_step.latest_date)
       end
       # 案件を再開する場合の処理
       start_lead(lead) unless lead.status?("in_progress")
@@ -40,9 +39,7 @@ class Leads::ApplicationController < Users::ApplicationController
       # バリデーション確認
       raise ActiveRecord::Rollback if lead.invalid?(:check_steps_status) || step.errors.present?
     end
-    if lead.errors.blank? && step.errors.blank?
-      flash[:success] = "#{flash[:success]}#{@success_message}" if @success_message.present?
-    else
+    if lead.errors.present? || step.errors.present?
       flash.delete(:success)
       flash[:danger] = "#{flash[:danger]}#{lead.errors.full_messages.first}" if lead.errors.present?
       flash[:danger] = "#{flash[:danger]}#{step.errors.full_messages.first}" if step.errors.present?
@@ -50,7 +47,7 @@ class Leads::ApplicationController < Users::ApplicationController
     redirect_to step
   end
   
-  # 案件を凍結し詳細ページへ遷移
+  # 案件を凍結処理を実行
   def cancel_lead(lead)
     ActiveRecord::Base.transaction do
       lead.update_attributes(status: "inactive", canceled_date: "#{Date.current}")
@@ -58,25 +55,27 @@ class Leads::ApplicationController < Users::ApplicationController
       raise ActiveRecord::Rollback if lead.invalid?(:check_steps_status)
     end
     if lead.errors.blank?
-      flash[:success] = "#{flash[:success]}本案件を凍結しました。以後、本案件は通知対象になりません。"
+      flash[:success] = "本案件を凍結しました。以後、本案件は通知対象になりません。#{flash[:success]}"
+      true
     else
-      flash[:danger] = "#{flash[:danger]}#{lead.errors.full_messages.first}"
+      flash[:danger] = "#{lead.errors.full_messages.first}#{flash[:danger]}"
+      false
     end
-    redirect_to latest_step_in(lead)
   end
   
   # 進捗の中止処理を実行し詳細ページへ遷移
   def cancel_step(lead, step)
     ActiveRecord::Base.transaction do
       step.update_attributes(status: "inactive", canceled_date: "#{Date.current}")
+      cancel_lead(lead) if params[:cancel_lead_flag] == "true"
       check_status_completed_or_not(lead, step)
       raise ActiveRecord::Rollback if lead.invalid?(:check_steps_status) || step.errors.present?
     end
     if lead.errors.blank? && step.errors.blank?
-      flash[:success] = "#{flash[:success]}#{step.name}を保留にしました。以後、本進捗は通知対象になりません。"
+      flash[:success] = "#{step.name}を保留にしました。以後、本進捗は通知対象になりません。#{flash[:success]}"
     else
-      flash[:danger] = "#{flash[:danger]}#{step.errors.full_messages.first}"
-      flash[:danger] = "#{flash[:danger]}#{lead.errors.full_messages.first}"
+      flash[:danger] = "#{step.errors.full_messages.first}#{flash[:danger]}"
+      flash[:danger] = "#{lead.errors.full_messages.first}#{flash[:danger]}"
     end
     redirect_to step
   end
@@ -98,10 +97,10 @@ class Leads::ApplicationController < Users::ApplicationController
       raise ActiveRecord::Rollback if lead.invalid?(:check_steps_status)
     end
     if lead.errors.blank?
-      flash[:success] = "#{flash[:success]}#{step.name}を削除しました。"
+      flash[:success] = "#{step.name}を削除しました。#{flash[:success]}"
       redirect_to working_step_in(lead)
     else
-      flash[:danger] = "#{flash[:danger]}#{step.name}を削除できませんでした。#{lead.errors.full_messages.first}"
+      flash[:danger] = "#{step.name}を削除できませんでした。#{lead.errors.full_messages.first}#{flash[:danger]}"
       redirect_to step
     end
   end

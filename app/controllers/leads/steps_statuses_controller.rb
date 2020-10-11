@@ -1,7 +1,5 @@
 class Leads::StepsStatusesController < Leads::StepsController
-  
-  def edit
-  end
+  before_action :set_steps, only: %i(cancel)
   
   def complete
     if params[:completed_id].present?

@@ -1,65 +1,7 @@
 <p id="notice"><%= notice %></p>
 
-<h4><%= "#{@lead.customer_name} 様：「" %><%= link_to @lead.room_name, leads_path(room_searchword: @lead.room_name) %><%= "(#{@lead.room_num})」に入居予定" %></h4>
-<h5>
-  <%= "(担当：" %><%= link_to @user.name, leads_path(user_searchword: @user.id) %><%= "）" %>
-  <%= "：あなたの案件です。" if @lead.user_id == current_user.id %>
-  <%= link_to "：担当者を変更する", edit_user_id_lead_path(@lead) if current_user.superior? %>
-</h5>
-
-<h2 style="display:inline;"><%= "進捗率：#{@lead.steps_rate}%" %></h2>
-<h2 style="display:inline;"><%= " (現在：<STEP#{working_step_in(@lead).order}> #{@lead.status?("in_progress") ? working_step_in(@lead).name : @lead.status_i18n})" %></h2>
-<br>
-
-<%= render 'leads/leads_statuses/start', lead: @lead, button_name: "再開" %>
-
-<% arrow_mark = "▽" %>
-<% flag_scheduled_resident_date = true %>
-<% flag_scheduled_payment_date = true %>
-<% flag_scheduled_contract_date = @lead.scheduled_contract_date.present? %>
-<table>
-  <tr>
-    <td colspan="1"><%= l(Time.parse(@lead.created_date), format: :date) %><br><%= arrow_mark %></td>
-    <% @steps.each do |step| %>
-      <td>
-        <% if flag_scheduled_resident_date && @lead.scheduled_resident_date < step.finish_date %>
-          <br>入居<br><%= l(Time.parse(@lead.scheduled_resident_date), format: :shortdate) %><br><%= arrow_mark %>
-          <% flag_scheduled_resident_date = false %>
-        <% end %>
-        <% if flag_scheduled_payment_date && @lead.scheduled_payment_date < step.finish_date %>
-          <br>入金<br><%= l(Time.parse(@lead.scheduled_payment_date), format: :shortdate) %><br><%= arrow_mark %>
-          <% flag_scheduled_payment_date = false %>
-        <% end %>
-        <% if flag_scheduled_contract_date && @lead.scheduled_contract_date < step.finish_date %>
-          <br>契約<br><%= l(Time.parse(@lead.scheduled_contract_date), format: :shortdate) %><br><%= arrow_mark %>
-          <% flag_scheduled_contract_date = false %>
-        <% end %>
-      <td></td>
-      </td>
-    <% end %>
-    <td>
-      <% if flag_scheduled_resident_date %>
-        <br>入居<br><%= l(Time.parse(@lead.scheduled_resident_date), format: :shortdate) %><br><%= arrow_mark %>
-      <% end %>
-      <% if flag_scheduled_payment_date %>
-        <br>入金<br><%= l(Time.parse(@lead.scheduled_payment_date), format: :shortdate) %><br><%= arrow_mark %>
-      <% end %>
-      <% if flag_scheduled_contract_date %>
-        <br>契約<br><%= l(Time.parse(@lead.scheduled_contract_date), format: :shortdate) %><br><%= arrow_mark %>
-      <% end %>
-    </td>
-    <td></td>
-  </tr>
-  <tr>
-    <td>申込</td>
-    <% @steps.each do |step| %>
-      <td><%= link_to ">", new_lead_step_path(@lead, order_num: step.order) %></td>
-      <td><%= link_to "#{step.order}", step_path(step), class: "btn #{step_button_color(step)} #{step_button_size(@step, step)}" %></td>
-    <% end %>
-    <td><%= link_to ">", new_lead_step_path(@lead, order_num: @lead.steps.count + 1) %></td>
-    <td>完了！</td>
-  </td>
-</table>
+<%= render partial: 'leads/leads/lead_show' %>
+<%= render partial: 'leads/steps/steps_index' %>
 
 <br>////////////////////////////////////////////////////////////////////////////////////////////////////////////<br>
 
@@ -94,10 +36,10 @@
         <%= render 'leads/step_statuses/start', step: @step, completed_id: nil, button_name: "開始" %>
       <% when "inactive" %>
         <%= render 'leads/step_statuses/start', step: @step, completed_id: nil, button_name: "再開" %>
-        <%= link_to "案件自体を凍結", cancel_lead_path(@lead), class: "btn btn-danger btn-sm", method: :patch %>
+        <%= link_to "案件自体を凍結", cancel_lead_path(@lead), class: "btn btn-danger btn-sm", method: :patch unless @lead.status?("inactive") %>
       <% when "in_progress" %>
         <%= render 'leads/step_statuses/complete', completed_step: @step, button_name: "完了" %>
-        <%= render 'leads/step_statuses/cancel', step: @step, button_name: "保留" %>
+        <%= render 'leads/step_statuses/cancel', lead: @lead, step: @step, button_name: "保留" %>
       <% when "completed" %>
         <%= render 'leads/step_statuses/start', step: @step, completed_id: nil, button_name: "再開" %>
       <% when "template" %>

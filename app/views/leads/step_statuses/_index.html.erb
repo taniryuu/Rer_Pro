@@ -1,9 +1,16 @@
+<!-- 本パーシャルを使用する場合は、オブジェクトとしてsteps, completed_stepが必要。before_actionとして、set_stepが必要。 -->
 進捗一覧<br>
 <table class="table table-hover" id="table-shops">
   <tbody>
-    <% @steps_except_self.each do |step| %>
+    <% steps.each do |step| %>
       <tr>
-        <td>Step<%= step.order %></td>
+        <td>
+          <p>
+            <a class="btn btn-default btn-xs" data-toggle="collapse" href="#collapseStep<%= step.id %>">
+          	  <%= "Step #{step.order}" %>
+            </a>
+          </p>
+        </td>
         <% if step.status?("not_yet") %>
           <td><%= render 'leads/step_statuses/start', step: step, completed_id: completed_step, button_name: "完了予定日を設定して開始する" %></td>
         <% elsif step.status?("inactive") %>
