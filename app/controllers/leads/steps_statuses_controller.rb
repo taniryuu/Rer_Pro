@@ -20,10 +20,7 @@ class Leads::StepsStatusesController < Leads::StepsController
   end
   
   def start
-    if [:step].present?
-      new_task = params[:step][:new_task]
-      start_step(@lead, @step, new_task)
-    end
+    start_step(@lead, @step)
   end
   
   def cancel

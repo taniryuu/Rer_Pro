@@ -94,8 +94,8 @@ class Leads::StepsController < Leads::ApplicationController
     cancel_step(@lead, @step)
   end
 
-  # すべてのタスクを未にする
-  def statuses_make_all_tasks_not_yet
+  # 「未」のタスクをすべて「完了」とする
+  def statuses_make_all_not_yet_tasks_completed
     #現在の進捗の「未」のタスクをすべて「完了」とし、「完了日」を本日とし、その後complete_or_continueのurlへ飛ぶ
     errors = []
     ActiveRecord::Base.transaction do
