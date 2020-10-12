@@ -17,20 +17,25 @@ class Leads::ApplicationController < Users::ApplicationController
     ActiveRecord::Base.transaction do
       # 進捗開始処理
       scheduled_complete_date = params[:step].present? ? params[:step][:scheduled_complete_date] : "#{Date.current}"
-      case step.status
-      when "not_yet"
-        flash[:success] = "#{step.name}を開始しました。" if step.update_attributes(status: "in_progress", scheduled_complete_date: scheduled_complete_date)
-      when "inactive"
-        flash[:success] = "#{step.name}を再開しました。" if step.update_attributes(status: "in_progress", scheduled_complete_date: scheduled_complete_date, canceled_date: "")
-      when "in_progress"
+      # case step.status
+      # when "not_yet"
+      #   flash[:success] = "#{step.name}を開始しました。" if step.update_attributes(status: "in_progress", scheduled_complete_date: scheduled_complete_date)
+      # when "inactive"
+      #   flash[:success] = "#{step.name}を再開しました。" if step.update_attributes(status: "in_progress", scheduled_complete_date: scheduled_complete_date, canceled_date: "")
+      # when "in_progress"
+      #   flash[:success] = "#{step.name}は既に進捗中です。"
+      # when "completed"
+      #   flash[:success] = "#{step.name}を再開しました。" if step.update_attributes(status: "in_progress", scheduled_complete_date: scheduled_complete_date, completed_date: "")
+      # end
+      if step.status?("in_progress")
         flash[:success] = "#{step.name}は既に進捗中です。"
-      when "completed"
-        flash[:success] = "#{step.name}を再開しました。" if step.update_attributes(status: "in_progress", scheduled_complete_date: scheduled_complete_date, completed_date: "")
+      else
+        flash[:success] = "#{step.name}を開始しました。" if step.update_attributes(status: "in_progress", scheduled_complete_date: scheduled_complete_date, completed_date: "", canceled_date: "")
       end
       # 完了する進捗がある場合の処理
       if params[:completed_id].present?
         completed_step = Step.find(params[:completed_id])
-        flash[:success] = "#{flash[:success]}#{step.name}を開始しました。" if complete_step(lead, completed_step, completed_step.latest_date)
+        complete_step(lead, completed_step, completed_step.latest_date)
       end
       # 案件を再開する場合の処理
       start_lead(lead) unless lead.status?("in_progress")
@@ -120,10 +125,10 @@ class Leads::ApplicationController < Users::ApplicationController
   def complete_step(lead, step, completed_date)
     if step.update_attributes(status: "completed", completed_date: completed_date, completed_tasks_rate: 100)
       update_steps_rate(lead)
-      flash[:success] = "#{flash[:success]}#{step.name}を完了しました。"
+      flash[:success] = "#{step.name}を完了しました。#{flash[:success]}"
       true
     else
-      flash[:danger] = "#{flash[:danger]}#{step.errors.full_messages.first}"
+      flash[:danger] = "#{step.errors.full_messages.first}#{flash[:danger]}"
       false
     end
   end

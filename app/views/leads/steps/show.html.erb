@@ -118,6 +118,21 @@
   <%= @lead.scheduled_contract_date %>
 </p>
 
+<p>
+  <strong>Created date:</strong>
+  <%= @lead.created_date %>
+</p>
+
+<p>
+  <strong>Completed date:</strong>
+  <%= @lead.completed_date %>
+</p>
+
+<p>
+  <strong>canceled_date:</strong>
+  <%= @lead.canceled_date %>
+</p>
+
 
 <%= link_to "担当者を変更する", edit_user_id_lead_path(@lead) if current_user.superior? %>
 
