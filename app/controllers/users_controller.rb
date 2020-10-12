@@ -3,7 +3,7 @@ class UsersController < NotificationsController
 
   # オブジェクトの準備
   before_action :set_user, only: %i(show)
-  before_action :set_member, only: %i(index show)
+  before_action :set_users, only: %i(index show)
   before_action :notice, only: :show
   # アクセス制限
   before_action :current_user_admin?, only: %i(new create destroy)

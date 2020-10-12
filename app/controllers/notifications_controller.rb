@@ -1,5 +1,5 @@
 class NotificationsController < Users::ApplicationController
-  before_action :set_member
+  before_action :set_users
 
   # superior_idに指定されたユーザー視点の通知
   def notice

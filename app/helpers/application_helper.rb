@@ -12,7 +12,7 @@ module ApplicationHelper
     return member_list
   end
 
-  # set_memberをbefore_actionしていて引数のusersに@usersを充てる
+  # set_usersをbefore_actionしていて引数のusersに@usersを充てる
   # 引数が上長==trueなら自分以外&&アクティブユーザーを取得、違う場合自分以外&&アクティブな上長の全員を取得する
   def superior_users(users, login_user)
     if login_user.superior?
