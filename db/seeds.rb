@@ -88,10 +88,10 @@ puts "Userテスト用サンプルレコード作成完了"
       #  memo: "",
       #  status: "進捗中"
       #  notice_created: 新規申込時通知
-        notice_change_limit: true,
+        notice_change_limit: true, # 通知テストの為一時的にtrueに変更してます。
         scheduled_resident_date: (Date.current + 21 - i).to_s,
         scheduled_payment_date: (Date.current + 14 - i).to_s,
-      #  scheduled_contract_date: 契約予定日
+        scheduled_contract_date: Date.current # 通知テストの為一時的にコメントアウト解除してます。
       #  steps_rate: 進捗率
       )
       Step.create!(

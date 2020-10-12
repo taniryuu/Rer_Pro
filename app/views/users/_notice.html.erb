@@ -1,0 +1,41 @@
+<% if @create_notices_user_num.present? %>
+  <p>
+    登録時通知
+    <%= @create_notices_user_num.count %>人
+    <%= @create_notices_total_count %>件
+  </p>
+  <% @create_notices_list.each do |user_leads| %>
+    <p><%= user_name(user_leads.first.user_id) %></p>
+    <% user_leads.each do |lead| %>
+      <p><%= lead.customer_name %>　<%= lead.created_date %></p>
+    <% end%>
+  <% end %>
+<% end %>
+
+<% if @limit_change_notices_user_num.present? %>
+  <p>
+    変更時通知
+    <%= @limit_change_notices_user_num.count %>人
+    <%= @limit_change_notices_total_count %>件
+  </p>
+  <% @limit_change_notices_list.each do |user_leads| %>
+    <p><%= user_name(user_leads.first.user_id) %></p>
+    <% user_leads.each do |lead| %>
+      <p><%= lead.customer_name %>　<%= lead.scheduled_contract_date %></p>
+    <% end %>
+  <% end %>
+<% end %>
+
+<% if @others_limit_notices_user_num.present? %>
+  <p>
+    期限通知
+    <%= @others_limit_notices_user_num.count %>人
+    <%= @others_limit_notices_total_count %>件
+  </p>
+  <% @others_limit_notices_list.each do |user_leads| %>
+    <p><%= user_name(user_leads.first.user_id) %></p>
+    <% user_leads.each do |lead| %>
+      <p><%= lead.customer_name %>　<%= lead.scheduled_contract_date %></p>
+    <% end %>
+  <% end %>
+<% end %>

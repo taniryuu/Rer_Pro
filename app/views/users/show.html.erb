@@ -6,31 +6,16 @@
 <%= link_to "ユーザー新規登録", new_user_path %>
 
 <%= link_to "案件一覧", leads_path %>
-<% if @create_notices_user_num.present? %>
-  <p>
-    登録時通知
-    <%= @create_notices_user_num.count %>人
-    <%= @create_notices_total_count %>件
-  </p>
-  <% @create_notices_list.each do |user_leads| %>
-    <p><%= user_name(user_leads.first.user_id) %></p>
-    <% user_leads.each do |lead| %>
-      <p><%= lead.customer_name %></p>
-    <% end%>
-  <% end %>
-<% end %>
 
-<% if @limit_change_notices_user_num.present? %>
+<%= render "notice" %>
+
+<% if @myleads_limit_notice.present? %>
   <p>
-    変更時通知
-    <%= @limit_change_notices_user_num.count %>人
-    <%= @limit_change_notices_total_count %>件
+    期限間近通知
+    <%= @myleads_limit_notice.count %>件
   </p>
-  <% @limit_change_notices_list.each do |user_leads| %>
-    <p><%= user_name(user_leads.first.user_id) %></p>
-    <% user_leads.each do |lead| %>
-      <p><%= lead.customer_name %></p>
-    <% end %>
+  <% @myleads_limit_notice.each do |lead| %>
+    <p><%= lead.customer_name %>　<%= lead.room_name %>:<%= lead.room_num %>号室　<%= lead.scheduled_contract_date %></p>
   <% end %>
 <% end %>
 
