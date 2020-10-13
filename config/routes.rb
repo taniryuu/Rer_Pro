@@ -26,21 +26,20 @@ Rails.application.routes.draw do
         patch 'complete/:completed_id' => 'steps_statuses#complete', as: :complete
         patch 'start' => 'steps_statuses#start', as: :start
         patch 'cancel' => 'steps_statuses#cancel', as: :cancel
-        get 'statuses_make_step_not_yet'
-        get 'statuses_make_all_not_yet_tasks_completed'
-      end
-      member do
-        get 'tasks/edit_add_delete_list'
-        post 'tasks/update_add_delete_list'
-        get 'tasks/edit_continue_or_destroy_step'
-        get 'tasks/edit_complete_or_continue_step'
-        get 'tasks/edit_change_status_or_complete_task'
+        patch 'statuses_make_step_not_yet'
+       # patch 'statuses_make_all_not_yet_tasks_completed'
       end
       resources :tasks do
         member do
           get 'add_canceled_list'
           get 'edit_revive_from_canceled_list'
           patch 'update_revive_from_canceled_list'
+          get 'edit_add_delete_list'
+          post 'update_add_delete_list'
+          get 'edit_continue_or_destroy_step'
+          get 'edit_complete_or_continue_step'
+          get 'edit_change_status_or_complete_task'
+          patch 'statuses_make_all_not_yet_tasks_completed'
         end
       end
     end

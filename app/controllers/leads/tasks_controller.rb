@@ -3,8 +3,8 @@ class Leads::TasksController < Leads::ApplicationController
   before_action :set_task, only: %i(show edit update destroy add_canceled_list 
                                     edit_revive_from_canceled_list update_revive_from_canceled_list)
   before_action :set_step, only: %i(index new create)
-  before_action :set_step_by_id, only: [:edit_add_delete_list, :update_add_delete_list, :edit_continue_or_destroy_step, :update_continue_or_destroy_step,
-                                        :edit_complete_or_continue_step, :update_complete_or_continue_step, :edit_change_status_or_complete_task, :update_change_status_or_complete_task]
+  before_action :set_step_by_id, only: [:edit_add_delete_list, :update_add_delete_list, :edit_continue_or_destroy_step,
+                                        :edit_complete_or_continue_step, :edit_change_status_or_complete_task, :statuses_make_all_not_yet_tasks_completed]
   before_action :set_steps, only: :edit_complete_or_continue_step
   # アクセス制限
   before_action :correct_user, except: %i(index show)
@@ -141,6 +141,19 @@ class Leads::TasksController < Leads::ApplicationController
 
   def edit_change_status_or_complete_task
   end
+
+  # 「未」のタスクをすべて「完了」とする
+  def statuses_make_all_not_yet_tasks_completed
+    #現在の進捗の「未」のタスクをすべて「完了」とし、「完了日」を本日とし、その後complete_or_continueのurlへ飛ぶ
+    errors = []
+    ActiveRecord::Base.transaction do
+      errors << @step.errors.full_messages unless @step.tasks.not_yet.update_all(status: "completed", completed_date: "#{Date.current}")
+      update_completed_tasks_rate(@step)
+      raise ActiveRecord::Rollback if errors.present?
+    end
+    redirect_to check_status_and_get_url
+  end
+
 
   private
     def set_task

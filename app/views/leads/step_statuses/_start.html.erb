@@ -1,6 +1,6 @@
 <%= form_with(url: start_step_path(step, completed_id: completed_id, new_task: new_task), model: step, local: true) do |form| %>
   <%= form.label :scheduled_complete_date %>
   <%= form.date_field :scheduled_complete_date, value: step.scheduled_complete_date %>
-  <%= form.hidden_field :new_task, value:  new_task %>
+  <%= form.hidden_field :new_task, value: new_task %>
   <%= form.submit button_name, class: "btn btn-primary" %>
 <% end %>

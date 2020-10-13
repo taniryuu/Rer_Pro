@@ -5,9 +5,9 @@ class Leads::ApplicationController < Users::ApplicationController
   def start_step(lead, step)
     @success_message = "" # transaction内で代入した値を使うため、インスタンス変数を用いている。""を代入してリセットしている。
     ActiveRecord::Base.transaction do
-      #if new_task == "true"
-      #  Task.create!(step_id: step.id ,name: "new_task", status: 0, scheduled_complete_date: "#{Date.current}")
-      #end
+      if params[:new_task].present?
+        Task.create!(step_id: step.id ,name: "new_task", status: 0, scheduled_complete_date: "#{Date.current}") if params[:new_task] == "true"
+      end
       scheduled_complete_date = params[:step].present? ? params[:step][:scheduled_complete_date] : "#{Date.current}"
       case step.status
       when "not_yet"
@@ -19,11 +19,7 @@ class Leads::ApplicationController < Users::ApplicationController
       when "completed"
         @success_message = "#{step.name}を再開しました。" if step.update_attributes(status: "in_progress", scheduled_complete_date: scheduled_complete_date, completed_date: "")
       end
-
-      if params[:new_task].present?
-        Task.create!(step_id: step.id ,name: "new_task", status: 0, scheduled_complete_date: "#{Date.current}") if params[:new_task] == "true"
-      end
-       
+      
       if params[:completed_id].present?
         completed_step = Step.find(params[:completed_id])
         @success_message = "#{flash[:success]}#{step.name}を開始しました。" if complete_step(lead, completed_step, completed_step.latest_date)
@@ -187,16 +183,15 @@ class Leads::ApplicationController < Users::ApplicationController
 
     # 進捗に「未」のタスクが無く、かつ「完了」のタスクも無い場合、continue_or_destroy_stepのurlにリダイレクトする
     if @step.tasks.find_by(status: "not_yet").nil? && @step.tasks.find_by(status: "completed").nil?
-      tasks_edit_continue_or_destroy_step_step_url(@step)
-      #redirect_to tasks_edit_continue_or_destroy_step_step_url(@step, format: "js")
+      edit_continue_or_destroy_step_task_url(@step)
 
     #進捗に「未」のタスクが無く、かつ「完了」のタスクが１つ以上ある場合、complete_or_continue_stepのurlにリダイレクトする
     elsif @step.tasks.find_by(status: "not_yet").nil? && @step.tasks.find_by(status: "completed").present?
-      tasks_edit_complete_or_continue_step_step_url(@step)
+      edit_complete_or_continue_step_task_url(@step)
 
     #進捗に「未」のタスクがあるにも関わらず、進捗のstatusが「完了」の場合、change_status_or_complete_taskのurlにリダイレクトする
     elsif @step.tasks.find_by(status: "not_yet").present? && @step.status?("completed")
-      tasks_edit_change_status_or_complete_task_step_url(@step)
+      edit_change_status_or_complete_task_task_url(@step)
 
     #以上いずれでもない場合、steps#showにリダイレクトする
     else
