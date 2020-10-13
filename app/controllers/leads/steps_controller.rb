@@ -32,6 +32,7 @@ class Leads::StepsController < Leads::ApplicationController
   def new
     @step = @lead.steps.new
     @completed_step = Step.find(params[:completed_id]) if params[:completed_id].present?
+    @start_lead_flag = true if params[:start_lead_flag].present?
   end
 
   # GET /steps/1/edit
@@ -115,6 +116,11 @@ class Leads::StepsController < Leads::ApplicationController
           @completed_step = Step.find(params[:step][:completed_id]) # 完了処理に失敗したら、改めてオブジェクトを渡す必要があるのでインスタンス変数を使用。
           errors << @completed_step.errors.full_messages unless complete_step(lead, @completed_step, @completed_step.latest_date)
         end
+        # 案件を再開する場合の処理
+        if params[:step][:start_lead_flag] == "true"
+          @start_lead_flag = true
+          errors << lead.errors.full_messages unless start_lead(lead)
+        end
         # 矛盾を解消
         check_status_inactive_or_not(step)
         check_status_completed_or_not(lead, step)
@@ -133,6 +139,7 @@ class Leads::StepsController < Leads::ApplicationController
         # 更新処理（バリデーションなし）
         prepare_order(step.order, params[:step][:order].to_i)
         step.update(step_params)
+        lead.update_attribute(:notice_change_limit, true) if step.saved_change_to_scheduled_complete_date?
         # 矛盾を解消
         check_status_inactive_or_not(step)
         check_status_completed_or_not(lead, step)

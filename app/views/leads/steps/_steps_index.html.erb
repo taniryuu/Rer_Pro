@@ -1,0 +1,48 @@
+<% arrow_mark = "▽" %>
+<% flag_scheduled_resident_date = true %>
+<% flag_scheduled_payment_date = true %>
+<% flag_scheduled_contract_date = @lead.scheduled_contract_date.present? %>
+<table>
+  <tr>
+    <td colspan="1"><%= l(Time.parse(@lead.created_date), format: :date) %><br><%= arrow_mark %></td>
+    <% @steps.each do |step| %>
+      <td>
+        <% if flag_scheduled_resident_date && @lead.scheduled_resident_date < step.finish_date %>
+          <br>入居<br><%= l(Time.parse(@lead.scheduled_resident_date), format: :shortdate) %><br><%= arrow_mark %>
+          <% flag_scheduled_resident_date = false %>
+        <% end %>
+        <% if flag_scheduled_payment_date && @lead.scheduled_payment_date < step.finish_date %>
+          <br>入金<br><%= l(Time.parse(@lead.scheduled_payment_date), format: :shortdate) %><br><%= arrow_mark %>
+          <% flag_scheduled_payment_date = false %>
+        <% end %>
+        <% if flag_scheduled_contract_date && @lead.scheduled_contract_date < step.finish_date %>
+          <br>契約<br><%= l(Time.parse(@lead.scheduled_contract_date), format: :shortdate) %><br><%= arrow_mark %>
+          <% flag_scheduled_contract_date = false %>
+        <% end %>
+      <td></td>
+      </td>
+    <% end %>
+    <td>
+      <% if flag_scheduled_resident_date %>
+        <br>入居<br><%= l(Time.parse(@lead.scheduled_resident_date), format: :shortdate) %><br><%= arrow_mark %>
+      <% end %>
+      <% if flag_scheduled_payment_date %>
+        <br>入金<br><%= l(Time.parse(@lead.scheduled_payment_date), format: :shortdate) %><br><%= arrow_mark %>
+      <% end %>
+      <% if flag_scheduled_contract_date %>
+        <br>契約<br><%= l(Time.parse(@lead.scheduled_contract_date), format: :shortdate) %><br><%= arrow_mark %>
+      <% end %>
+    </td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>申込</td>
+    <% @steps.each do |step| %>
+      <td><%= link_to ">", new_lead_step_path(@lead, order_num: step.order) %></td>
+      <td><%= link_to "#{step.order}", step_path(step), class: "btn #{step_button_color(step)} #{step_button_size(@step, step)}" %></td>
+    <% end %>
+    <td><%= link_to ">", new_lead_step_path(@lead, order_num: @lead.steps.count + 1) %></td>
+    <td>完了！</td>
+  </tr>
+</table>
+

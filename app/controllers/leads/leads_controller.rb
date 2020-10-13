@@ -78,6 +78,9 @@ class Leads::LeadsController < Leads::ApplicationController
   def update
     respond_to do |format|
       if @lead.update(lead_params) && update_steps_rate(@lead)
+        check_status_inactive_or_not(@lead)
+        check_status_completed_or_not(@lead, nil)
+        @lead.update_attribute(:notice_change_limit, true) if @lead.saved_change_to_scheduled_resident_date? || @lead.saved_change_to_scheduled_payment_date?
         format.html { redirect_to @lead, notice: 'Lead was successfully updated.' }
         format.json { render :show, status: :ok, location: @lead }
       else

@@ -1,0 +1,2 @@
+module Leads::LeadsStatusesHelper
+end

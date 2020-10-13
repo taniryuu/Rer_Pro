@@ -1,4 +1,4 @@
-<!-- 本パーシャルを使用する場合は、before_actionとして、set_step及びset_stepsが必要。 -->
+<!-- 本パーシャルを使用する場合は、オブジェクトとしてsteps, completed_step, button_nameが必要。before_actionとして、set_step及びset_stepsが必要。 -->
 <button type="button" class="btn btn-info" data-toggle="modal" data-target="#step-complete" data-name="<%= completed_step.name %>" data-id="<%= completed_step.id %>"><%= button_name %></button>
 
 <!-- Modal -->
@@ -12,54 +12,13 @@
         </button>
       </div>
       <div class="modal-body">
-        進捗一覧<br>
-        <table class="table table-hover" id="table-shops">
-          <tbody>
-            <% @steps_except_self.each do |step| %>
-              <tr>
-                <td>Step<%= step.order %></td>
-                <% if step.status?("not_yet") %>
-                  <td><%= render 'leads/step_statuses/start', step: step, completed_id: completed_step.id, new_task: nil, button_name: "完了予定日を設定して開始する" %></td>
-                <% elsif step.status?("inactive") %>
-                  <td>
-                    <p>
-                      <a class="btn btn-default btn-xs" data-toggle="collapse" href="#collapseStep<%= step.id %>">
-                    	  <%= "(#{step.status_i18n})" %>
-                      </a>
-                    </p>
-                    <div id="collapseStep<%= step.id %>" class="collapse">
-                    	<div class="well">
-                        <%= render 'leads/step_statuses/start', step: step, completed_id: completed_step.id, new_task: nil, button_name: "完了予定日を再設定して再開する" %>
-                    	</div>
-                    </div>
-                  </td>
-                <% elsif step.status?("in_progress") %>
-                  <td><%= link_to "＜#{step.status_i18n}＞#{step.name}を継続", complete_step_path(step, completed_step), method: :patch, class: "btn btn-info btn-sm" %></td>
-                <% elsif step.status?("completed") %>
-                  <td>
-                    <p>
-                      <a class="btn btn-default btn-xs" data-toggle="collapse" href="#collapseStep<%= step.id %>">
-                    	  <%= step.status_i18n %>
-                      </a>
-                    </p>
-                    <div id="collapseStep<%= step.id %>" class="collapse">
-                    	<div class="well">
-                        <%= render 'leads/step_statuses/start', step: step, completed_id: completed_step.id, new_task: nil, button_name: "完了予定日を再設定して再開する" %>
-                    	</div>
-                    </div>
-                  </td>
-                <% end %>
-                <td><%= link_to "詳細確認", step_path(step), target: :_blank %></td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
+        <%= render 'leads/step_statuses/index', steps: @steps_except_self, completed_step: completed_step %>
         <% if @steps_from_now_on.present? %>
           <%= link_to "新しく作成する場合はこちら", new_lead_step_path(@lead, completed_id: completed_step.id), class: "pull-right" %>
         <% else %>
-          <%= link_to "新たに次の進捗を作成して進む", new_lead_step_path(@lead, completed_id: completed_step.id), class: "btn btn-primary btn-lg" %>
+          <%= link_to "新たに次の進捗を作成して案件を続行", new_lead_step_path(@lead, completed_id: completed_step.id), class: "btn btn-primary btn-lg" %>
           <br><br>
-          <%= link_to "全ての進捗を完了＋案件自体を完了にする", complete_step_path(completed_step, completed_step), method: :patch, 
+          <%= link_to "全ての進捗を完了＋案件自体を完了", complete_step_path(completed_step, completed_step), method: :patch, 
             data: { confirm: '本案件を全て完了とします。本当によろしいですか？（終了済の扱いになります。）' }, class: "btn btn-info btn-lg pull-right" %>
         <% end %>
       </div>

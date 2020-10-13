@@ -1,2 +1,10 @@
-<%= link_to "#{button_name}", cancel_step_path(step), method: :patch, 
-  data: { confirm: '本進捗を保留にします。本当によろしいですか？（通知対象から外れます。）' }, class: "btn btn-danger btn-xs" %>
+<% if @steps_from_now_on.present? %>
+  <%= link_to "#{button_name}", cancel_step_path(step), method: :patch, 
+    data: { confirm: "本進捗を#{button_name}にします。本当によろしいですか？（通知対象から外れます。）" }, class: "btn btn-danger btn-xs" %>
+<% elsif lead.status?("in_progress") %>
+  <%= link_to "#{button_name}＋案件自体を完了", cancel_step_path(step), method: :patch, 
+    data: { confirm: "本進捗を#{button_name}にした上で、案件を終了します。本当によろしいですか？（案件自体が終了済の扱いになります。）" }, class: "btn btn-info btn-xs" %>
+  <%= link_to "#{button_name}＋案件も凍結", cancel_step_path(step, cancel_lead_flag: true), method: :patch, 
+    data: { confirm: "本進捗を#{button_name}にし、案件も凍結します。本当によろしいですか？（案件ごと通知対象から外れます。）" }, class: "btn btn-danger btn-xs" %>
+<% end %>
+
