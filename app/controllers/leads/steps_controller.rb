@@ -7,7 +7,7 @@ class Leads::StepsController < Leads::ApplicationController
   before_action :only_same_company_id?
   before_action :correct_user, except: %i(index show)
   # 後処理
-  after_action :sort_order, only: %i(destroy index)
+  # after_action :sort_order, only: %i(destroy index)
 
 
   # GET /steps
@@ -70,6 +70,18 @@ class Leads::StepsController < Leads::ApplicationController
   # DELETE /steps/1.json
   def destroy
     destroy_step(@lead, @step)
+  end
+
+  # 進捗を未にする
+  def statuses_make_step_not_yet
+    errors = []
+    ActiveRecord::Base.transaction do
+      errors << @step.errors.full_messages unless @step.update_attributes(status: "not_yet")
+      update_steps_rate(@lead)
+      errors << @lead.errors.full_messages if @lead.invalid?(:check_steps_status)
+      raise ActiveRecord::Rollback if errors.present?
+    end
+    redirect_to check_status_and_get_url
   end
 
   private
@@ -148,18 +160,6 @@ class Leads::StepsController < Leads::ApplicationController
           (new_order..(pre_order - 1)).reverse_each do |order_num|
             next_step = @lead.steps.find_by(order: order_num)
             next_step.update_attribute(:order, order_num + 1)
-          end
-        end
-      end
-    end
-    
-    # 順番をチェックし、空があったら詰める処理
-    def sort_order
-      if @lead.steps.find_by(order: @lead.steps.count + 1).present?
-        (1..@lead.steps.count).each do |order_num|
-          if @lead.steps.find_by(order: order_num).blank?
-            step = @lead.steps.find_by(order: order_num + 1)
-            step.update_attribute(:order, order_num)
           end
         end
       end
