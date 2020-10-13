@@ -40,4 +40,9 @@ class User < ApplicationRecord
   def users_in_company
     User.where(company_id: self.company_id).order(id)
   end
+
+  # ユーザーが持つ完了してない案件通知の日数と現在日時を計算し通知が発生する日付を返す
+  def limit_date
+    Date.current + self.notified_num
+  end
 end
