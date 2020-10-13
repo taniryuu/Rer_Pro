@@ -1,21 +1,12 @@
-<% provide(:class_text, 'task--edit_change_status_or_complete_task') %>
-<% provide(:button_text, '選択') %>
-
-<h3>いづれか選択してください </h3>
-
-<%= form_with(url: tasks_update_change_status_or_complete_task_step_path(step_id: @step), method: :post, local: true) do |f| %>
-
-  <%= f.radio_button :change_status_or_complete_task, :not_yet , checked: 'checked' %>
-  <%= f.label :change_status_or_complete_task, "現在の進捗を「未」にする", value: :not_yet %>
-  <br>
-  <%= f.radio_button :change_status_or_complete_task, :in_progress %>
-  <%= f.label :change_status_or_complete_task, "現在の進捗を「進捗中」にする", value: :in_progress %>
-  <br>
-  <%= f.radio_button :change_status_or_complete_task, :inactive %>
-  <%= f.label :change_status_or_complete_task, "現在の進捗を「保留」にする", value: :inactive %>
-  <br>
-  <%= f.radio_button :change_status_or_complete_task, :erase_all_not_yet %>
-  <%= f.label :change_status_or_complete_task, "「未」のタスクをすべて「完了」にする", value: :erase_all_not_yet %>
-  <br>
-　<%= f.submit yield(:button_text), class: "btn-#{yield(:class_text)}" %>
-<% end %>
+<h4>&#9312;現在の進捗を「未」にする</h4>
+<%= button_to '更新', statuses_make_step_not_yet_step_path(@step), method: :patch %>
+<br>
+<h4>&#9313;現在の進捗を「進捗中」にする</h4>
+<%= render 'leads/step_statuses/start', step: @step, completed_id: nil, new_task: nil, button_name: "開始" %>
+<br>
+<h4>&#9314;現在の進捗を「保留」にする</h4>
+<%= button_to '更新', cancel_step_path(@step), method: :patch %>
+<br>
+<h4>&#9315;「未」のタスクをすべて「完了」にする</h4>
+<%= button_to '更新', statuses_make_all_not_yet_tasks_completed_task_path(@step), method: :patch %>
+~  

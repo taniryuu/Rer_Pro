@@ -15,18 +15,12 @@ class Leads::ApplicationController < Users::ApplicationController
   # 進捗の開始処理を実行し詳細ページへ遷移
   def start_step(lead, step)
     ActiveRecord::Base.transaction do
+      # 作成するタスクがある場合の処理
+      if params[:new_task].present?
+        Task.create!(step_id: step.id ,name: "new_task", status: 0, scheduled_complete_date: "#{Date.current}") if params[:new_task] == "true"
+      end
       # 進捗開始処理
       scheduled_complete_date = params[:step].present? ? params[:step][:scheduled_complete_date] : "#{Date.current}"
-      # case step.status
-      # when "not_yet"
-      #   flash[:success] = "#{step.name}を開始しました。" if step.update_attributes(status: "in_progress", scheduled_complete_date: scheduled_complete_date)
-      # when "inactive"
-      #   flash[:success] = "#{step.name}を再開しました。" if step.update_attributes(status: "in_progress", scheduled_complete_date: scheduled_complete_date, canceled_date: "")
-      # when "in_progress"
-      #   flash[:success] = "#{step.name}は既に進捗中です。"
-      # when "completed"
-      #   flash[:success] = "#{step.name}を再開しました。" if step.update_attributes(status: "in_progress", scheduled_complete_date: scheduled_complete_date, completed_date: "")
-      # end
       if step.status?("in_progress")
         flash[:success] = "#{step.name}は既に進捗中です。"
       else
@@ -102,6 +96,7 @@ class Leads::ApplicationController < Users::ApplicationController
       raise ActiveRecord::Rollback if lead.invalid?(:check_steps_status)
     end
     if lead.errors.blank?
+      sort_order
       flash[:success] = "#{step.name}を削除しました。#{flash[:success]}"
       redirect_to working_step_in(lead)
     else
@@ -198,8 +193,42 @@ class Leads::ApplicationController < Users::ApplicationController
   def calculate_rate(completed_num, not_yet_num)
     return completed_num == 0 ? 0 : 100 * completed_num / (completed_num + not_yet_num)
   end
-  
-  
+
+ 
+  # 順番をチェックし、空があったら詰める処理
+  def sort_order
+    if @lead.steps.find_by(order: @lead.steps.count + 1).present?
+      (1..@lead.steps.count).each do |order_num|
+        if @lead.steps.find_by(order: order_num).blank?
+          step = @lead.steps.find_by(order: order_num + 1)
+          step.update_attribute(:order, order_num)
+        end
+      end
+    end
+  end
+
+  # タスクの状態に応じてリダイレクト先を取得する
+  def check_status_and_get_url  
+    # タスク操作後、
+
+    # 進捗に「未」のタスクが無く、かつ「完了」のタスクも無い場合、continue_or_destroy_stepのurlにリダイレクトする
+    if @step.tasks.find_by(status: "not_yet").nil? && @step.tasks.find_by(status: "completed").nil?
+      edit_continue_or_destroy_step_task_url(@step)
+
+    #進捗に「未」のタスクが無く、かつ「完了」のタスクが１つ以上ある場合、complete_or_continue_stepのurlにリダイレクトする
+    elsif @step.tasks.find_by(status: "not_yet").nil? && @step.tasks.find_by(status: "completed").present?
+      edit_complete_or_continue_step_task_url(@step)
+
+    #進捗に「未」のタスクがあるにも関わらず、進捗のstatusが「完了」の場合、change_status_or_complete_taskのurlにリダイレクトする
+    elsif @step.tasks.find_by(status: "not_yet").present? && @step.status?("completed")
+      edit_change_status_or_complete_task_task_url(@step)
+
+    #以上いずれでもない場合、steps#showにリダイレクトする
+    else
+      step_url(@step)
+    end 
+  end
+
   private
     # 進捗一覧を取得
     def set_steps
