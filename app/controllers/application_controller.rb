@@ -3,7 +3,7 @@ class ApplicationController < ActionController::Base
   before_action :configure_permitted_parameters, if: :devise_controller?
 
   # ログインしているユーザーがいる企業の社員全員取得
-  def set_members
+  def set_users
     @users = current_user.users_in_company
   end
 

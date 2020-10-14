@@ -5,8 +5,19 @@
 
 <%= link_to "ユーザー新規登録", new_user_path %>
 
-
 <%= link_to "案件一覧", leads_path %>
+
+<%= render "notice" %>
+
+<% if @myleads_limit_notice.present? %>
+  <p>
+    期限間近通知
+    <%= @myleads_limit_notice.count %>件
+  </p>
+  <% @myleads_limit_notice.each do |lead| %>
+    <p><%= lead.customer_name %>　<%= lead.room_name %>:<%= lead.room_num %>号室　<%= lead.scheduled_contract_date %></p>
+  <% end %>
+<% end %>
 
 <main role="main" class="container">
   <div class="my-3 p-3 bg-white rounded shadow-sm">
