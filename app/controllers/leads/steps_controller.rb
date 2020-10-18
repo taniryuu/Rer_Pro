@@ -82,7 +82,7 @@ class Leads::StepsController < Leads::ApplicationController
       errors << @lead.errors.full_messages if @lead.invalid?(:check_steps_status)
       raise ActiveRecord::Rollback if errors.present?
     end
-    redirect_to check_status_and_get_url
+    redirect_to check_status_and_get_url(@step)
   end
 
   private

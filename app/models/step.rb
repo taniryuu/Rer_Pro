@@ -13,6 +13,7 @@ class Step < ApplicationRecord
   validates :completed_date, presence: true, length: { in: 0..32 }, if: -> { status == "completed" }
   validate :completed_date_prohibit_future
   validates :completed_tasks_rate, presence: true, numericality: {only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: 100}
+  validate :match_tasks_status, on: :check_tasks_status
   enum status:[:not_yet, :inactive, :in_progress, :completed, :template] # 進捗ステータス
   
   # :orderカラムが連番であることを保証するには、最大値がレコードの数と一致する必要がある。@step.valid?(:check_order)したときのみバリデーションを実行。
@@ -25,7 +26,15 @@ class Step < ApplicationRecord
     end
   end
   
-  
+  # タスクの:statusは、進捗のstatusに対応するstatusが必要。@step.valid?(:check_tasks_status)したときのみバリデーションを実行。
+  def match_tasks_status
+    if self.status?("in_progress") && self.tasks.not_yet.blank?
+      errors.add(:status, ":進捗中の進捗には、未のタスクが少なくとも一つ以上必要です。")
+    elsif self.status?("completed") && self.tasks.completed.blank?
+      errors.add(:status, ":完了済みの進捗には、完了済のタスクが少なくとも一つ以上必要です。")
+    end
+  end
+ 
   # メソッド
   
   # statusに応じた終了日を取得（ない場合は""）
