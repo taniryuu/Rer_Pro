@@ -208,7 +208,7 @@ class Leads::ApplicationController < Users::ApplicationController
   end
 
   # タスクの状態に応じてリダイレクト先を取得する
-  def check_status_and_get_url(step) 
+  def check_status_and_get_url(step, redirect_to_step) 
     # タスク操作後、
 
     # 進捗に「未」のタスクが無く、かつ「完了」のタスクも無い場合、continue_or_destroy_stepのurlにリダイレクトする
@@ -225,7 +225,7 @@ class Leads::ApplicationController < Users::ApplicationController
 
     #以上いずれでもない場合、steps#showにリダイレクトする
     else
-      step_url(step)
+      step_url(redirect_to_step)
     end 
   end
 

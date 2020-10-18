@@ -36,7 +36,7 @@ class Leads::TasksController < Leads::ApplicationController
       flash[:danger] = "完了予定日に過去の日付を入力しようとしています。"
     end
     if @task.save && update_completed_tasks_rate(@step)
-      redirect_to check_status_and_get_url(@step)
+      redirect_to check_status_and_get_url(@step, @step)
     else
       render :new 
     end
@@ -56,7 +56,7 @@ class Leads::TasksController < Leads::ApplicationController
       elsif prohibit_future(@task.completed_date)
         flash[:danger] = "完了日に過去の日付を入力しようとしています。"
       end
-      redirect_to check_status_and_get_url(@step)
+      redirect_to check_status_and_get_url(@step ,@step)
     else
       render :edit
     end
@@ -65,7 +65,7 @@ class Leads::TasksController < Leads::ApplicationController
   def destroy
     @task.destroy
     update_completed_tasks_rate(@step)
-    redirect_to check_status_and_get_url(@step)
+    redirect_to check_status_and_get_url(@step, @step)
   end
 
   # 「To Do リスト」にチェックを入れて「更新」ボタンを押したときに実行されるアクション
@@ -103,7 +103,7 @@ class Leads::TasksController < Leads::ApplicationController
         end
       end
     end
-    redirect_to check_status_and_get_url(@step)
+    redirect_to check_status_and_get_url(@step, @step)
   end
 
   # 「To Do リスト」で中止ボタンを押して「中止」リストに入れる処理
@@ -111,7 +111,7 @@ class Leads::TasksController < Leads::ApplicationController
     @task.update_attribute(:status, "canceled")
     update_completed_tasks_rate(@step)
     @task.update_attribute(:canceled_date, "#{Date.current}") if @task.canceled_date.blank?
-    redirect_to check_status_and_get_url(@step)
+    redirect_to check_status_and_get_url(@step, @step)
   end
 
   # 復活ボタンを押したときに実行されるアクション
@@ -128,7 +128,7 @@ class Leads::TasksController < Leads::ApplicationController
     else
       flash[:danger] = "#{@task.name}の更新は失敗しました。" + @task.errors.full_messages[0]
     end
-    redirect_to check_status_and_get_url(@step)
+    redirect_to check_status_and_get_url(@step, @step)
   end
 
   def edit_continue_or_destroy_step
@@ -151,7 +151,7 @@ class Leads::TasksController < Leads::ApplicationController
       update_completed_tasks_rate(@step)
       raise ActiveRecord::Rollback if errors.present?
     end
-    redirect_to check_status_and_get_url(@step)
+    redirect_to check_status_and_get_url(@step, @step)
   end
 
 
