@@ -45,7 +45,11 @@ class Leads::StepsController < Leads::ApplicationController
     @step = @lead.steps.new(step_params)
     if save_and_errors_of(@lead, @step).blank?
       flash[:success] = "#{flash[:success]}#{@step.name}を作成しました。"
-      redirect_to @step
+      if params[:step][:completed_id].present?
+        redirect_to check_status_and_get_url(@completed_step, @step)
+      else
+        redirect_to @step
+      end
     else
       flash.delete(:success)
       flash.now[:danger] = "#{@lead.errors.full_messages.first}" if @lead.errors.present?
@@ -59,7 +63,7 @@ class Leads::StepsController < Leads::ApplicationController
   def update
     if update_and_errors_of(@lead, @step).blank?
       flash[:success] = "#{flash[:success]}#{@step.name}を更新しました。"
-      redirect_to @step
+      redirect_to check_status_and_get_url(@step, @step)
     else
       flash.delete(:success)
       flash.now[:danger] = @lead.errors.full_messages.first if @lead.errors.present?

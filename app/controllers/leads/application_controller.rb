@@ -28,8 +28,8 @@ class Leads::ApplicationController < Users::ApplicationController
       end
       # 完了する進捗がある場合の処理
       if params[:completed_id].present?
-        completed_step = Step.find(params[:completed_id])
-        complete_step(lead, completed_step, completed_step.latest_date)
+        @completed_step = Step.find(params[:completed_id])
+        complete_step(lead, @completed_step, @completed_step.latest_date)
       end
       # 案件を再開する場合の処理
       start_lead(lead) unless lead.status?("in_progress")
@@ -43,7 +43,12 @@ class Leads::ApplicationController < Users::ApplicationController
       flash[:danger] = "#{flash[:danger]}#{lead.errors.full_messages.first}" if lead.errors.present?
       flash[:danger] = "#{flash[:danger]}#{step.errors.full_messages.first}" if step.errors.present?
     end
-    redirect_to step
+    
+    if params[:completed_id].present? && lead.errors.blank? && step.errors.blank?
+      redirect_to check_status_and_get_url(@completed_step, step)
+    else 
+      redirect_to step
+    end
   end
   
   # 案件を凍結処理を実行
