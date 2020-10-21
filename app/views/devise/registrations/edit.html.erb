@@ -12,14 +12,14 @@
         <%= f.text_field :login_id, autofocus: true, autocomplete: "login_id" %>
       <% else %>
         <%= resource.login_id %>
-        <%= f.hidden_field :login_id, value: resource.login_id %>
+        <%= f.hidden_field :login_id, autofocus: true, value: resource.login_id %>
       <% end %>
     </div>
 
   <div class="field">
     <%= f.label :name %><br/>
     <% if current_user.admin? %>
-      <%= f.text_field :name, autofocus: true, autocomplete: "name" %>
+      <%= f.text_field :name, autocomplete: "name" %>
     <% else %>
       <%= resource.name %>
       <%= f.hidden_field :name, value: resource.name %>
@@ -29,29 +29,29 @@
   <% if current_user.admin? %>
     <div class="field">
       <%= f.label :superior %><br/>
-      <%= f.check_box :superior, autofocus: true, autocomplete: "superior" %>
+      <%= f.check_box :superior, autocomplete: "superior" %>
     </div>
 
     <div class="field">
       <%= f.label :status %><br/>
-      <%= f.select :status, User.statuses.keys.map { |k| [I18n.t("enums.user.status.#{k}"), k]}, autofocus: true, autocomplete: "status" %>
+      <%= f.select :status, User.statuses.keys.map { |k| [I18n.t("enums.user.status.#{k}"), k]}, autocomplete: "status" %>
     </div>
   <% end %>
 
   <div class="field">
     <%= f.label :superior_id %><br/>
-    <%= f.select :superior_id, member_list(superior_users(@users, @user)), autofocus: true, autocomplete: "superior_id" %>
+    <%= f.select :superior_id, member_list(superior_users(@users, @user)), autocomplete: "superior_id" %>
   </div>
 
   <div class="field">
     <%= f.label :notified_num %><br/>
-    <%= f.number_field :notified_num, autofocus: true, in: 0..21, autocomplete: "notified_num" %>
+    <%= f.number_field :notified_num, in: 0..31, autocomplete: "notified_num" %>
   </div>
 
   <div class="field">
     <%= f.label :email %><br/>
     <% if !defined?(password_only) || !password_only %>
-      <%= f.email_field :email, autofocus: true, autocomplete: "email" %>
+      <%= f.email_field :email, autocomplete: "email" %>
     <% end %>
   </div>
 
