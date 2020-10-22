@@ -45,7 +45,12 @@ class Leads::ApplicationController < Users::ApplicationController
     end
     
     if params[:completed_id].present? && lead.errors.blank? && step.errors.blank?
-      redirect_to check_status_and_get_url(@completed_step, step)
+      if $step_num == 0
+        $step_num += 1
+        redirect_to check_status_and_get_url(@completed_step, step)
+      else
+        redirect_to step
+      end 
     else 
       redirect_to step
     end

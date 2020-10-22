@@ -38,7 +38,6 @@
         <%= render 'leads/step_statuses/start', step: @step, completed_id: nil, new_task: nil, button_name: "再開" %>
         <%= link_to "案件自体を凍結", cancel_lead_path(@lead), class: "btn btn-danger btn-sm", method: :patch unless @lead.status?("inactive") %>
       <% when "in_progress" %>
-        <%= $step_num = 0 %>
         <%= render 'leads/step_statuses/complete', completed_step: @step, button_name: "完了" %>
         <%= render 'leads/step_statuses/cancel', lead: @lead, step: @step, button_name: "保留" %>
       <% when "completed" %>
