@@ -14,8 +14,8 @@ class Leads::StepsStatusesController < Leads::StepsController
         raise ActiveRecord::Rollback if @lead.invalid?(:check_steps_status)
       end
       if @lead.errors.blank?
-        if $step_num == 0
-          $step_num += 1
+        unless $through_check_status
+          $through_check_status = true
           redirect_to check_status_and_get_url(completed_step, @step)
         else
           redirect_to @step

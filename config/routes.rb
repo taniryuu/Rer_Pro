@@ -28,7 +28,7 @@ Rails.application.routes.draw do
         patch 'start' => 'steps_statuses#start', as: :start
         patch 'cancel' => 'steps_statuses#cancel', as: :cancel
         patch 'statuses_make_step_not_yet'
-       # patch 'statuses_make_all_not_yet_tasks_completed'
+       # patch 'complete_all_tasks'
       end
       resources :tasks do
         member do
@@ -40,7 +40,7 @@ Rails.application.routes.draw do
           get 'edit_continue_or_destroy_step'
           get 'edit_complete_or_continue_step'
           get 'edit_change_status_or_complete_task'
-          patch 'statuses_make_all_not_yet_tasks_completed'
+          patch 'complete_all_tasks'
         end
       end
     end

@@ -22,11 +22,11 @@ class Leads::StepsController < Leads::ApplicationController
     # タスクステータスが「未」のリスト
     @tasks = @step.tasks.not_yet.order(:scheduled_complete_date)
     # タスクステータスが「完了」のリスト
-    @completed_tasks_array = @step.tasks.completed.order(:completed_date)
+    @completed_tasks = @step.tasks.completed.order(:completed_date)
     # タスクステータスが「中止」のリスト
-    @canceled_tasks_array = @step.tasks.canceled.order(:canceled_date)
+    @canceled_tasks = @step.tasks.canceled.order(:canceled_date)
     @task = @step.tasks.new
-    $step_num = 0
+    $through_check_status = false
   end
 
   # GET /steps/new
@@ -46,9 +46,10 @@ class Leads::StepsController < Leads::ApplicationController
     @step = @lead.steps.new(step_params)
     if save_and_errors_of(@lead, @step).blank?
       flash[:success] = "#{flash[:success]}#{@step.name}を作成しました。"
-      if params[:step][:completed_id].present?         
-        if $step_num == 0
-          $step_num += 1
+      if params[:step][:completed_id].present?
+        @completed_step.update_attributes(status: "completed", completed_date: "#{Date.current}")
+        unless $through_check_status
+          $through_check_status = true
           redirect_to check_status_and_get_url(@completed_step, @step)
         else
           redirect_to @step
@@ -56,8 +57,8 @@ class Leads::StepsController < Leads::ApplicationController
       elsif params[:step][:status].present? && params[:step][:status] == "completed"
         scheduled_complete_date = params[:step][:scheduled_complete_date].present? ? params[:step][:scheduled_complete_date] : "#{Date.current}"
         Task.create!(step_id: @step.id ,name: "completed_task", status: 1, scheduled_complete_date: scheduled_complete_date, completed_date: params[:step][:completed_date]) 
-        if $step_num == 0
-          $step_num += 1
+        unless $through_check_status
+          $through_check_status = true
           redirect_to check_status_and_get_url(@step, @step)
         else
           redirect_to @step
@@ -78,8 +79,8 @@ class Leads::StepsController < Leads::ApplicationController
   def update
     if update_and_errors_of(@lead, @step).blank?
       flash[:success] = "#{flash[:success]}#{@step.name}を更新しました。"
-      if $step_num == 0
-        $step_num += 1
+      unless $through_check_status
+        $through_check_status = true
         redirect_to check_status_and_get_url(@step, @step)
       else
         redirect_to @step
@@ -145,12 +146,12 @@ class Leads::StepsController < Leads::ApplicationController
           errors << lead.errors.full_messages unless start_lead(lead)
         end
         # 新規タスク作成
-        if step.tasks.not_yet.blank?
+        if !step.status?("completed") && step.tasks.not_yet.blank? 
           Task.create!(step_id: step.id ,name: "new_task", status: 0, scheduled_complete_date: params[:step][:scheduled_complete_date])
         end
         # 矛盾を解消
         check_status_inactive_or_not(step)
-        #check_status_completed_or_not(lead, step)
+        check_status_completed_or_not(lead, step)
         # バリデーション確認
         errors << lead.errors.full_messages if lead.invalid?(:check_steps_status)
         errors << step.errors.full_messages if step.invalid?(:check_order)
@@ -173,7 +174,7 @@ class Leads::StepsController < Leads::ApplicationController
         end
         # 矛盾を解消
         check_status_inactive_or_not(step)
-        #check_status_completed_or_not(lead, step)
+        check_status_completed_or_not(lead, step)
         # バリデーション確認
         errors << lead.errors.full_messages if lead.invalid?(:check_steps_status)
         errors << step.errors.full_messages if step.invalid?(:check_order)

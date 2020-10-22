@@ -1,6 +1,5 @@
 <h3><%= "<STEP#{@step.order}>#{@step.name}" %>:</h3>
 <h4>&#9312;現在の進捗を「未」にする</h4>
-<%= $step_num %>
 <%= button_to '更新', statuses_make_step_not_yet_step_path(@step), method: :patch %>
 <br>
 <h4>&#9313;現在の進捗を「進捗中」にする</h4>
@@ -10,5 +9,5 @@
 <%= button_to '更新', cancel_step_path(@step), method: :patch %>
 <br>
 <h4>&#9315;「未」のタスクをすべて「完了」にする</h4>
-<%= button_to '更新', statuses_make_all_not_yet_tasks_completed_task_path(@step), method: :patch %>
+<%= button_to '更新', complete_all_tasks_task_path(@step), method: :patch %>
 ~  

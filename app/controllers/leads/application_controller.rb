@@ -16,7 +16,7 @@ class Leads::ApplicationController < Users::ApplicationController
   def start_step(lead, step)
     ActiveRecord::Base.transaction do
       # 作成するタスクがある場合の処理
-      if params[:new_task].present?
+      if params[:new_task].present? && step.tasks.not_yet.blank?
         Task.create!(step_id: step.id ,name: "new_task", status: 0, scheduled_complete_date: "#{Date.current}") if params[:new_task] == "true"
       end
       # 進捗開始処理
@@ -45,8 +45,8 @@ class Leads::ApplicationController < Users::ApplicationController
     end
     
     if params[:completed_id].present? && lead.errors.blank? && step.errors.blank?
-      if $step_num == 0
-        $step_num += 1
+      unless $through_check_status
+        $through_check_status = true
         redirect_to check_status_and_get_url(@completed_step, step)
       else
         redirect_to step
@@ -144,6 +144,7 @@ class Leads::ApplicationController < Users::ApplicationController
     # stepがnilでなければ、stepの整合性を担保
     if step.present?
       update_completed_tasks_rate(step)
+      step.completed_tasks_rate = 100 if step.status?("completed")
       if step.completed_date.present? && step.completed_tasks_rate < 100 # ここから未完了に揃える処理
         if step.status?("completed")
           if step.scheduled_complete_date.blank?
@@ -154,7 +155,7 @@ class Leads::ApplicationController < Users::ApplicationController
         else
           step.update_attributes(completed_date: "")
         end
-        flash[:danger] = "#{flash[:danger]}未完了のタスクがあるため、#{step.name}を完了にできません。"
+        flash[:danger] = "#{flash[:danger]}未完了のタスクがあるため、#{step.name}を完了にできません。" if step.status?("completed")
       elsif !step.status?("completed") && step.completed_tasks_rate == 100 # ここから完了状態に揃える処理
         if step.completed_date.blank?
           step.update_attributes(status: "completed", completed_date: "#{Date.current}")
