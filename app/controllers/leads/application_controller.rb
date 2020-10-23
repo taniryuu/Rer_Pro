@@ -17,7 +17,7 @@ class Leads::ApplicationController < Users::ApplicationController
     ActiveRecord::Base.transaction do
       # 作成するタスクがある場合の処理
       if params[:new_task].present? && step.tasks.not_yet.blank?
-        Task.create!(step_id: step.id ,name: "new_task", status: 0, scheduled_complete_date: "#{Date.current}") if params[:new_task] == "true"
+        Task.create!(step_id: step.id ,name: "new_task", status: "not_yet", scheduled_complete_date: "#{Date.current}") if params[:new_task] == "true"
       end
       # 進捗開始処理
       scheduled_complete_date = params[:step].present? ? params[:step][:scheduled_complete_date] : "#{Date.current}"

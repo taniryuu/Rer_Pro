@@ -222,7 +222,7 @@ class Leads::TasksController < Leads::ApplicationController
     end
 
     def create_new_task_step_in_progress(lead, step)
-      Task.create!(step_id: step.id ,name: "new_task", status: 0, scheduled_complete_date: "#{Date.current}")
+      Task.create!(step_id: step.id ,name: "new_task", status: "not_yet", scheduled_complete_date: "#{Date.current}")
       redirect_to step_statuses_start_step_url(@step)
     end
 end

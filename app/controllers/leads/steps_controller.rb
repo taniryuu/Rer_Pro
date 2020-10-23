@@ -56,7 +56,7 @@ class Leads::StepsController < Leads::ApplicationController
         end
       elsif params[:step][:status].present? && params[:step][:status] == "completed"
         scheduled_complete_date = params[:step][:scheduled_complete_date].present? ? params[:step][:scheduled_complete_date] : "#{Date.current}"
-        Task.create!(step_id: @step.id ,name: "completed_task", status: 1, scheduled_complete_date: scheduled_complete_date, completed_date: params[:step][:completed_date]) 
+        Task.create!(step_id: @step.id ,name: "completed_task", status: "completed", scheduled_complete_date: scheduled_complete_date, completed_date: params[:step][:completed_date]) 
         unless $through_check_status
           $through_check_status = true
           redirect_to check_status_and_get_url(@step, @step)
@@ -147,7 +147,7 @@ class Leads::StepsController < Leads::ApplicationController
         end
         # 新規タスク作成
         if !step.status?("completed") && step.tasks.not_yet.blank? 
-          Task.create!(step_id: step.id ,name: "new_task", status: 0, scheduled_complete_date: params[:step][:scheduled_complete_date])
+          Task.create!(step_id: step.id ,name: "new_task", status: "not_yet", scheduled_complete_date: params[:step][:scheduled_complete_date])
         end
         # 矛盾を解消
         check_status_inactive_or_not(step)
@@ -170,7 +170,7 @@ class Leads::StepsController < Leads::ApplicationController
         lead.update_attribute(:notice_change_limit, true) if step.saved_change_to_scheduled_complete_date?
         # 新規タスク作成
         if params[:step][:status] == "in_progress" && step.tasks.not_yet.blank?
-          Task.create!(step_id: step.id ,name: "new_task", status: 0, scheduled_complete_date: params[:step][:scheduled_complete_date])
+          Task.create!(step_id: step.id ,name: "new_task", status: "not_yet", scheduled_complete_date: params[:step][:scheduled_complete_date])
         end
         # 矛盾を解消
         check_status_inactive_or_not(step)

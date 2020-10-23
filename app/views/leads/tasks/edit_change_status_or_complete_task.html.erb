@@ -1,4 +1,4 @@
-<h3><%= "<STEP#{@step.order}>#{@step.name}" %>:</h3>
+<h3><%= step_name(@step) %>:</h3>
 <h4>&#9312;現在の進捗を「未」にする</h4>
 <%= button_to '更新', statuses_make_step_not_yet_step_path(@step), method: :patch %>
 <br>
