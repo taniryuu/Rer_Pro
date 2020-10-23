@@ -45,7 +45,7 @@ class Leads::ApplicationController < Users::ApplicationController
     end
     
     if params[:completed_id].present? && lead.errors.blank? && step.errors.blank?
-      check_status_and_redirect(@completed_step, step)
+      check_status_and_redirect_to(@completed_step, step)
     else 
       redirect_to step
     end
@@ -236,7 +236,7 @@ class Leads::ApplicationController < Users::ApplicationController
   end
 
   #$through_check_statusに応じてリダイレクト先を選択する
-  def check_status_and_redirect(step, redirect_to_step)
+  def check_status_and_redirect_to(step, redirect_to_step)
     unless $through_check_status
       $through_check_status = true
       redirect_to check_status_and_get_url(step, redirect_to_step)

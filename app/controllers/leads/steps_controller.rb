@@ -48,11 +48,11 @@ class Leads::StepsController < Leads::ApplicationController
       flash[:success] = "#{flash[:success]}#{@step.name}を作成しました。"
       if params[:step][:completed_id].present?
         @completed_step.update_attributes(status: "completed", completed_date: "#{Date.current}")
-        check_status_and_redirect(@completed_step, @step)
+        check_status_and_redirect_to(@completed_step, @step)
       elsif params[:step][:status].present? && params[:step][:status] == "completed"
         scheduled_complete_date = params[:step][:scheduled_complete_date].present? ? params[:step][:scheduled_complete_date] : "#{Date.current}"
         Task.create!(step_id: @step.id ,name: "completed_task", status: "completed", scheduled_complete_date: scheduled_complete_date, completed_date: params[:step][:completed_date]) 
-        check_status_and_redirect(@step, @step)
+        check_status_and_redirect_to(@step, @step)
       else
         redirect_to @step
       end
@@ -69,7 +69,7 @@ class Leads::StepsController < Leads::ApplicationController
   def update
     if update_and_errors_of(@lead, @step).blank?
       flash[:success] = "#{flash[:success]}#{@step.name}を更新しました。"
-      check_status_and_redirect(@step, @step)
+      check_status_and_redirect_to(@step, @step)
     else
       flash.delete(:success)
       flash.now[:danger] = @lead.errors.full_messages.first if @lead.errors.present?
