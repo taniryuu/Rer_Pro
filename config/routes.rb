@@ -13,6 +13,8 @@ Rails.application.routes.draw do
     get 'users/:id/edit' => 'users/registrations#edit', as: :edit_other_user_registration
     match 'users/:id', to: 'users/registrations#update', via: [:patch, :put], as: :other_user_registration
   end
+  get "users/:id/notices", to: "notifications#index", as: :notices
+  patch "users/:id/notices", to: "notifications#update", as: :notices_update
   
   # 案件フォルダ群（Leads::ApplicationControllerを継承）lead, step, task関連
   resources :leads, shallow: true, module: 'leads' do

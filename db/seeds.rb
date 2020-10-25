@@ -91,7 +91,7 @@ puts "Userテスト用サンプルレコード作成完了"
         notice_change_limit: true, # 通知テストの為一時的にtrueに変更してます。
         scheduled_resident_date: (Date.current + 21 - i).to_s,
         scheduled_payment_date: (Date.current + 14 - i).to_s,
-        scheduled_contract_date: Date.current # 通知テストの為一時的にコメントアウト解除してます。
+      #  scheduled_contract_date: Date.current,
       #  steps_rate: 進捗率
       )
       Step.create!(
