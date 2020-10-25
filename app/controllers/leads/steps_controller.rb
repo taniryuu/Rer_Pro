@@ -46,10 +46,11 @@ class Leads::StepsController < Leads::ApplicationController
     @step = @lead.steps.new(step_params)
     if save_and_errors_of(@lead, @step).blank?
       flash[:success] = "#{flash[:success]}#{@step.name}を作成しました。"
-      if params[:step][:completed_id].present?
-        @completed_step.update_attributes(status: "completed", completed_date: "#{Date.current}")
-        check_status_and_redirect_to(@completed_step, @step)
-      elsif params[:step][:status].present? && params[:step][:status] == "completed"
+      #if params[:step][:completed_id].present?
+      #  @completed_step.update_attributes(status: "completed", completed_date: "#{Date.current}")
+      #  check_status_and_redirect_to(@completed_step, @step)
+      if params[:step][:status].present? && params[:step][:status] == "completed"
+        flash[:danger] = "「完了」タスクが無い、進捗は「完了」ステータスで新規作成しようとしています。「完了」タスクを自動で生成しました。"
         scheduled_complete_date = params[:step][:scheduled_complete_date].present? ? params[:step][:scheduled_complete_date] : "#{Date.current}"
         Task.create!(step_id: @step.id ,name: "completed_task", status: "completed", scheduled_complete_date: scheduled_complete_date, completed_date: params[:step][:completed_date]) 
         check_status_and_redirect_to(@step, @step)
@@ -124,6 +125,7 @@ class Leads::StepsController < Leads::ApplicationController
         # 完了する進捗がある場合の処理
         if params[:step][:completed_id].present?
           @completed_step = Step.find(params[:step][:completed_id]) # 完了処理に失敗したら、改めてオブジェクトを渡す必要があるのでインスタンス変数を使用。
+          errors << @completed_step.errors.full_messages unless complete_step(lead, @completed_step, @completed_step.latest_date)
         end
         # 案件を再開する場合の処理
         if params[:step][:start_lead_flag] == "true"
@@ -131,7 +133,7 @@ class Leads::StepsController < Leads::ApplicationController
           errors << lead.errors.full_messages unless start_lead(lead)
         end
         # 新規タスク作成
-        if !step.status?("completed") && step.tasks.not_yet.blank? 
+        if (step.status?("in_progress") || step.status?("inactive")) && step.tasks.not_yet.blank? 
           Task.create!(step_id: step.id ,name: "new_task", status: "not_yet", scheduled_complete_date: params[:step][:scheduled_complete_date])
         end
         # 矛盾を解消
