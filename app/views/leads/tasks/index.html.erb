@@ -58,7 +58,7 @@
     <h3>済 リスト</h3>
     <table>
       <tbody>
-        <% @completed_tasks_array.each do |task| %>
+        <% @completed_tasks.each do |task| %>
           <tr>
             <td><%= link_to "#{task.name}", task_path(task) %></td>
             <td><%= task.completed_date %></td>
@@ -71,7 +71,7 @@
     <h3>中止 リスト</h3>
     <table>
       <tbody>
-        <% @canceled_tasks_array.each do |task| %>
+        <% @canceled_tasks.each do |task| %>
           <tr>
             <td><%= link_to "#{task.name}", task_path(task) %></td>
             <td><%= task.canceled_date %></td>

@@ -33,7 +33,7 @@
       <%= @step.memo %><br>
       <% case @step.status %>
       <% when "not_yet" %>
-        <%= render 'leads/step_statuses/start', step: @step, completed_id: nil, new_task: nil, button_name: "開始" %>
+        <%= render 'leads/step_statuses/start', step: @step, completed_id: nil, new_task: true, button_name: "開始" %>
       <% when "inactive" %>
         <%= render 'leads/step_statuses/start', step: @step, completed_id: nil, new_task: nil, button_name: "再開" %>
         <%= link_to "案件自体を凍結", cancel_lead_path(@lead), class: "btn btn-danger btn-sm", method: :patch unless @lead.status?("inactive") %>
@@ -41,7 +41,7 @@
         <%= render 'leads/step_statuses/complete', completed_step: @step, button_name: "完了" %>
         <%= render 'leads/step_statuses/cancel', lead: @lead, step: @step, button_name: "保留" %>
       <% when "completed" %>
-        <%= render 'leads/step_statuses/start', step: @step, completed_id: nil, new_task: nil, button_name: "再開" %>
+        <%= render 'leads/step_statuses/start', step: @step, completed_id: nil, new_task: true, button_name: "再開" %>
       <% when "template" %>
         <button type="button" class="btn btn-info">このテンプレートを使用して新規作成</button>
       <% end %>

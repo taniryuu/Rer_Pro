@@ -16,8 +16,8 @@ class Leads::ApplicationController < Users::ApplicationController
   def start_step(lead, step)
     ActiveRecord::Base.transaction do
       # 作成するタスクがある場合の処理
-      if params[:new_task].present?
-        Task.create!(step_id: step.id ,name: "new_task", status: 0, scheduled_complete_date: "#{Date.current}") if params[:new_task] == "true"
+      if params[:new_task].present? && step.tasks.not_yet.blank?
+        Task.create!(step_id: step.id ,name: "new_task", status: "not_yet", scheduled_complete_date: "#{Date.current}") if params[:new_task] == "true"
       end
       # 進捗開始処理
       scheduled_complete_date = params[:step].present? ? params[:step][:scheduled_complete_date] : "#{Date.current}"
@@ -28,8 +28,8 @@ class Leads::ApplicationController < Users::ApplicationController
       end
       # 完了する進捗がある場合の処理
       if params[:completed_id].present?
-        completed_step = Step.find(params[:completed_id])
-        complete_step(lead, completed_step, completed_step.latest_date)
+        @completed_step = Step.find(params[:completed_id])
+        complete_step(lead, @completed_step, @completed_step.latest_date)
       end
       # 案件を再開する場合の処理
       start_lead(lead) unless lead.status?("in_progress")
@@ -43,7 +43,12 @@ class Leads::ApplicationController < Users::ApplicationController
       flash[:danger] = "#{flash[:danger]}#{lead.errors.full_messages.first}" if lead.errors.present?
       flash[:danger] = "#{flash[:danger]}#{step.errors.full_messages.first}" if step.errors.present?
     end
-    redirect_to step
+    
+    if params[:completed_id].present? && lead.errors.blank? && step.errors.blank?
+      check_status_and_redirect_to(@completed_step, step)
+    else 
+      redirect_to step
+    end
   end
   
   # 案件を凍結処理を実行
@@ -134,6 +139,7 @@ class Leads::ApplicationController < Users::ApplicationController
     # stepがnilでなければ、stepの整合性を担保
     if step.present?
       update_completed_tasks_rate(step)
+      step.completed_tasks_rate = 100 if step.status?("completed")
       if step.completed_date.present? && step.completed_tasks_rate < 100 # ここから未完了に揃える処理
         if step.status?("completed")
           if step.scheduled_complete_date.blank?
@@ -144,7 +150,7 @@ class Leads::ApplicationController < Users::ApplicationController
         else
           step.update_attributes(completed_date: "")
         end
-        flash[:danger] = "#{flash[:danger]}未完了のタスクがあるため、#{step.name}を完了にできません。"
+        flash[:danger] = "#{flash[:danger]}未完了のタスクがあるため、#{step.name}を完了にできません。" if step.status?("completed")
       elsif !step.status?("completed") && step.completed_tasks_rate == 100 # ここから完了状態に揃える処理
         if step.completed_date.blank?
           step.update_attributes(status: "completed", completed_date: "#{Date.current}")
@@ -208,26 +214,37 @@ class Leads::ApplicationController < Users::ApplicationController
   end
 
   # タスクの状態に応じてリダイレクト先を取得する
-  def check_status_and_get_url  
+  def check_status_and_get_url(step, redirect_to_step) 
     # タスク操作後、
 
     # 進捗に「未」のタスクが無く、かつ「完了」のタスクも無い場合、continue_or_destroy_stepのurlにリダイレクトする
-    if @step.tasks.find_by(status: "not_yet").nil? && @step.tasks.find_by(status: "completed").nil?
-      edit_continue_or_destroy_step_task_url(@step)
+    if step.tasks.find_by(status: "not_yet").nil? && step.tasks.find_by(status: "completed").nil?
+      edit_continue_or_destroy_step_task_url(step)
 
     #進捗に「未」のタスクが無く、かつ「完了」のタスクが１つ以上ある場合、complete_or_continue_stepのurlにリダイレクトする
-    elsif @step.tasks.find_by(status: "not_yet").nil? && @step.tasks.find_by(status: "completed").present?
-      edit_complete_or_continue_step_task_url(@step)
+    elsif step.tasks.find_by(status: "not_yet").nil? && step.tasks.find_by(status: "completed").present?
+      edit_complete_or_continue_step_task_url(step)
 
     #進捗に「未」のタスクがあるにも関わらず、進捗のstatusが「完了」の場合、change_status_or_complete_taskのurlにリダイレクトする
-    elsif @step.tasks.find_by(status: "not_yet").present? && @step.status?("completed")
-      edit_change_status_or_complete_task_task_url(@step)
+    elsif step.tasks.find_by(status: "not_yet").present? && step.status?("completed")
+      edit_change_status_or_complete_task_task_url(step)
 
     #以上いずれでもない場合、steps#showにリダイレクトする
     else
-      step_url(@step)
+      step_url(redirect_to_step)
     end 
   end
+
+  #$through_check_statusに応じてリダイレクト先を選択する
+  def check_status_and_redirect_to(step, redirect_to_step)
+    unless $through_check_status
+      $through_check_status = true
+      redirect_to check_status_and_get_url(step, redirect_to_step)
+    else
+      redirect_to redirect_to_step
+    end
+  end
+
 
   private
     # 進捗一覧を取得

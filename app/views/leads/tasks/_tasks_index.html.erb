@@ -65,7 +65,7 @@
     <div class="panel-heading">
       <p class="panel-title">
         <a data-toggle="collapse" data-parent="#accordion" href="#collapse3"><h4 style="display:inline;">済 リスト</h4></a>
-        <h5 style="display:inline;"><%= "(#{@completed_tasks_array.count}件)" %></h5>
+        <h5 style="display:inline;"><%= "(#{@completed_tasks.count}件)" %></h5>
       </p>
     </div>
     <div id="collapse3" class="panel-collapse collapse in">
@@ -73,7 +73,7 @@
         <!--p>済 リスト</p-->
         <table>
           <tbody>
-            <% @completed_tasks_array.each do |task| %>
+            <% @completed_tasks.each do |task| %>
               <tr>
                 <td><%= link_to "#{task.name}", task_path(task) %></td>
                 <td><%= l(Time.parse(task.completed_date), format: :shortdate) %></td>
@@ -89,7 +89,7 @@
     <div class="panel-heading">
       <p class="panel-title">
         <a data-toggle="collapse" data-parent="#accordion" href="#collapse4"><h4 style="display:inline;">中止 リスト</h4></a>
-        <h5 style="display:inline;"><%= "(#{@canceled_tasks_array.count}件)" %></h5>
+        <h5 style="display:inline;"><%= "(#{@canceled_tasks.count}件)" %></h5>
       </p>
     </div>
     <div id="collapse4" class="panel-collapse collapse">
@@ -97,7 +97,7 @@
         <!--p>中止 リスト</p-->
         <table>
           <tbody>
-            <% @canceled_tasks_array.each do |task| %>
+            <% @canceled_tasks.each do |task| %>
               <tr>
                 <td><%= link_to "#{task.name}", task_path(task) %></td>
                 <td><%= l(Time.parse(task.canceled_date), format: :shortdate) %></td>

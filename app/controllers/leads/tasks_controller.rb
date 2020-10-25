@@ -4,7 +4,7 @@ class Leads::TasksController < Leads::ApplicationController
                                     edit_revive_from_canceled_list update_revive_from_canceled_list)
   before_action :set_step, only: %i(index new create)
   before_action :set_step_by_id, only: [:edit_add_delete_list, :update_add_delete_list, :edit_continue_or_destroy_step,
-                                        :edit_complete_or_continue_step, :edit_change_status_or_complete_task, :statuses_make_all_not_yet_tasks_completed]
+                                        :edit_complete_or_continue_step, :edit_change_status_or_complete_task, :complete_all_tasks]
   before_action :set_steps, only: :edit_complete_or_continue_step
   # アクセス制限
   before_action :correct_user, except: %i(index show)
@@ -14,9 +14,9 @@ class Leads::TasksController < Leads::ApplicationController
     # タスクステータスが「未」のリスト
     @tasks = @step.tasks.not_yet.order(:scheduled_complete_date)
     # タスクステータスが「完了」のリスト
-    @completed_tasks_array = @step.tasks.completed.order(:completed_date)
+    @completed_tasks = @step.tasks.completed.order(:completed_date)
     # タスクステータスが「中止」のリスト
-    @canceled_tasks_array = @step.tasks.canceled.order(:canceled_date)
+    @canceled_tasks = @step.tasks.canceled.order(:canceled_date)
     @task = @step.tasks.new
   end
 
@@ -35,8 +35,9 @@ class Leads::TasksController < Leads::ApplicationController
     if prohibit_future(@task.scheduled_complete_date)
       flash[:danger] = "完了予定日に過去の日付を入力しようとしています。"
     end
-    if @task.save && update_completed_tasks_rate(@step)
-      redirect_to check_status_and_get_url
+    if @task.save
+      update_completed_tasks_rate(@step)
+      check_status_and_redirect_to(@step, @step)
     else
       render :new 
     end
@@ -44,7 +45,8 @@ class Leads::TasksController < Leads::ApplicationController
 
 
   def update
-    if @task.update(task_params) && update_completed_tasks_rate(@step)
+    if @task.update(task_params) 
+      update_completed_tasks_rate(@step)
       # 完了日が空なら今日の日付を入れる
       @task.date_blank_then_today("completed")
       # 中止にした日が空なら今日の日付を入れる
@@ -56,7 +58,7 @@ class Leads::TasksController < Leads::ApplicationController
       elsif prohibit_future(@task.completed_date)
         flash[:danger] = "完了日に過去の日付を入力しようとしています。"
       end
-      redirect_to check_status_and_get_url
+      check_status_and_redirect_to(@step, @step)
     else
       render :edit
     end
@@ -65,7 +67,7 @@ class Leads::TasksController < Leads::ApplicationController
   def destroy
     @task.destroy
     update_completed_tasks_rate(@step)
-    redirect_to check_status_and_get_url
+    check_status_and_redirect_to(@step, @step)
   end
 
   # 「To Do リスト」にチェックを入れて「更新」ボタンを押したときに実行されるアクション
@@ -86,7 +88,7 @@ class Leads::TasksController < Leads::ApplicationController
     n1 = checkbox_array.size
     i2 = 0
     # タスクステータスが「完了」のリスト
-    @completed_tasks_array = @step.tasks.completed.order(:completed_date)
+    @completed_tasks = @step.tasks.completed.order(:completed_date)
 
     n1.times do |i1|
       if checkbox_array[i1] == "true"
@@ -103,7 +105,7 @@ class Leads::TasksController < Leads::ApplicationController
         end
       end
     end
-    redirect_to check_status_and_get_url
+    check_status_and_redirect_to(@step, @step)
   end
 
   # 「To Do リスト」で中止ボタンを押して「中止」リストに入れる処理
@@ -111,7 +113,7 @@ class Leads::TasksController < Leads::ApplicationController
     @task.update_attribute(:status, "canceled")
     update_completed_tasks_rate(@step)
     @task.update_attribute(:canceled_date, "#{Date.current}") if @task.canceled_date.blank?
-    redirect_to check_status_and_get_url
+    check_status_and_redirect_to(@step, @step)
   end
 
   # 復活ボタンを押したときに実行されるアクション
@@ -120,15 +122,16 @@ class Leads::TasksController < Leads::ApplicationController
 
   # 復活ボタンを押した画面から更新ボタンを押した後の処理
   def update_revive_from_canceled_list
-    if @task.update_attributes(revive_from_canceled_list_params) && update_completed_tasks_rate(@step)
+    if @task.update_attributes(revive_from_canceled_list_params)
       if prohibit_future(@task.scheduled_complete_date)
         flash[:danger] = "完了予定日に過去の日付を入力しようとしています。"
       end
       @task.update_attribute(:status, "not_yet")
+      update_completed_tasks_rate(@step)
     else
       flash[:danger] = "#{@task.name}の更新は失敗しました。" + @task.errors.full_messages[0]
     end
-    redirect_to check_status_and_get_url
+    check_status_and_redirect_to(@step, @step)
   end
 
   def edit_continue_or_destroy_step
@@ -143,7 +146,7 @@ class Leads::TasksController < Leads::ApplicationController
   end
 
   # 「未」のタスクをすべて「完了」とする
-  def statuses_make_all_not_yet_tasks_completed
+  def complete_all_tasks
     #現在の進捗の「未」のタスクをすべて「完了」とし、「完了日」を本日とし、その後complete_or_continueのurlへ飛ぶ
     errors = []
     ActiveRecord::Base.transaction do
@@ -151,7 +154,7 @@ class Leads::TasksController < Leads::ApplicationController
       update_completed_tasks_rate(@step)
       raise ActiveRecord::Rollback if errors.present?
     end
-    redirect_to check_status_and_get_url
+    redirect_to check_status_and_get_url(@step, @step)
   end
 
 
@@ -189,7 +192,7 @@ class Leads::TasksController < Leads::ApplicationController
     end
 
     def create_new_task_step_in_progress(lead, step)
-      Task.create!(step_id: step.id ,name: "new_task", status: 0, scheduled_complete_date: "#{Date.current}")
+      Task.create!(step_id: step.id ,name: "new_task", status: "not_yet", scheduled_complete_date: "#{Date.current}")
       redirect_to step_statuses_start_step_url(@step)
     end
 end
