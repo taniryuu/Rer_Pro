@@ -28,8 +28,13 @@ class UsersController < NotificationsController
   end
 
   def show
-    # 自分の案件の完了予定日に近づいてる案件の通知
-    @myleads_limit_notice = @user.leads.in_progress.where.not(scheduled_contract_date: "").where("scheduled_contract_date <= ?", @user.limit_date)
+    # 入居予定日に近づいてる案件の通知
+    @mystep_limit_notices = []
+    @user.leads.in_progress.each do |lead|
+      if lead.steps.todo.where("scheduled_complete_date <= ?", @user.limit_date).present?
+        @mystep_limit_notices.push(lead)
+      end
+    end
   end
 
   def destroy

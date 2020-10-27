@@ -64,4 +64,8 @@ module LeadsHelper
     end
   end
   
+  # 建物名と部屋番号を繋げて表示する
+  def room_name_num(lead)
+    "#{lead.room_name}" + ":" + "#{lead.room_num}号室"
+  end
 end

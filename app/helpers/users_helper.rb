@@ -1,5 +1,5 @@
 module UsersHelper
-  # ユーザー名を表示するためのメソッド
+  # ユーザー名を表示する
   def user_name(id)
     @users.find(id).name
   end

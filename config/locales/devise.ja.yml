@@ -24,7 +24,7 @@ ja:
 #      unconfirmed: 'You have to confirm your account before continuing.'
       locked: 'あなたのアカウントは凍結されています。'
 #      locked: 'Your account is locked.'
-      invalid: 'メールアドレスかパスワードが違います。'
+      invalid: 'ログインIDかパスワードが違います。'
 #      invalid: 'Invalid email or password.'
       invalid_token: '認証キーが不正です。'
 #      invalid_token: 'Invalid authentication token.'
