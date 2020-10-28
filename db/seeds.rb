@@ -101,6 +101,7 @@ puts "Userテスト用サンプルレコード作成完了"
         status: "in_progress",
         order: 1,
         scheduled_complete_date: (Date.current + 3).to_s,
+        # notice_change_limit: true # 完了予定日変更時通知
       )
     end
     puts "「サンプル太郎(#{j})」の案件作成完了"

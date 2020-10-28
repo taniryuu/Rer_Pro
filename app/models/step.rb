@@ -14,6 +14,7 @@ class Step < ApplicationRecord
   validate :completed_date_prohibit_future
   validates :completed_tasks_rate, presence: true, numericality: {only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: 100}
   #validate :match_tasks_status, on: :check_tasks_status
+  validates :notice_change_limit, inclusion: { in: [true, false] }
   enum status:[:not_yet, :inactive, :in_progress, :completed, :template] # 進捗ステータス
   
   # :orderカラムが連番であることを保証するには、最大値がレコードの数と一致する必要がある。@step.valid?(:check_order)したときのみバリデーションを実行。
