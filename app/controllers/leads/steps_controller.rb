@@ -32,6 +32,7 @@ class Leads::StepsController < Leads::ApplicationController
   # GET /steps/new
   def new
     @step = @lead.steps.new
+    @step.tasks.build
     @completed_step = Step.find(params[:completed_id]) if params[:completed_id].present?
     @start_lead_flag = true if params[:start_lead_flag].present?
   end
@@ -43,7 +44,7 @@ class Leads::StepsController < Leads::ApplicationController
   # POST /steps
   # POST /steps.json
   def create
-    @step = @lead.steps.new(step_params)
+    @step = @lead.steps.new(step_and_task_params)
     if save_and_errors_of(@lead, @step).blank?
       flash[:success] = "#{flash[:success]}#{@step.name}を作成しました。"
       #if params[:step][:completed_id].present?
@@ -111,8 +112,9 @@ class Leads::StepsController < Leads::ApplicationController
     end
 
     # Only allow a list of trusted parameters through.
-    def step_params
-      params.require(:step).permit(:lead_id, :name, :memo, :status, :order, :scheduled_complete_date, :completed_date, :completed_tasks_rate)
+    def step_and_task_params
+      params.require(:step).permit(:lead_id, :name, :memo, :status, :order, :scheduled_complete_date, :completed_date, :completed_tasks_rate,
+                          tasks_attributes: [:name, :memo, :status, :scheduled_complete_date, :completed_date, :canceled_date])
     end
     
     # クリエイト処理
@@ -133,9 +135,9 @@ class Leads::StepsController < Leads::ApplicationController
           errors << lead.errors.full_messages unless start_lead(lead)
         end
         # 新規タスク作成
-        if (step.status?("in_progress") || step.status?("inactive")) && step.tasks.not_yet.blank? 
-          Task.create!(step_id: step.id ,name: "new_task", status: "not_yet", scheduled_complete_date: params[:step][:scheduled_complete_date])
-        end
+        #if (step.status?("in_progress") || step.status?("inactive")) && step.tasks.not_yet.blank? 
+        #  Task.create!(step_id: step.id ,name: "new_task", status: "not_yet", scheduled_complete_date: params[:step][:scheduled_complete_date])
+        #end
         # 矛盾を解消
         check_status_inactive_or_not(step)
         check_status_completed_or_not(lead, step)
@@ -153,7 +155,7 @@ class Leads::StepsController < Leads::ApplicationController
       ActiveRecord::Base.transaction do
         # 更新処理（バリデーションなし）
         prepare_order(step.order, params[:step][:order].to_i)
-        step.update(step_params)
+        step.update(step_and_task_params)
         lead.update_attribute(:notice_change_limit, true) if step.saved_change_to_scheduled_complete_date?
         # 新規タスク作成
         if params[:step][:status] == "in_progress" && step.tasks.not_yet.blank?

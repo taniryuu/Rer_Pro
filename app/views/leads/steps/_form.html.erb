@@ -60,7 +60,38 @@
     
   <% end %>
 ----------------------------------------------------------------<br>
-ここで一緒にタスクを追加、編集できると良い。<br>
+  <%= form.fields_for :tasks do |s| %>
+
+    <div class="field">
+      <%= s.label :name %>
+      <%= s.text_field :name %>
+    </div>
+
+    <div class="field">
+      <%= s.label :memo %>
+      <%= s.text_area :memo, size: "50x3" %>
+    </div>
+
+    <div class="field">
+      <%= s.label :status %>
+      <%= s.select :status, Task.statuses.keys.map { |k| [I18n.t("enums.task.status.#{k}"), k]} %>
+    </div>
+
+    <div class="field">
+      <%= s.label :scheduled_complete_date %>
+      <%= s.date_field :scheduled_complete_date %><br>
+    </div>
+
+    <div class="field">
+      <%= s.label :completed_date %>
+      <%= s.date_field :completed_date %><br>
+    </div>
+
+    <div class="field">
+      <%= s.label :canceled_date %>
+      <%= s.date_field :canceled_date %><br>
+    </div>
+  <% end %>
 ----------------------------------------------------------------<br>
   <div class="actions">
     <%= form.submit %>
