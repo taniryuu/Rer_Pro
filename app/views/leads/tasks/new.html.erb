@@ -23,7 +23,7 @@
   <%= f.date_field :completed_date, class: "form-control" %>
 
   <%= f.label :canceled_date, class: "label-#{yield(:class_text)}" %>
-  <%= f.date_local_field :canceled_date, class: "form-control" %>
+  <%= f.date_field :canceled_date, class: "form-control" %>
 
 
   <%= f.submit yield(:button_text), class: "btn-#{yield(:class_text)}" %>
