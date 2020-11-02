@@ -73,11 +73,6 @@
     </div>
 
     <div class="field">
-      <%= s.label :status %>
-      <%= s.select :status, Task.statuses.keys.map { |k| [I18n.t("enums.task.status.#{k}"), k]} %>
-    </div>
-
-    <div class="field">
       <%= s.label :scheduled_complete_date %>
       <%= s.date_field :scheduled_complete_date %><br>
     </div>

@@ -134,10 +134,18 @@ class Leads::StepsController < Leads::ApplicationController
           @start_lead_flag = true
           errors << lead.errors.full_messages unless start_lead(lead)
         end
-        # 新規タスク作成
-        #if (step.status?("in_progress") || step.status?("inactive")) && step.tasks.not_yet.blank? 
-        #  Task.create!(step_id: step.id ,name: "new_task", status: "not_yet", scheduled_complete_date: params[:step][:scheduled_complete_date])
-        #end
+        # 親子モデル同時フォーム更新でできたtaskを削除
+        new_task_id = step.tasks.target.first.id
+        Task.find(new_task_id).destroy
+        # 条件を満たすときだけ改めて「未」のタスクを追加
+        if (step.status?("in_progress") || step.status?("inactive")) && step.tasks.not_yet.blank?
+          name = params[:step][:tasks_attributes]["0"]["name"]
+          scheduled_complete_date = params[:step][:tasks_attributes]["0"]["scheduled_complete_date"]
+          completed_date = params[:step][:tasks_attributes]["0"]["completed_date"]
+          canceled_date = params[:step][:tasks_attributes]["0"]["canceled_date"]
+          # 新規タスク作成
+          Task.create!(step_id: step.id ,name: name, status: "not_yet", scheduled_complete_date: scheduled_complete_date, completed_date: completed_date, canceled_date: canceled_date)
+        end
         # 矛盾を解消
         check_status_inactive_or_not(step)
         check_status_completed_or_not(lead, step)
