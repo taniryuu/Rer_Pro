@@ -1,7 +1,7 @@
 class NotificationsController < Users::ApplicationController
   before_action :set_users
   before_action :notice
-
+  
   # superior_idに指定されたユーザー視点の通知
   def notice
     # 新規作成時の通知
@@ -55,7 +55,8 @@ class NotificationsController < Users::ApplicationController
   def index
   end
 
-  def update
+  # 新規作成時通知をfalseに更新
+  def update_create
     user = @active_users.find(params[:id])
     leads = user.leads.in_progress
     ActiveRecord::Base.transaction do

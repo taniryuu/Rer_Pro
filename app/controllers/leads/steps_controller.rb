@@ -5,7 +5,7 @@ class Leads::StepsController < Leads::ApplicationController
   before_action :set_steps, only: %i(show)
   # フィルター（アクセス権限）
   before_action :only_same_company_id?
-  before_action :correct_user, except: %i(index show)
+  before_action :correct_user, except: %i(index show change_limit_chack)
   # 後処理
   # after_action :sort_order, only: %i(destroy index)
 
@@ -27,6 +27,7 @@ class Leads::StepsController < Leads::ApplicationController
     @canceled_tasks = @step.tasks.canceled.order(:canceled_date)
     @task = @step.tasks.new
     $through_check_status = false
+    @steps_notice_list = @lead.steps.where(notice_change_limit: true)
   end
 
   # GET /steps/new
@@ -94,6 +95,19 @@ class Leads::StepsController < Leads::ApplicationController
       raise ActiveRecord::Rollback if errors.present?
     end
     redirect_to check_status_and_get_url(@step, @step)
+  end
+
+  # Stepの期限変更通知をfalseに更新
+  def change_limit_chack
+    if @user.superior_id == current_user.id
+      @step.update(notice_change_limit: false)
+      @lead.update(notice_change_limit: false) if @lead.steps.where(notice_change_limit: true).blank?
+      flash[:success] = "確認しました。"
+      redirect_to @step
+    else
+      flash.now[:danger] = "確認処理に失敗しました。"
+      render :show
+    end
   end
 
   private
