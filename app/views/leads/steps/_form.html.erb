@@ -61,6 +61,7 @@
   <% end %>
 ----------------------------------------------------------------<br>
   <%= form.fields_for :tasks do |s| %>
+    <!--%= render 'devise/shared/error_messages', resource: s.object %-->
 
     <div class="field">
       <%= s.label :name %>
