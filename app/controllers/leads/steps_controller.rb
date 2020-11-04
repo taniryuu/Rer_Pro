@@ -5,7 +5,7 @@ class Leads::StepsController < Leads::ApplicationController
   before_action :set_steps, only: %i(show)
   # フィルター（アクセス権限）
   before_action :only_same_company_id?
-  before_action :correct_user, except: %i(index show change_limit_chack)
+  before_action :correct_user, except: %i(index show change_limit_check)
   # 後処理
   # after_action :sort_order, only: %i(destroy index)
 
@@ -98,16 +98,15 @@ class Leads::StepsController < Leads::ApplicationController
   end
 
   # Stepの期限変更通知をfalseに更新
-  def change_limit_chack
+  def change_limit_check
     if @user.superior_id == current_user.id
       @step.update(notice_change_limit: false)
       @lead.update(notice_change_limit: false) if @lead.steps.where(notice_change_limit: true).blank?
       flash[:success] = "確認しました。"
-      redirect_to @step
     else
-      flash.now[:danger] = "確認処理に失敗しました。"
-      render :show
+      flash[:danger] = "確認処理に失敗しました。"
     end
+    redirect_to @step
   end
 
   private

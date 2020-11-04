@@ -31,7 +31,7 @@ Rails.application.routes.draw do
         patch 'cancel' => 'steps_statuses#cancel', as: :cancel
         patch 'statuses_make_step_not_yet'
        # patch 'complete_all_tasks'
-        patch 'change_limit_chack'
+        patch 'change_limit_check'
       end
       resources :tasks do
         member do
