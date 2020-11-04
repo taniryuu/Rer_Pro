@@ -52,6 +52,7 @@ ActiveRecord::Schema.define(version: 2020_08_31_123021) do
     t.string "completed_date", default: "", null: false
     t.string "canceled_date", default: "", null: false
     t.integer "completed_tasks_rate", default: 0, null: false
+    t.boolean "notice_change_limit", default: false, null: false
     t.integer "lead_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

@@ -1,5 +1,6 @@
 <p id="notice"><%= notice %></p>
 
+<%= render 'steps_notice' %>
 <%= render partial: 'leads/leads/lead_show' %>
 <%= render partial: 'leads/steps/steps_index' %>
 
@@ -192,4 +193,3 @@
   <strong>Completed tasks rate:</strong>
   <%= @step.completed_tasks_rate %>
 </p>
-

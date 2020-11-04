@@ -1,0 +1,8 @@
+<% if @steps_notice_list.present? %>
+  <% @steps_notice_list.each do |step| %>
+    <p>
+      <%= step.name %>
+      <%= link_to "確認", change_limit_check_step_path(step), method: :patch, data: { confirm: "期限の変更を確認します。"} %>
+    </p>
+  <% end %>
+<% end %>

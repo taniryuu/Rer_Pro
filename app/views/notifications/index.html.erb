@@ -1,113 +1,144 @@
-<% if @create_notices_user_num.present? %>
-  <h3>
-    登録時通知
-    <%= @create_notices_user_num.count %>人
-    <%= @create_notices_total_count %>件
-  </h3>
-  <% @create_notices_list.each_with_index do |user_leads, i| %>
-    <div class="accordion" id="accordionExample">
-      <div class="card">
-        <div class="card-header" id="headingOne">
-          <div class="mb-0">
-            <div>
-              <%= user_name(user_leads.first.user_id) %>
-              <span class="btn btn-link text-left" type="button" data-toggle="collapse" data-target="#collapse<%= i %>" aria-expanded="true" aria-controls="collapse<%= i %>">
-                :<%= user_leads.count %>件
-              </span>
+<%# 全通知の有無で分岐 %>
+<% if @create_notices_user_num.present? || @limit_change_notices_user_num.present? || @step_limit_notices_user_num.present? || @mystep_limit_notices.present? %>
+  <% if @create_notices_user_num.present? %>
+    <h3>
+      登録時通知
+      <%= @create_notices_user_num.count %>人
+      <%= @create_notices_total_count %>件
+    </h3>
+    <% @create_notices_list.each_with_index do |user_leads, i| %>
+      <div class="accordion" id="accordionExample">
+        <div class="card">
+          <div class="card-header" id="headingOne">
+            <div class="mb-0">
+              <div>
+                <%= user_name(user_leads.first.user_id) %>
+                <span class="btn btn-link text-left" type="button" data-toggle="collapse" data-target="#collapse<%= i %>" aria-expanded="true" aria-controls="collapse<%= i %>">
+                  :<%= user_leads.count %>件
+                </span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div id="collapse<%= i %>" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
-        <div class="card-body">
-          <%= link_to "確認", notices_update_path(user_leads.first.user_id), method: :patch %>
-          <table class="table table-hover">
-            <thead>
-              <tr>
-                <th width="5%">申込日</th>
-                <th width="20%">部屋名:部屋番号</th>
-                <th width="10%">お客様名</th>
-                <th width="5%">詳細</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% user_leads.each do |lead| %>
+        <div id="collapse<%= i %>" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
+          <div class="card-body">
+            <%= link_to "確認", notices_update_create_path(user_leads.first.user_id), method: :patch %>
+            <table class="table table-hover">
+              <thead>
                 <tr>
-                  <td><%= l(Time.parse(lead.created_date), format: :shortdate) %></td>
-                  <td><%= room_name_num(lead) %></td>
-                  <td><%= lead.customer_name %></td>
-                  <td><%= link_to "詳細", step_path(lead) %></td>
+                  <th width="5%">申込日</th>
+                  <th width="20%">部屋名:部屋番号</th>
+                  <th width="10%">お客様名</th>
+                  <th width="5%">詳細</th>
                 </tr>
-              <% end %>
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                <% user_leads.each do |lead| %>
+                  <tr>
+                    <td><%= l(Time.parse(lead.created_date), format: :shortdate) %></td>
+                    <td><%= room_name_num(lead) %></td>
+                    <td><%= lead.customer_name %></td>
+                    <td><%= link_to "詳細", step_path(lead) %></td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
-    </div>
+    <% end %>
   <% end %>
-<% end %>
 
-<% if @limit_change_notices_user_num.present? %>
-  <h3>
-    変更時通知
-    <%= @limit_change_notices_user_num.count %>人
-    <%= @limit_change_notices_total_count %>件
-  </h3>
-  <% @limit_change_notices_list.each do |user_leads| %>
-    <h4><%= user_name(user_leads.first.user_id) %></h4>
-    <table class="table table-hover">
-      <thead>
-        <tr>
-          <th width="5%">申込日</th>
-          <th width="20%">部屋名:部屋番号</th>
-          <th width="10%">お客様名</th>
-          <th width="30%">メモ</th>
-          <th width="5%">詳細</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% user_leads.each do |lead| %>
+  <% if @limit_change_notices_user_num.present? %>
+    <h3>
+      変更時通知
+      <%= @limit_change_notices_user_num.count %>人
+      <%= @limit_change_notices_total_count %>件
+    </h3>
+    <% @limit_change_notices_list.each do |user_leads| %>
+      <h4><%= user_name(user_leads.first.user_id) %></h4>
+      <table class="table table-hover">
+        <thead>
           <tr>
-            <td><%= l(Time.parse(lead.created_date), format: :shortdate) %></td>
-            <td><%= room_name_num(lead) %></td>
-            <td><%= lead.customer_name %></td>
-            <td><%= lead.memo %></td>
-            <td><%= link_to "詳細", step_path(lead) %></td>
+            <th width="5%">申込日</th>
+            <th width="20%">部屋名:部屋番号</th>
+            <th width="10%">お客様名</th>
+            <th width="30%">メモ</th>
+            <th width="5%">詳細</th>
           </tr>
-        <% end %>
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          <% user_leads.each do |lead| %>
+            <tr>
+              <td><%= l(Time.parse(lead.created_date), format: :shortdate) %></td>
+              <td><%= room_name_num(lead) %></td>
+              <td><%= lead.customer_name %></td>
+              <td><%= lead.memo %></td>
+              <td><%= link_to "詳細", step_path(lead) %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% end %>
   <% end %>
-<% end %>
 
-<% if @step_limit_notices_user_num.present? %>
-  <h3>
-    期限通知
-    <%= @step_limit_notices_user_num.count %>人
-    <%= @step_limit_notices_total_count %>件
-  </h3>
-  <% @step_limit_notices_list.each do |user_leads| %>
-    <h4><%= user_name(user_leads.first.user_id) %></h4>
-    <table class="table table-hover">
-      <thead>
-        <tr>
-          <th width="5%">申込日</th>
-          <th width="20%">部屋名:部屋番号</th>
-          <th width="10%">お客様名</th>
-          <th width="5%">詳細</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% user_leads.each do |lead| %>
+  <% if @step_limit_notices_user_num.present? %>
+    <h3>
+      期限通知
+      <%= @step_limit_notices_user_num.count %>人
+      <%= @step_limit_notices_total_count %>件
+    </h3>
+    <% @step_limit_notices_list.each do |user_leads| %>
+      <h4><%= user_name(user_leads.first.user_id) %></h4>
+      <table class="table table-hover">
+        <thead>
           <tr>
-            <td><%= l(Time.parse(lead.created_date), format: :shortdate) %></td>
-            <td><%= room_name_num(lead) %></td>
-            <td><%= lead.customer_name %></td>
-            <td><%= link_to "詳細", step_path(lead) %></td>
+            <th width="5%">申込日</th>
+            <th width="20%">部屋名:部屋番号</th>
+            <th width="10%">お客様名</th>
+            <th width="5%">詳細</th>
           </tr>
-        <% end %>
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          <% user_leads.each do |lead| %>
+            <tr>
+              <td><%= l(Time.parse(lead.created_date), format: :shortdate) %></td>
+              <td><%= room_name_num(lead) %></td>
+              <td><%= lead.customer_name %></td>
+              <td><%= link_to "詳細", step_path(lead) %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% end %>
   <% end %>
+
+  <% if @mystep_limit_notices.present? %>
+    <h3>
+      自分の通知:<%= @mystep_limit_notices.count %>件
+    </h3>
+    <table class="table table-hover">
+        <thead>
+          <tr>
+            <th width="5%">申込日</th>
+            <th width="20%">部屋名:部屋番号</th>
+            <th width="10%">お客様名</th>
+            <th width="5%">詳細</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @mystep_limit_notices.each do |lead| %>
+            <tr>
+              <td><%= l(Time.parse(lead.created_date), format: :shortdate) %></td>
+              <td><%= room_name_num(lead) %></td>
+              <td><%= lead.customer_name %></td>
+              <td><%= link_to "詳細", step_path(lead) %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+  <% end %>
+<% else %>
+  <h3>現在の通知はありません</h3>
 <% end %>
