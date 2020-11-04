@@ -4,6 +4,8 @@ class NotificationsController < Users::ApplicationController
   
   # superior_idに指定されたユーザー視点の通知
   def notice
+    # 入居予定日に近づいてる自分の案件の通知
+    @mystep_limit_notices = []
     # 新規作成時の通知
     @create_notices_list = [] # ユーザー毎に取得して配列に格納
     @create_notices_user_num = [] # 案件の担当ユーザーを取得
@@ -16,6 +18,12 @@ class NotificationsController < Users::ApplicationController
     @step_limit_notices_list = []
     @step_limit_notices_user_num = []
     @step_limit_notices_total_count = 0
+    # 自分の案件の通知取得ロジック
+    current_user.leads.in_progress.each do |lead|
+      if lead.steps.todo.where("scheduled_complete_date <= ?", current_user.limit_date).present?
+        @mystep_limit_notices.push(lead)
+      end
+    end
     # 企業内の全ユーザーから通知送信先がcurrent_user.id,statusがactiveのユーザーに絞る
     @active_users = @users.where(status: "active")
                           .where(superior_id: current_user.id)
