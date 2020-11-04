@@ -1,5 +1,5 @@
 <%# 全通知の有無で分岐 %>
-<% if @create_notices_user_num.present? && @limit_change_notices_user_num.present? && @step_limit_notices_user_num.present? && @mystep_limit_notices.present? %>
+<% if @create_notices_user_num.present? || @limit_change_notices_user_num.present? || @step_limit_notices_user_num.present? || @mystep_limit_notices.present? %>
   <% if @create_notices_user_num.present? %>
     <h3>
       登録時通知
