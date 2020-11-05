@@ -39,17 +39,15 @@ class Leads::StepsController < Leads::ApplicationController
 
   # GET /steps/1/edit
   def edit
+    @task = Task.new
   end
 
   # POST /steps
   # POST /steps.json
   def create
-    @step = @lead.steps.new(step_and_task_params)
+    @step = @lead.steps.new(step_params)
     if save_and_errors_of(@lead, @step).blank?
       flash[:success] = "#{flash[:success]}#{@step.name}を作成しました。"
-      #if params[:step][:completed_id].present?
-      #  @completed_step.update_attributes(status: "completed", completed_date: "#{Date.current}")
-      #  check_status_and_redirect_to(@completed_step, @step)
       if params[:step][:status].present? && params[:step][:status] == "completed"
         flash[:danger] = "「完了」タスクが無い、進捗は「完了」ステータスで新規作成しようとしています。「完了」タスクを自動で生成しました。"
         scheduled_complete_date = params[:step][:scheduled_complete_date].present? ? params[:step][:scheduled_complete_date] : "#{Date.current}"
@@ -69,6 +67,7 @@ class Leads::StepsController < Leads::ApplicationController
   # PATCH/PUT /steps/1
   # PATCH/PUT /steps/1.json
   def update
+    @task = Task.new(task_params)
     if update_and_errors_of(@lead, @step).blank?
       flash[:success] = "#{flash[:success]}#{@step.name}を更新しました。"
       check_status_and_redirect_to(@step, @step)
@@ -112,9 +111,12 @@ class Leads::StepsController < Leads::ApplicationController
     end
 
     # Only allow a list of trusted parameters through.
-    def step_and_task_params
-      params.require(:step).permit(:lead_id, :name, :memo, :status, :order, :scheduled_complete_date, :completed_date, :completed_tasks_rate,
-                          tasks_attributes: [:name, :memo, :status, :scheduled_complete_date, :completed_date, :canceled_date])
+    def step_params
+      params.require(:step).permit(:lead_id, :name, :memo, :status, :order, :scheduled_complete_date, :completed_date, :completed_tasks_rate)
+    end
+
+    def task_params
+      params.require(:task).permit(:step_id, :name, :memo, :status, :scheduled_complete_date, :completed_date, :canceled_date)
     end
     
     # クリエイト処理
@@ -143,13 +145,15 @@ class Leads::StepsController < Leads::ApplicationController
         # 条件を満たすときだけ改めて「未」のタスクを追加
         if (step.status?("in_progress") || step.status?("inactive")) && step.tasks.not_yet.blank?
           name = params[:step][:tasks_attributes]["0"]["name"]
+          memo = params[:step][:tasks_attributes]["0"]["memo"]
           scheduled_complete_date = params[:step][:tasks_attributes]["0"]["scheduled_complete_date"]
           completed_date = params[:step][:tasks_attributes]["0"]["completed_date"]
           canceled_date = params[:step][:tasks_attributes]["0"]["canceled_date"]
           # 新規タスク作成
           # バリデーションに引っ掛かったstepのidはnilのため
           if step.id.present?
-            Task.create!(step_id: step.id ,name: name, status: "not_yet", scheduled_complete_date: scheduled_complete_date, completed_date: completed_date, canceled_date: canceled_date)
+            Task.create!(step_id: step.id, name: name, memo: memo, status: "not_yet",
+                         scheduled_complete_date: scheduled_complete_date, completed_date: completed_date, canceled_date: canceled_date)
           end
         end
         # 矛盾を解消
@@ -169,18 +173,50 @@ class Leads::StepsController < Leads::ApplicationController
       ActiveRecord::Base.transaction do
         # 更新処理（バリデーションなし）
         prepare_order(step.order, params[:step][:order].to_i)
-        step.update(step_and_task_params)
+        step.update(step_params)
         lead.update_attribute(:notice_change_limit, true) if step.saved_change_to_scheduled_complete_date?
-        # 新規タスク作成
-        if params[:step][:status] == "in_progress" && step.tasks.not_yet.blank?
-          Task.create!(step_id: step.id ,name: "new_task", status: "not_yet", scheduled_complete_date: params[:step][:scheduled_complete_date])
+        # 親子モデル同時フォーム更新でできたtaskを削除
+        # バリデーションに引っ掛かったtaskのidはnilのため
+        #count = 0
+        #step_tasks_count = step.tasks.target.count
+        #step_tasks_count.times do |i|
+        #  id = step.tasks.target[i].id
+        #  count += 1 unless id.nil?
+        #end
+        #step_tasks_count.times do |i|
+        #  Task.find(i+1).destroy
+        #end
+        #if step.tasks.target.first.id.present?
+        #  new_task_id = step.tasks.target.first.id
+        #  Task.find(new_task_id).destroy
+        #end
+        # 条件を満たすときだけ改めて「未」のタスクを追加
+        if (step.status?("in_progress") || step.status?("inactive")) && step.tasks.not_yet.blank?
+          #name = params[:task]["name"]
+          #memo = params[:task]["memo"]
+          #scheduled_complete_date = params[:task]["scheduled_complete_date"]
+          #completed_date = params[:task]["completed_date"]
+          #canceled_date = params[:task]["canceled_date"]
+          # 新規タスク作成
+          # バリデーションに引っ掛かったstepのidはnilのため
+          @task.update(task_params)
+          #if @task.valid?
+          #  Task.create!(step_id: step.id, name: name, memo: memo, status: "not_yet",
+          #               scheduled_complete_date: scheduled_complete_date, completed_date: completed_date, canceled_date: canceled_date)
+          #end
+          #end
         end
+        # 新規タスク作成
+        #if params[:step][:status] == "in_progress" && step.tasks.not_yet.blank?
+        #  Task.create!(step_id: step.id ,name: "new_task", status: "not_yet", scheduled_complete_date: params[:step][:scheduled_complete_date])
+        #end
         # 矛盾を解消
         check_status_inactive_or_not(step)
         check_status_completed_or_not(lead, step)
         # バリデーション確認
         errors << lead.errors.full_messages if lead.invalid?(:check_steps_status)
         errors << step.errors.full_messages if step.invalid?(:check_order)
+        errors << step.errors.full_messages if @task.invalid?
         raise ActiveRecord::Rollback if errors.present?
       end
       errors.presence || nil

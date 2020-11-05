@@ -60,32 +60,39 @@
     
   <% end %>
 ----------------------------------------------------------------<br>
-  <%= form.fields_for :tasks do |s| %>
-    <!--%= render 'devise/shared/error_messages', resource: s.object %-->
+  <%= fields_for @task do |t| %>
+    <%= render 'devise/shared/error_messages', resource: @task %>
+
+    <%= t.hidden_field :step_id, value: step.id %>
 
     <div class="field">
-      <%= s.label :name %>
-      <%= s.text_field :name %>
+      <%= t.label :name %>
+      <%= t.text_field :name %>
     </div>
 
     <div class="field">
-      <%= s.label :memo %>
-      <%= s.text_area :memo, size: "50x3" %>
+      <%= t.label :memo %>
+      <%= t.text_area :memo, size: "50x3" %>
     </div>
 
     <div class="field">
-      <%= s.label :scheduled_complete_date %>
-      <%= s.date_field :scheduled_complete_date %><br>
+      <%= t.label :status %>
+      <%= t.select :status, Task.statuses.keys.map { |k| [I18n.t("enums.task.status.#{k}"), k]} %>
     </div>
 
     <div class="field">
-      <%= s.label :completed_date %>
-      <%= s.date_field :completed_date %><br>
+      <%= t.label :scheduled_complete_date %>
+      <%= t.date_field :scheduled_complete_date %><br>
     </div>
 
     <div class="field">
-      <%= s.label :canceled_date %>
-      <%= s.date_field :canceled_date %><br>
+      <%= t.label :completed_date %>
+      <%= t.date_field :completed_date %><br>
+    </div>
+
+    <div class="field">
+      <%= t.label :canceled_date %>
+      <%= t.date_field :canceled_date %><br>
     </div>
   <% end %>
 ----------------------------------------------------------------<br>
