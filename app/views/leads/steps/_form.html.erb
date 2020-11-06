@@ -75,10 +75,7 @@
       <%= t.text_area :memo, size: "50x3" %>
     </div>
 
-    <div class="field">
-      <%= t.label :status %>
-      <%= t.select :status, Task.statuses.keys.map { |k| [I18n.t("enums.task.status.#{k}"), k]} %>
-    </div>
+    <%= t.hidden_field :status, value: "not_yet" %>
 
     <div class="field">
       <%= t.label :scheduled_complete_date %>

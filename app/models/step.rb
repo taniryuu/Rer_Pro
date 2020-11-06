@@ -1,7 +1,6 @@
 class Step < ApplicationRecord
   belongs_to :lead
   has_many :tasks, dependent: :destroy, inverse_of: :step
-  #accepts_nested_attributes_for :tasks, allow_destroy: true
   scope :ord, -> { order(:order) }
   
   validates :name, presence: true, length: { in: 2..50 }

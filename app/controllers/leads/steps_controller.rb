@@ -175,41 +175,9 @@ class Leads::StepsController < Leads::ApplicationController
         prepare_order(step.order, params[:step][:order].to_i)
         step.update(step_params)
         lead.update_attribute(:notice_change_limit, true) if step.saved_change_to_scheduled_complete_date?
-        # 親子モデル同時フォーム更新でできたtaskを削除
-        # バリデーションに引っ掛かったtaskのidはnilのため
-        #count = 0
-        #step_tasks_count = step.tasks.target.count
-        #step_tasks_count.times do |i|
-        #  id = step.tasks.target[i].id
-        #  count += 1 unless id.nil?
-        #end
-        #step_tasks_count.times do |i|
-        #  Task.find(i+1).destroy
-        #end
-        #if step.tasks.target.first.id.present?
-        #  new_task_id = step.tasks.target.first.id
-        #  Task.find(new_task_id).destroy
-        #end
-        # 条件を満たすときだけ改めて「未」のタスクを追加
         if (step.status?("in_progress") || step.status?("inactive")) && step.tasks.not_yet.blank?
-          #name = params[:task]["name"]
-          #memo = params[:task]["memo"]
-          #scheduled_complete_date = params[:task]["scheduled_complete_date"]
-          #completed_date = params[:task]["completed_date"]
-          #canceled_date = params[:task]["canceled_date"]
-          # 新規タスク作成
-          # バリデーションに引っ掛かったstepのidはnilのため
           @task.update(task_params)
-          #if @task.valid?
-          #  Task.create!(step_id: step.id, name: name, memo: memo, status: "not_yet",
-          #               scheduled_complete_date: scheduled_complete_date, completed_date: completed_date, canceled_date: canceled_date)
-          #end
-          #end
         end
-        # 新規タスク作成
-        #if params[:step][:status] == "in_progress" && step.tasks.not_yet.blank?
-        #  Task.create!(step_id: step.id ,name: "new_task", status: "not_yet", scheduled_complete_date: params[:step][:scheduled_complete_date])
-        #end
         # 矛盾を解消
         check_status_inactive_or_not(step)
         check_status_completed_or_not(lead, step)
