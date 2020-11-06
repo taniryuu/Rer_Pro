@@ -39,7 +39,7 @@
                     <td><%= l(Time.parse(lead.created_date), format: :shortdate) %></td>
                     <td><%= room_name_num(lead) %></td>
                     <td><%= lead.customer_name %></td>
-                    <td><%= link_to "詳細", step_path(lead) %></td>
+                    <td><%= link_to "詳細", step_path(working_step_in(lead)) %></td>
                   </tr>
                 <% end %>
               </tbody>
@@ -75,7 +75,7 @@
               <td><%= room_name_num(lead) %></td>
               <td><%= lead.customer_name %></td>
               <td><%= lead.memo %></td>
-              <td><%= link_to "詳細", step_path(lead) %></td>
+              <td><%= link_to "詳細", step_path(working_step_in(lead)) %></td>
             </tr>
           <% end %>
         </tbody>
@@ -106,7 +106,7 @@
               <td><%= l(Time.parse(lead.created_date), format: :shortdate) %></td>
               <td><%= room_name_num(lead) %></td>
               <td><%= lead.customer_name %></td>
-              <td><%= link_to "詳細", step_path(lead) %></td>
+              <td><%= link_to "詳細", step_path(working_step_in(lead)) %></td>
             </tr>
           <% end %>
         </tbody>
@@ -133,7 +133,7 @@
               <td><%= l(Time.parse(lead.created_date), format: :shortdate) %></td>
               <td><%= room_name_num(lead) %></td>
               <td><%= lead.customer_name %></td>
-              <td><%= link_to "詳細", step_path(lead) %></td>
+              <td><%= link_to "詳細", step_path(working_step_in(lead)) %></td>
             </tr>
           <% end %>
         </tbody>
