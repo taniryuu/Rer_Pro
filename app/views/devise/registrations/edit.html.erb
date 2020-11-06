@@ -40,7 +40,7 @@
 
   <div class="field">
     <%= f.label :superior_id %><br/>
-    <%= f.select :superior_id, member_list(superior_users(@users, @user)), autocomplete: "superior_id" %>
+    <%= f.select :superior_id, users_list(superior_users(@users, @user)), autocomplete: "superior_id" %>
   </div>
 
   <div class="field">

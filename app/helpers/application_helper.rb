@@ -1,15 +1,15 @@
 module ApplicationHelper
-  # 引数のusersで取ってきた複数のユーザーをmember_listにpushしてリストを作成
-  def member_list(users)
-    member_list = []
+  # 引数のusersで取ってきた複数のユーザーをusers_listにpushしてリストを作成
+  def users_list(users)
+    users_list = []
     if users.present?
       users.each do |user|
-        member_list.push(["#{user.name}", user.id])
+        users_list.push(["#{user.name}", user.id])
       end
     else
-      member_list.push(["該当する社員がいません"])
+      users_list.push(["該当する社員がいません"])
     end
-    return member_list
+    return users_list
   end
 
   # set_usersをbefore_actionしていて引数のusersに@usersを充てる
