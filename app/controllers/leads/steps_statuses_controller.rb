@@ -1,5 +1,6 @@
 class Leads::StepsStatusesController < Leads::StepsController
-  before_action :set_steps, only: %i(cancel)
+  before_action :set_steps, only: %i(cancel start)
+  before_action :set_tasks, only: %i(start)
   
   def complete
     if params[:completed_id].present?
@@ -25,11 +26,36 @@ class Leads::StepsStatusesController < Leads::StepsController
   end
   
   def start
-    start_step(@lead, @step)
+    errors = []
+    ActiveRecord::Base.transaction do
+      # 新規タスク作成
+      if (@step.status?("in_progress") || @step.status?("inactive") || @step.status?("not_yet")) && @step.tasks.not_yet.blank?
+        @task = @step.tasks.create(task_params)
+        errors << @task.errors.full_messages if @task.invalid?
+      end
+      raise ActiveRecord::Rollback if errors.present?
+    end
+    if errors.present?
+      render 'leads/steps/show'
+    else
+      start_step(@lead, @step)
+    end
   end
   
   def cancel
     cancel_step(@lead, @step)
   end
   
+  private
+
+    def task_params
+      params.require(:task).permit(:step_id, :name, :memo, :status, :scheduled_complete_date, :completed_date, :canceled_date)
+    end
+
+    def set_tasks
+      @tasks = @step.tasks.not_yet.order(:scheduled_complete_date)
+      @completed_tasks = @step.tasks.completed.order(:completed_date)
+      @canceled_tasks = @step.tasks.canceled.order(:canceled_date)
+    end
+
 end
