@@ -3,7 +3,7 @@ class UsersController < NotificationsController
 
   # オブジェクトの準備
   before_action :set_user, only: %i(show)
-  before_action :set_users, only: %i(index show)
+  before_action :set_users, only: %i(index show destroy)
   before_action :notice, only: :show
   # アクセス制限
   before_action :current_user_admin?, only: %i(new create destroy)
@@ -31,7 +31,7 @@ class UsersController < NotificationsController
   end
 
   def destroy
-    @user = User.find_by(id: params[:command])
+    @user = @users.find_by(id: params[:command])
     if @user.present? && delete_judgment(@user)
       if DELETE_COMMAND == params[:input_delete]
         if @user.leads.find_by(completed_date: "").blank?
