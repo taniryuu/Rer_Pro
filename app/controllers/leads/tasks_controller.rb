@@ -6,6 +6,7 @@ class Leads::TasksController < Leads::ApplicationController
   before_action :set_step_by_id, only: [:edit_add_delete_list, :update_add_delete_list, :edit_continue_or_destroy_step,
                                         :edit_complete_or_continue_step, :edit_change_status_or_complete_task, :complete_all_tasks]
   before_action :set_steps, only: :edit_complete_or_continue_step
+  before_action :set_new_task, only: %i(edit_continue_or_destroy_step edit_complete_or_continue_step edit_change_status_or_complete_task)
   # アクセス制限
   before_action :correct_user, except: %i(index show)
 
@@ -137,10 +138,8 @@ class Leads::TasksController < Leads::ApplicationController
   def edit_continue_or_destroy_step
   end
 
-
   def edit_complete_or_continue_step
   end
-
 
   def edit_change_status_or_complete_task
   end
@@ -178,6 +177,10 @@ class Leads::TasksController < Leads::ApplicationController
       @user = User.find(@lead.user_id)
     end
 
+    def set_new_task
+      @task = @step.tasks.new
+    end
+
     def task_params
       params.require(:task).permit(:step_id, :name, :memo, :status, :scheduled_complete_date, :completed_date, :canceled_date)
     end
@@ -191,8 +194,4 @@ class Leads::TasksController < Leads::ApplicationController
       day.blank? ? false : Date.parse(day) < Date.current
     end
 
-    def create_new_task_step_in_progress(lead, step)
-      Task.create!(step_id: step.id ,name: "new_task", status: "not_yet", scheduled_complete_date: "#{Date.current}")
-      redirect_to step_statuses_start_step_url(@step)
-    end
 end

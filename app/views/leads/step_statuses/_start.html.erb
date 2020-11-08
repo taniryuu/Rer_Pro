@@ -1,6 +1,9 @@
 <%= form_with(url: start_step_path(step, completed_id: completed_id, new_task: new_task, task: task), model: step, local: true) do |form| %>
-  <%= form.label :scheduled_complete_date %>
-  <%= form.date_field :scheduled_complete_date, value: step.scheduled_complete_date %>
+  <div class="field">
+    <%= form.label :scheduled_complete_date %>
+    <%= form.date_field :scheduled_complete_date, value: step.scheduled_complete_date %>
+  </div>
+  <p>新しいタスク:</p>
   <%= form.hidden_field :new_task, value: new_task %>
   <%= fields_for task do |t| %>
     <%= render 'devise/shared/error_messages', resource: task %>
