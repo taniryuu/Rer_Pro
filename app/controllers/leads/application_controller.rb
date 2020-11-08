@@ -27,20 +27,26 @@ class Leads::ApplicationController < Users::ApplicationController
         @completed_step = Step.find(params[:completed_id])
         complete_step(lead, @completed_step, @completed_step.latest_date)
       end
+      # 新規タスク作成
+      if (@step.status?("in_progress") || @step.status?("inactive") || @step.status?("not_yet")) && @step.tasks.not_yet.blank?
+        @task = @step.tasks.create(task_simple_params)
+        #errors << @task.errors.full_messages if @task.invalid?
+      end
       # 案件を再開する場合の処理
       start_lead(lead) unless lead.status?("in_progress")
       # 矛盾を解消
       check_status_completed_or_not(lead, step)
       # バリデーション確認
-      raise ActiveRecord::Rollback if lead.invalid?(:check_steps_status) || step.errors.present?
+      raise ActiveRecord::Rollback if lead.invalid?(:check_steps_status) || step.errors.present? || @task.errors.present?
     end
-    if lead.errors.present? || step.errors.present?
+    if lead.errors.present? || step.errors.present? || @task.errors.present?
       flash.delete(:success)
       flash[:danger] = "#{flash[:danger]}#{lead.errors.full_messages.first}" if lead.errors.present?
       flash[:danger] = "#{flash[:danger]}#{step.errors.full_messages.first}" if step.errors.present?
+      flash[:danger] = "#{flash[:danger]}#{@task.errors.full_messages.first}" if @task.errors.present?
     end
     
-    if params[:completed_id].present? && lead.errors.blank? && step.errors.blank?
+    if params[:completed_id].present? && lead.errors.blank? && step.errors.blank? && task.errors.blank?
       check_status_and_redirect_to(@completed_step, step)
     else 
       redirect_to step
@@ -249,5 +255,9 @@ class Leads::ApplicationController < Users::ApplicationController
       @steps_except_self = @steps.not_self(@step)
       @steps_from_now_on = @steps_except_self.todo
     end
-    
+
+    def task_simple_params
+      #params.require(:task).permit(:step_id, :name, :memo, :status, :scheduled_complete_date, :completed_date, :canceled_date)
+      params.require(:task).permit(:step_id, :name, :status, :scheduled_complete_date)
+    end
 end
