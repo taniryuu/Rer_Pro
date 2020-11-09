@@ -52,10 +52,20 @@ class Leads::StepsController < Leads::ApplicationController
       if params[:step][:status].present? && params[:step][:status] == "completed"
         flash[:danger] = "「完了」タスクが無い、進捗は「完了」ステータスで新規作成しようとしています。「完了」タスクを自動で生成しました。"
         scheduled_complete_date = params[:step][:scheduled_complete_date].present? ? params[:step][:scheduled_complete_date] : "#{Date.current}"
-        Task.create!(step_id: @step.id ,name: "completed_task", status: "completed", scheduled_complete_date: scheduled_complete_date, completed_date: params[:step][:completed_date]) 
-        check_status_and_redirect_to(@step, @step)
+        Task.create!(step_id: @step.id ,name: "completed_task", status: "completed", scheduled_complete_date: scheduled_complete_date, completed_date: params[:step][:completed_date])
+        # 編集-完了から進捗を新規作成した場合
+        if @completed_step.present?
+          check_status_and_redirect_to(@completed_step, @step)
+        else
+          check_status_and_redirect_to(@step, @step)
+        end
       else
-        redirect_to @step
+        # 編集-完了から進捗を新規作成した場合
+        if @completed_step.present?
+          check_status_and_redirect_to(@completed_step, @step)
+        else
+          check_status_and_redirect_to(@step, @step)
+        end
       end
     else
       flash.delete(:success)
@@ -137,9 +147,9 @@ class Leads::StepsController < Leads::ApplicationController
           @start_lead_flag = true
           errors << lead.errors.full_messages unless start_lead(lead)
         end
-        # 新規タスク作成
-        if (step.status?("in_progress") || step.status?("inactive") || step.status?("not_yet")) && step.tasks.not_yet.blank?
-          @task =Task.create(task_params)
+        # stepが「未」のときはtaskを作らない
+        if step.status?("not_yet")
+          @task.destroy
         end
         # 矛盾を解消
         check_status_inactive_or_not(step)
@@ -162,7 +172,7 @@ class Leads::StepsController < Leads::ApplicationController
         step.update(step_params)
         lead.update_attribute(:notice_change_limit, true) if step.saved_change_to_scheduled_complete_date?
         # 新規タスク作成
-        if (step.status?("in_progress") || step.status?("inactive") || step.status?("not_yet")) && step.tasks.not_yet.blank?
+        if (step.status?("in_progress") || step.status?("inactive")) && step.tasks.not_yet.blank?
           @task =Task.create(task_params)
         end
         # 矛盾を解消

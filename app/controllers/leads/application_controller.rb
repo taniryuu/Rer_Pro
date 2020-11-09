@@ -28,7 +28,7 @@ class Leads::ApplicationController < Users::ApplicationController
         complete_step(lead, @completed_step, @completed_step.latest_date)
       end
       # 新規タスク作成
-      if (@step.status?("in_progress") || @step.status?("inactive") || @step.status?("not_yet")) && @step.tasks.not_yet.blank?
+      if (@step.status?("in_progress") || @step.status?("inactive")) && @step.tasks.not_yet.blank?
         @task = @step.tasks.create(task_simple_params)
       end
       # 案件を再開する場合の処理
@@ -42,7 +42,7 @@ class Leads::ApplicationController < Users::ApplicationController
       flash.delete(:success)
       flash[:danger] = "#{flash[:danger]}#{lead.errors.full_messages.first}" if lead.errors.present?
       flash[:danger] = "#{flash[:danger]}#{step.errors.full_messages.first}" if step.errors.present?
-      flash[:danger] = "#{flash[:danger]}#{@task.errors.full_messages.first}" if @task.errors.present?
+      flash[:danger] = "#{flash[:danger]}#{@task.errors.full_messages.first}" if @task.present? && @task.errors.present?
     end
     
     if params[:completed_id].present? && lead.errors.blank? && step.errors.blank? && (@task.present? && @task.errors.blank?)
