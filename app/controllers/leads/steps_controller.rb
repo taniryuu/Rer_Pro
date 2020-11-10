@@ -147,8 +147,8 @@ class Leads::StepsController < Leads::ApplicationController
           @start_lead_flag = true
           errors << lead.errors.full_messages unless start_lead(lead)
         end
-        # stepが「未」のときはtaskを作らない
-        if step.status?("not_yet")
+        # stepが「未」または「完了」のときはtaskを作らない
+        if step.status?("not_yet") || step.status?("completed")
           @task.destroy
         end
         # 矛盾を解消

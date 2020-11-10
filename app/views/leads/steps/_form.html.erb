@@ -67,9 +67,9 @@
 
     <div class="field">
       <%= t.label :name %>
-      <%= t.text_field :name %>
+      <%= t.text_field :name %><br>
+      ↑ 入力必須<br>
     </div>
-
     <div class="field">
       <%= t.label :memo %>
       <%= t.text_area :memo, size: "50x3" %>
@@ -80,8 +80,8 @@
     <div class="field">
       <%= t.label :scheduled_complete_date %>
       <%= t.date_field :scheduled_complete_date %><br>
+       ↑ 入力必須<br>
     </div>
-
     <div class="field">
       <%= t.label :completed_date %>
       <%= t.date_field :completed_date %><br>

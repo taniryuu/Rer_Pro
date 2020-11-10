@@ -1,4 +1,4 @@
-<h3><%= step_name(@step) %>:</h3>
+<h3><%= step_name(@step) %>のステータスは「完了」ですが、「未」のタスクがあります</h3>
 <h4>&#9312;現在の進捗を「未」にする</h4>
 <%= button_to '更新', statuses_make_step_not_yet_step_path(@step), method: :patch %>
 <br>
