@@ -52,6 +52,7 @@ ActiveRecord::Schema.define(version: 2020_08_31_123021) do
     t.string "completed_date", default: "", null: false
     t.string "canceled_date", default: "", null: false
     t.integer "completed_tasks_rate", default: 0, null: false
+    t.boolean "notice_change_limit", default: false, null: false
     t.integer "lead_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -91,6 +92,7 @@ ActiveRecord::Schema.define(version: 2020_08_31_123021) do
     t.datetime "updated_at", null: false
     t.index ["company_id"], name: "index_users_on_company_id"
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["login_id"], name: "index_users_on_login_id", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 

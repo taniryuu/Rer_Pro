@@ -9,6 +9,7 @@ class CreateSteps < ActiveRecord::Migration[5.2]
       t.string :completed_date, null: false, default: ""
       t.string :canceled_date, null: false, default: ""
       t.integer :completed_tasks_rate, null: false, default: 0
+      t.boolean :notice_change_limit, null: false, default: false
 
       t.references :lead, foreign_key: true
       
