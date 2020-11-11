@@ -28,8 +28,8 @@ class Leads::ApplicationController < Users::ApplicationController
         complete_step(lead, @completed_step, @completed_step.latest_date)
       end
       # 新規タスク作成
-      if (@step.status?("in_progress") || @step.status?("inactive")) && @step.tasks.not_yet.blank?
-        @task = @step.tasks.create(task_simple_params)
+      if (step.status?("in_progress") || step.status?("inactive")) && step.tasks.not_yet.blank?
+        @task = step.tasks.create(task_simple_params)
       end
       # 案件を再開する場合の処理
       start_lead(lead) unless lead.status?("in_progress")
@@ -256,7 +256,6 @@ class Leads::ApplicationController < Users::ApplicationController
     end
 
     def task_simple_params
-      #params.require(:task).permit(:step_id, :name, :memo, :status, :scheduled_complete_date, :completed_date, :canceled_date)
       params.require(:task).permit(:step_id, :name, :status, :scheduled_complete_date)
     end
 end

@@ -54,20 +54,9 @@ class Leads::StepsController < Leads::ApplicationController
         flash[:danger] = "「完了」タスクが無い、進捗は「完了」ステータスで新規作成しようとしています。「完了」タスクを自動で生成しました。"
         scheduled_complete_date = params[:step][:scheduled_complete_date].present? ? params[:step][:scheduled_complete_date] : "#{Date.current}"
         Task.create!(step_id: @step.id ,name: "completed_task", status: "completed", scheduled_complete_date: scheduled_complete_date, completed_date: params[:step][:completed_date])
-        # 編集-完了から進捗を新規作成した場合
-        if @completed_step.present?
-          check_status_and_redirect_to(@completed_step, @step)
-        else
-          check_status_and_redirect_to(@step, @step)
-        end
-      else
-        # 編集-完了から進捗を新規作成した場合
-        if @completed_step.present?
-          check_status_and_redirect_to(@completed_step, @step)
-        else
-          check_status_and_redirect_to(@step, @step)
-        end
       end
+      # 編集-完了から進捗を新規作成した場合
+      @completed_step.present? ? check_status_and_redirect_to(@completed_step, @step) : check_status_and_redirect_to(@step, @step)
     else
       flash.delete(:success)
       flash.now[:danger] = "#{@lead.errors.full_messages.first}" if @lead.errors.present?
