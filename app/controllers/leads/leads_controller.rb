@@ -1,6 +1,7 @@
 class Leads::LeadsController < Leads::ApplicationController
   # オブジェクトの準備
   before_action :set_lead_and_user, except: %i(index new create)
+  before_action :set_users, only: %i(index edit_user_id)
   # フィルター（アクセス権限）
   before_action :only_same_company_id?, except: %i(index new create)
   before_action :correct_user, only: %i(edit update)
@@ -10,10 +11,6 @@ class Leads::LeadsController < Leads::ApplicationController
   # GET /leads
   # GET /leads.json
   def index
-    @users = []
-    User.where(company_id: current_user.company_id).each do |user|
-      @users.push(["#{user.name}", user.id])
-    end
     user_ids_all = User.where(company_id: current_user.company_id).pluck(:id)
     user_ids = params[:user_searchword].present? ? params[:user_searchword] : user_ids_all
     params_sort = params[:sort].present? ? params[:sort] : "created_date desc"

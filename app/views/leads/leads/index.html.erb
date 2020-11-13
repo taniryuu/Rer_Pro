@@ -6,7 +6,7 @@
   <% if params[:user_searchword].blank? %>
     <h1>案件一覧</h1>
   <% else %>
-    <% @user = User.find(params[:user_searchword]) %>
+    <% @user = @users.find(params[:user_searchword]) %>
     <h1><%= link_to @user.name, user_path(@user) %>担当案件一覧</h1>
   <% end %>
   <div class="row">
@@ -28,7 +28,7 @@
               <th colspan="1">担当者名
                 <%= render "index_sort", mark: " ▼ ", sort: "user_id" %>
                 <%= render "index_sort", mark: " ▲ ", sort: "user_id desc" %>
-                <%= f.select :user_searchword, @users, selected: params[:user_searchword].to_i, class: "form-control-search", multiple: true, include_blank: true %>
+                <%= f.select :user_searchword, users_list(@users), selected: params[:user_searchword].to_i, class: "form-control-search", multiple: true, include_blank: true %>
               </th>
               <th colspan="1">物件名/部屋番号
                 <%= render "index_sort", mark: " ▼ ", sort: "room_name" %>
@@ -62,7 +62,7 @@
           <% @leads.each do |lead| %>
             <tr>
               <td><%= "#{lead.status_i18n}" %><br>(ここに遅延状況を表示)</td>
-              <td><%= User.find(lead.user_id).name %></td>
+              <td><%= @users.find(lead.user_id).name %></td>
               <td><%= "#{lead.room_name} / #{lead.room_num}号室" %></td>
               <td><%= lead.customer_name %></td>
               <td><%= l(Time.parse(lead.scheduled_resident_date), format: :shortdate) %></td>
@@ -92,4 +92,3 @@
     </div>
   </div>
 </div>
-
