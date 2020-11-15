@@ -18,8 +18,12 @@
   </div>
   <div>
     <%= f.label :scheduled_complete_date, class: "label-#{yield(:class_text)}" %>
-    <%= f.date_field :scheduled_complete_date, value: Date.parse(@task.scheduled_complete_date) %>
-  </div>  
+    <% if @task.scheduled_complete_date.present? %>
+      <%= f.date_field :scheduled_complete_date, value: Date.parse(@task.scheduled_complete_date) %>
+    <% else %>
+      <%= f.date_field :scheduled_complete_date %>
+    <% end %>
+  </div>
   <div>
     <%= f.label :completed_date, class: "label-#{yield(:class_text)}" %>
     <% if @task.completed_date.present? %>
@@ -42,5 +46,5 @@
   <%= f.hidden_field :step_id, class: "form-control", value: @step.id %>
 
 <% end %>
-<!-- tasks#showに戻る -->
-<%= button_to '戻る', task_path(@step), method: :get, class: "btn-#{yield(:class_text)}" %>
+<!-- steps#showに戻る -->
+<%= button_to '戻る', step_path(@step), method: :get, class: "btn-#{yield(:class_text)}" %>

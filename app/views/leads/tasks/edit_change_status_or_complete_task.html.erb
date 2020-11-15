@@ -1,9 +1,9 @@
-<h3><%= step_name(@step) %>:</h3>
+<h3><%= step_name(@step) %>のステータスは「完了」ですが、「未」のタスクがあります</h3>
 <h4>&#9312;現在の進捗を「未」にする</h4>
 <%= button_to '更新', statuses_make_step_not_yet_step_path(@step), method: :patch %>
 <br>
 <h4>&#9313;現在の進捗を「進捗中」にする</h4>
-<%= render 'leads/step_statuses/start', step: @step, completed_id: nil, new_task: nil, button_name: "開始" %>
+<%= render 'leads/step_statuses/start', step: @step, completed_id: nil, new_task: nil, task: @task, button_name: "開始" %>
 <br>
 <h4>&#9314;現在の進捗を「保留」にする</h4>
 <%= button_to '更新', cancel_step_path(@step), method: :patch %>

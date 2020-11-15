@@ -35,29 +35,28 @@ class Leads::StepsController < Leads::ApplicationController
     @step = @lead.steps.new
     @completed_step = Step.find(params[:completed_id]) if params[:completed_id].present?
     @start_lead_flag = true if params[:start_lead_flag].present?
+    @task = Task.new
   end
 
   # GET /steps/1/edit
   def edit
+    @task = Task.new
   end
 
   # POST /steps
   # POST /steps.json
   def create
     @step = @lead.steps.new(step_params)
+    @task = @step.tasks.new(task_params)
     if save_and_errors_of(@lead, @step).blank?
       flash[:success] = "#{flash[:success]}#{@step.name}を作成しました。"
-      #if params[:step][:completed_id].present?
-      #  @completed_step.update_attributes(status: "completed", completed_date: "#{Date.current}")
-      #  check_status_and_redirect_to(@completed_step, @step)
       if params[:step][:status].present? && params[:step][:status] == "completed"
         flash[:danger] = "「完了」タスクが無い、進捗は「完了」ステータスで新規作成しようとしています。「完了」タスクを自動で生成しました。"
         scheduled_complete_date = params[:step][:scheduled_complete_date].present? ? params[:step][:scheduled_complete_date] : "#{Date.current}"
-        Task.create!(step_id: @step.id ,name: "completed_task", status: "completed", scheduled_complete_date: scheduled_complete_date, completed_date: params[:step][:completed_date]) 
-        check_status_and_redirect_to(@step, @step)
-      else
-        redirect_to @step
+        Task.create!(step_id: @step.id ,name: "completed_task", status: "completed", scheduled_complete_date: scheduled_complete_date, completed_date: params[:step][:completed_date])
       end
+      # 編集-完了から進捗を新規作成した場合
+      @completed_step.present? ? check_status_and_redirect_to(@completed_step, @step) : check_status_and_redirect_to(@step, @step)
     else
       flash.delete(:success)
       flash.now[:danger] = "#{@lead.errors.full_messages.first}" if @lead.errors.present?
@@ -69,6 +68,7 @@ class Leads::StepsController < Leads::ApplicationController
   # PATCH/PUT /steps/1
   # PATCH/PUT /steps/1.json
   def update
+    @task = Task.new(task_params)
     if update_and_errors_of(@lead, @step).blank?
       flash[:success] = "#{flash[:success]}#{@step.name}を更新しました。"
       check_status_and_redirect_to(@step, @step)
@@ -127,6 +127,10 @@ class Leads::StepsController < Leads::ApplicationController
     def step_params
       params.require(:step).permit(:lead_id, :name, :memo, :status, :order, :scheduled_complete_date, :completed_date, :completed_tasks_rate)
     end
+
+    def task_params
+      params.require(:task).permit(:step_id, :name, :memo, :status, :scheduled_complete_date, :completed_date, :canceled_date)
+    end
     
     # クリエイト処理
     def save_and_errors_of(lead, step)
@@ -145,9 +149,9 @@ class Leads::StepsController < Leads::ApplicationController
           @start_lead_flag = true
           errors << lead.errors.full_messages unless start_lead(lead)
         end
-        # 新規タスク作成
-        if (step.status?("in_progress") || step.status?("inactive")) && step.tasks.not_yet.blank? 
-          Task.create!(step_id: step.id ,name: "new_task", status: "not_yet", scheduled_complete_date: params[:step][:scheduled_complete_date])
+        # stepが「未」または「完了」のときはtaskを作らない
+        if step.status?("not_yet") || step.status?("completed")
+          @task.destroy
         end
         # 矛盾を解消
         check_status_inactive_or_not(step)
@@ -155,6 +159,7 @@ class Leads::StepsController < Leads::ApplicationController
         # バリデーション確認
         errors << lead.errors.full_messages if lead.invalid?(:check_steps_status)
         errors << step.errors.full_messages if step.invalid?(:check_order)
+        errors << @task.errors.full_messages if @task.invalid?
         raise ActiveRecord::Rollback if errors.present?
       end
       errors.presence || nil
@@ -169,8 +174,8 @@ class Leads::StepsController < Leads::ApplicationController
         step.update(step_params)
         lead.update_attribute(:notice_change_limit, true) if step.saved_change_to_scheduled_complete_date?
         # 新規タスク作成
-        if params[:step][:status] == "in_progress" && step.tasks.not_yet.blank?
-          Task.create!(step_id: step.id ,name: "new_task", status: "not_yet", scheduled_complete_date: params[:step][:scheduled_complete_date])
+        if (step.status?("in_progress") || step.status?("inactive")) && step.tasks.not_yet.blank?
+          @task =Task.create(task_params)
         end
         # 矛盾を解消
         check_status_inactive_or_not(step)
@@ -178,6 +183,7 @@ class Leads::StepsController < Leads::ApplicationController
         # バリデーション確認
         errors << lead.errors.full_messages if lead.invalid?(:check_steps_status)
         errors << step.errors.full_messages if step.invalid?(:check_order)
+        errors << @task.errors.full_messages if @task.invalid?
         raise ActiveRecord::Rollback if errors.present?
       end
       errors.presence || nil

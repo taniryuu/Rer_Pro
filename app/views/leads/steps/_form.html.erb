@@ -60,7 +60,38 @@
     
   <% end %>
 ----------------------------------------------------------------<br>
-ここで一緒にタスクを追加、編集できると良い。<br>
+  <%= fields_for @task do |t| %>
+    <%= render 'devise/shared/error_messages', resource: @task %>
+
+    <%= t.hidden_field :step_id, value: step.id %>
+
+    <div class="field">
+      <%= t.label :name %>
+      <%= t.text_field :name %><br>
+      ↑ 入力必須<br>
+    </div>
+    <div class="field">
+      <%= t.label :memo %>
+      <%= t.text_area :memo, size: "50x3" %>
+    </div>
+
+    <%= t.hidden_field :status, value: "not_yet" %>
+
+    <div class="field">
+      <%= t.label :scheduled_complete_date %>
+      <%= t.date_field :scheduled_complete_date %><br>
+       ↑ 入力必須<br>
+    </div>
+    <div class="field">
+      <%= t.label :completed_date %>
+      <%= t.date_field :completed_date %><br>
+    </div>
+
+    <div class="field">
+      <%= t.label :canceled_date %>
+      <%= t.date_field :canceled_date %><br>
+    </div>
+  <% end %>
 ----------------------------------------------------------------<br>
   <div class="actions">
     <%= form.submit %>
