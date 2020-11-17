@@ -49,9 +49,6 @@ class Leads::ApplicationController < Users::ApplicationController
       check_status_and_redirect_to(@completed_step, step, nil)
     elsif params[:completed_id].present?
       check_status_and_redirect_to(@completed_step, step, "true")
-    #  @steps = lead.steps.all.ord
-    #  @steps_except_self = @steps.not_self(@completed_step)
-    #  render :'leads/step_statuses/_index'
     else
       check_status_and_redirect_to(step, step, roop_ok)
     end
@@ -243,11 +240,11 @@ class Leads::ApplicationController < Users::ApplicationController
 
   #$through_check_statusに応じてリダイレクト先を選択する
   def check_status_and_redirect_to(step, redirect_to_step, roop_ok)
-    if  $through_check_status == false
-      $through_check_status = true
-      redirect_to check_status_and_get_url(step, redirect_to_step)
-    elsif roop_ok.present? && roop_ok == "true"
+    if roop_ok.present? && roop_ok == "true"
       $through_check_status = false
+      redirect_to check_status_and_get_url(step, redirect_to_step)
+    elsif  $through_check_status == false
+      $through_check_status = true
       redirect_to check_status_and_get_url(step, redirect_to_step)
     else
       redirect_to redirect_to_step
