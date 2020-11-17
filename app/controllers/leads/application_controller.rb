@@ -248,12 +248,12 @@ class Leads::ApplicationController < Users::ApplicationController
 
 
   private
-    # 進捗一覧を取得
-    def set_leads
-      user_ids_all = User.where(company_id: current_user.company_id).pluck(:id)
+    # 案件一覧を取得
+    def set_leads(leads)
+      user_ids_all = @users.pluck(:id)
       user_ids = params[:user_searchword].present? ? params[:user_searchword] : user_ids_all
       params_sort = params[:sort].present? ? params[:sort] : "created_date desc"
-      @leads = Lead.where(user_id: user_ids)
+      @leads = leads.where(user_id: user_ids)
                     .search("room_name", params[:room_searchword])
                     .search("customer_name", params[:customer_searchword])
                     .order(params_sort)

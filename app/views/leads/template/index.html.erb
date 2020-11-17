@@ -2,10 +2,10 @@
 
 <div class="container">
   <% if params[:user_searchword].blank? %>
-    <h1>案件一覧</h1>
+    <h1>テンプレート一覧</h1>
   <% else %>
     <% @user = @users.find(params[:user_searchword]) %>
-    <h1><%= link_to @user.name, user_path(@user) %>担当案件一覧</h1>
+    <h1><%= link_to @user.name, user_path(@user) %>作成テンプレート一覧</h1>
   <% end %>
   <%= render "leads/index/main", leads: @leads %>
 </div>

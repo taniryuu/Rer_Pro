@@ -17,31 +17,30 @@
               <%= f.submit "絞る(ｿｰﾄﾘｾｯﾄ)", class: "btn btn-primary btn-search" %>
             </th>
             <th colspan="1">担当者名
-              <%= render "index_sort", mark: " ▼ ", sort: "user_id" %>
-              <%= render "index_sort", mark: " ▲ ", sort: "user_id desc" %>
+              <%= render "leads/index/sort", mark: " ▼ ", sort: "user_id" %>
+              <%= render "leads/index/sort", mark: " ▲ ", sort: "user_id desc" %>
               <%= f.select :user_searchword, users_list(@users), selected: params[:user_searchword].to_i, class: "form-control-search", multiple: true, include_blank: true %>
             </th>
             <th colspan="1">物件名/部屋番号
-              <%= render "index_sort", mark: " ▼ ", sort: "room_name" %>
-              <%= render "index_sort", mark: " ▲ ", sort: "room_name desc" %>
+              <%= render "leads/index/sort", mark: " ▼ ", sort: "room_name" %>
+              <%= render "leads/index/sort", mark: " ▲ ", sort: "room_name desc" %>
               <%= f.search_field :room_searchword, class: "form-control-search", placeholder: search_message, value: params[:room_searchword], size: "10×10" %>
             </th>
             <th colspan="1">お客様名
-              <%= render "index_sort", mark: " ▼ ", sort: "customer_name" %>
-              <%= render "index_sort", mark: " ▲ ", sort: "customer_name desc" %>
+              <%= render "leads/index/sort", mark: " ▼ ", sort: "customer_name" %>
+              <%= render "leads/index/sort", mark: " ▲ ", sort: "customer_name desc" %>
               <%= f.search_field :customer_searchword, class: "form-control-search", placeholder: search_message, value: params[:customer_searchword], size: "10×10" %>
             </th>
             <th colspan="1">入居予定日
-              <%= render "index_sort", mark: " ▼ ", sort: "scheduled_resident_date" %>
-              <%= render "index_sort", mark: " ▲ ", sort: "scheduled_resident_date desc" %>
+              <%= render "leads/index/sort", mark: " ▲ ", sort: "scheduled_resident_date desc" %>
             </th>
             <th colspan="1">入金予定日
-              <%= render "index_sort", mark: " ▼ ", sort: "scheduled_payment_date" %>
-              <%= render "index_sort", mark: " ▲ ", sort: "scheduled_payment_date desc" %>
+              <%= render "leads/index/sort", mark: " ▼ ", sort: "scheduled_payment_date" %>
+              <%= render "leads/index/sort", mark: " ▲ ", sort: "scheduled_payment_date desc" %>
             </th>
             <th colspan="1">進捗状況
-              <%= render "index_sort", mark: " ▼ ", sort: "steps_rate" %>
-              <%= render "index_sort", mark: " ▲ ", sort: "steps_rate desc" %>
+              <%= render "leads/index/sort", mark: " ▼ ", sort: "steps_rate" %>
+              <%= render "leads/index/sort", mark: " ▲ ", sort: "steps_rate desc" %>
             </th>
             <th colspan="1">
               <%= link_to '新規作成', new_lead_path, class: "btn btn-primary btn-lg" %>
@@ -66,7 +65,7 @@
               <td>
                 <div class = "tooltip-lead-index-show">
                   <p class = "btn btn-primary btn-lg">詳細表示</p>
-                  <div class = "description-lead-index-show"><%= render "index_show", lead: lead %></div>
+                  <div class = "description-lead-index-show"><%= render "leads/index/show", lead: lead %></div>
                 </div>
               </td>
             <% elsif lead.user_id == current_user.id %>
