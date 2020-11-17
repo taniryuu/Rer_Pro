@@ -44,11 +44,15 @@ class Leads::ApplicationController < Users::ApplicationController
       flash[:danger] = "#{flash[:danger]}#{step.errors.full_messages.first}" if step.errors.present?
       flash[:danger] = "#{flash[:danger]}#{@task.errors.full_messages.first}" if @task.present? && @task.errors.present?
     end
-    
+    roop_ok = params[:roop_ok]
     if params[:completed_id].present? && lead.errors.blank? && step.errors.blank? && (@task.present? && @task.errors.blank?)
       check_status_and_redirect_to(@completed_step, step, nil)
+    elsif params[:completed_id].present?
+      check_status_and_redirect_to(@completed_step, step, "true")
+    #  @steps = lead.steps.all.ord
+    #  @steps_except_self = @steps.not_self(@completed_step)
+    #  render :'leads/step_statuses/_index'
     else
-      roop_ok = params[:roop_ok]
       check_status_and_redirect_to(step, step, roop_ok)
     end
   end

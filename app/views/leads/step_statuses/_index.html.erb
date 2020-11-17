@@ -3,6 +3,10 @@
 進捗一覧<br>
 <table class="table table-hover" id="table-shops">
   <tbody>
+    <!--% steps = @steps_except_self %-->
+    <!--% if $through_check_status == true %-->
+      <!--% completed_step = @completed_step %-->
+    <!--% end %-->
     <% steps.each do |step| %>
       <tr>
         <td>
