@@ -241,7 +241,7 @@ class Leads::ApplicationController < Users::ApplicationController
   #$through_check_statusに応じてリダイレクト先を選択する
   def check_status_and_redirect_to(step, redirect_to_step, roop_ok)
     if roop_ok.present? && roop_ok == "true"
-      $through_check_status = false
+      #$through_check_status = false
       redirect_to check_status_and_get_url(step, redirect_to_step)
     elsif  $through_check_status == false
       $through_check_status = true
