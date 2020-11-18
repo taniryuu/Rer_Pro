@@ -28,6 +28,8 @@ class UsersController < NotificationsController
   end
 
   def show
+    @myleads_in_progress = @user.leads.where(notice_created: true)
+    @myleads = @myleads_in_progress.limit(3)
   end
 
   def destroy
