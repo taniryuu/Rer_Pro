@@ -3,9 +3,9 @@ class CompaniesController < ApplicationController
   before_action :set_company, only: [:show, :edit, :update, :destroy]
   # アクセス制限
   before_action :authenticate_user!, except: %i(new create)
-  before_action :current_user_admin?, only: %i(show edit update destroy)
+  before_action :logged_out_user?, only: %i(new create)
+  before_action :current_user_admin?, :same_company_or_companies_admin?, only: %i(show edit update destroy)
   before_action :current_user_companies_admin?, only: %i(index)
-  before_action :same_company_or_companies_admin?, only: %i(show edit update destroy)
 
   # GET /companies
   # GET /companies.json
@@ -73,6 +73,14 @@ class CompaniesController < ApplicationController
     # Only allow a list of trusted parameters through.
     def company_and_user_params
       params.require(:company).permit(:name, :status, :admin, users_attributes: [:name, :login_id, :email, :password, :password_confirmation, :admin, :superior])
+    end
+
+    # ユーザーがログイン中ならアクセスを制限する
+    def logged_out_user?
+      if current_user.present?
+        flash[:danger] = "ログアウトしてください。"
+        redirect_to current_user
+      end
     end
 
     # current_userのCompanyに管理者権限がない場合のアクセス制限
