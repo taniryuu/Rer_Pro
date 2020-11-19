@@ -109,6 +109,7 @@ class Leads::ApplicationController < Users::ApplicationController
       redirect_to working_step_in(lead)
     else
       flash[:danger] = "#{step.name}を削除できませんでした。#{lead.errors.full_messages.first}#{flash[:danger]}"
+      Task.create!(step_id: step.id ,name: "new_task", status: "not_yet", scheduled_complete_date: "#{Date.current}")
       redirect_to step
     end
   end
