@@ -109,10 +109,17 @@ class Leads::ApplicationController < Users::ApplicationController
       redirect_to working_step_in(lead)
     else
       flash[:danger] = "#{step.name}を削除できませんでした。#{lead.errors.full_messages.first}#{flash[:danger]}"
-      name = params[:task][:name]
-      scheduled_complete_date = params[:task][:scheduled_complete_date]
-      Task.create!(step_id: step.id ,name: name, status: "not_yet", scheduled_complete_date: scheduled_complete_date)
-      redirect_to step
+      if params[:new_task] == "true"
+        ActiveRecord::Base.transaction do
+          @task = step.tasks.create(task_simple_params)
+          raise ActiveRecord::Rollback if @task.present? && @task.errors.present?
+        end
+      end
+      if @task.invalid?
+        check_status_and_redirect_to(step, step, "true")
+      else
+        redirect_to step
+      end
     end
   end
   

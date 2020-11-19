@@ -6,6 +6,6 @@
 <br>
 <h4>&#9313;この進捗を削除する</h4>
 <!--%= button_to '削除', step_path(@step), method: :delete %-->
-<%= render 'leads/step_statuses/destroy', step: @step, task: @task, button_name: "削除" %>
+<%= render 'leads/step_statuses/destroy', step: @step, task: @task, new_task: true, button_name: "削除" %>
 
 

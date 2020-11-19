@@ -1,4 +1,4 @@
-<%= form_with(url: destroy_step_path(step, task: task), model: task, method: :delete, local: true) do |form| %>
+<%= form_with(url: destroy_step_path(step, new_task: new_task), model: task, method: :delete, local: true) do |form| %>
   <p>新しいタスク:</p>
   <%= render 'devise/shared/error_messages', resource: task %>
 
