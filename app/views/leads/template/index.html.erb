@@ -1,3 +1,5 @@
+<% search_message = "ｷｰﾜｰﾄﾞを入力..." %>
+
 <p id="notice"><%= notice %></p>
 
 <div class="container">
@@ -7,5 +9,73 @@
     <% @user = @users.find(params[:user_searchword]) %>
     <h1><%= link_to @user.name, user_path(@user) %>作成テンプレート一覧</h1>
   <% end %>
-  <%= render "leads/index/main", leads: @leads %>
+  <div class="row">
+    <div class="col-md-3 col-md-offset-9">
+      <%= form_with url: template_index_leads_path, method: :get, local: true do |f| %>
+        <%= f.submit "検索結果をリセット（全表示）", class: "btn btn-default btn-search" if params[:user_searchword].present? || params[:room_searchword].present? || params[:customer_searchword].present? %>
+      <% end %>
+    </div>
+    <br>
+    <div class="col-md-12 col-md-offset-1">
+      <%= paginate @leads %>
+      <table class="table table-hover" id="table-users">
+        <thead>
+          <%= form_with url: template_index_leads_path, method: :get, local: true do |f| %>
+            <tr>
+              <th colspan="1">
+                <%= f.submit "絞る(ｿｰﾄﾘｾｯﾄ)", class: "btn btn-primary btn-search" %>
+              </th>
+              <th colspan="1">テンプレート名
+                <%= render "leads/index/sort", mark: " ▼ ", sort: "template_name" %>
+                <%= render "leads/index/sort", mark: " ▲ ", sort: "template_name desc" %>
+                <%= f.search_field :template_name_searchword, class: "form-control-search", placeholder: search_message, value: params[:template_name_searchword], size: "10×10" %>
+              <th colspan="1">作成担当者名
+                <%= render "leads/index/sort", mark: " ▼ ", sort: "user_id" %>
+                <%= render "leads/index/sort", mark: " ▲ ", sort: "user_id desc" %>
+                <%= f.select :user_searchword, users_list(@users), selected: params[:user_searchword].to_i, class: "form-control-search", multiple: true, include_blank: true %>
+              </th>
+              <th colspan="1">物件名/部屋番号
+                <%= render "leads/index/sort", mark: " ▼ ", sort: "room_name" %>
+                <%= render "leads/index/sort", mark: " ▲ ", sort: "room_name desc" %>
+                <%= f.search_field :room_searchword, class: "form-control-search", placeholder: search_message, value: params[:room_searchword], size: "10×10" %>
+              </th>
+              <th colspan="1">お客様名
+                <%= render "leads/index/sort", mark: " ▼ ", sort: "customer_name" %>
+                <%= render "leads/index/sort", mark: " ▲ ", sort: "customer_name desc" %>
+                <%= f.search_field :customer_searchword, class: "form-control-search", placeholder: search_message, value: params[:customer_searchword], size: "10×10" %>
+              </th>
+              <th colspan="1">作成日
+                <%= render "leads/index/sort", mark: " ▼ ", sort: "created_at" %>
+                <%= render "leads/index/sort", mark: " ▲ ", sort: "created_at desc" %>
+              </th>
+              <th colspan="1">進捗状況
+                <%= render "leads/index/sort", mark: " ▼ ", sort: "steps_rate" %>
+                <%= render "leads/index/sort", mark: " ▲ ", sort: "steps_rate desc" %>
+              </th>
+              <th colspan="1">
+                <%= link_to '新規作成', new_lead_path, class: "btn btn-primary btn-lg" %>
+              </th>
+            </tr>
+          <% end %>
+        </thead>
+        <tbody>
+          <% @leads.each do |lead| %>
+            <tr>
+              <td><%= link_to 'このテンプレを使う', template_copy_lead_path(lead), method: :patch, class: "btn btn-primary btn-sm", 
+                data: { confirm: "【確認】このテンプレートの進捗及びタスクを丸ごとコピーします。よろしいですか？" } %></td>
+              <td><%= lead.template_name %></td>
+              <td><%= @users.find(lead.user_id).name %></td>
+              <td><%= "#{lead.room_name} / #{lead.room_num}号室" %></td>
+              <td><%= lead.customer_name %></td>
+              <td><%= l(lead.created_at, format: :shortdate) %></td>
+              <td><%= "進捗登録数：#{lead.steps.count}" %></td>
+              <td><%= link_to '詳細', step_path(lead.steps.first), class: "btn btn-primary btn-sm" %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+      <%= paginate @leads %>
+    </div>
+  </div>
+
 </div>

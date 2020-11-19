@@ -3,7 +3,7 @@ class Leads::LeadsController < Leads::ApplicationController
   before_action :set_lead_and_user, except: %i(index new create)
   before_action :set_users, only: %i(index edit_user_id)
   before_action ->{
-    set_leads(Lead.all)
+    set_leads(Lead.where.not(status: "template"))
   }, only: %i(index)
   # フィルター（アクセス権限）
   before_action :only_same_company_id?, except: %i(index new create)
@@ -65,7 +65,7 @@ class Leads::LeadsController < Leads::ApplicationController
         check_status_inactive_or_not(@lead)
         check_status_completed_or_not(@lead, nil)
         @lead.update_attribute(:notice_change_limit, true) if @lead.saved_change_to_scheduled_resident_date? || @lead.saved_change_to_scheduled_payment_date?
-        format.html { redirect_to @lead, notice: 'Lead was successfully updated.' }
+        format.html { redirect_to step_path(working_step_in(@lead)), notice: 'Lead was successfully updated.' }
         format.json { render :show, status: :ok, location: @lead }
       else
         format.html { render :edit }
