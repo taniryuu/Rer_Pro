@@ -1,0 +1,20 @@
+<%= form_with(url: destroy_step_path(step, task: task), model: task, method: :delete, local: true) do |form| %>
+  <p>新しいタスク:</p>
+  <%= render 'devise/shared/error_messages', resource: task %>
+
+  <%= form.hidden_field :step_id, value: step.id %>
+
+  <div class="field">
+    <%= form.label :name %>
+    <%= form.text_field :name %>
+  </div>
+
+  <%= form.hidden_field :status, value: "not_yet" %>
+
+  <div class="field">
+    <%= form.label :scheduled_complete_date %>
+    <%= form.date_field :scheduled_complete_date %><br>
+  </div>
+
+  <%= form.submit button_name, class: "btn btn-primary" %>
+<% end %>
