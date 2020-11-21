@@ -2,7 +2,6 @@ class UsersController < NotificationsController
   include UsersHelper
 
   # オブジェクトの準備
-  before_action :set_user, only: %i(show)
   before_action :set_users, only: %i(index show destroy)
   before_action :notice, only: :show
   # アクセス制限
@@ -28,6 +27,8 @@ class UsersController < NotificationsController
   end
 
   def show
+    @myleads_in_progress = current_user.leads.todo
+    @myleads = @myleads_in_progress.limit(3)
   end
 
   def destroy
@@ -50,11 +51,6 @@ class UsersController < NotificationsController
   end
 
   private
-
-    # ユーザーIDを取得し識別
-    def set_user
-      @user = User.find(params[:id])
-    end
 
     def user_params
       params.require(:user).permit(:name, :login_id, :superior, :email, :password, :password_confirmation, :company_id, :superior_id)

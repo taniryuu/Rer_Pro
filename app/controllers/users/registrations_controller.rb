@@ -19,7 +19,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
 
   # GET /resource/edit
   def edit
-    if by_admin_user?(params) && resource_class.to_adapter.get(params[:id]).try(:id)
+    if by_admin_user?(params) && @users.find_by(params[:id]).try(:id)
       self.resource = resource_class.to_adapter.get(params[:id])
     else
       authenticate_scope!
@@ -29,7 +29,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
 
   # PUT /resource
   def update
-    if by_admin_user?(params) && resource_class.to_adapter.get(params[:id]).try(:id)
+    if by_admin_user?(params) && @users.find_by(params[:id]).try(:id)
       self.resource = resource_class.to_adapter.get(params[:id])
     else
       self.resource = resource_class.to_adapter.get(send(:"current_#{resource_name}").to_key)
