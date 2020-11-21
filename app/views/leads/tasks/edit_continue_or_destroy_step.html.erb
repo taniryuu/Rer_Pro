@@ -2,11 +2,9 @@
 <h4>&#9312;この進捗にタスクを追加し、現在の進捗を「進捗中」とする</h4>
 <%= render 'leads/step_statuses/start', step: @step, completed_id: nil, new_task: true, task: @task, loop_ok: true, button_name: "開始" %>
 <br>
-<h4>&#9313;この進捗を削除する</h4>
 <% if @step.status?("in_progress") && @lead.steps.in_progress.count > 1 || !@step.status?("in_progress") %>
+  <h4>&#9313;この進捗を削除する</h4>
   <%= button_to '削除', step_path(@step), method: :delete %>
-<% else %>
-  <%= render 'leads/step_statuses/destroy', step: @step, task: @task, new_task: true, button_name: "削除" %>
 <% end %>
 
 

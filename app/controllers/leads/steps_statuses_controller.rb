@@ -31,9 +31,4 @@ class Leads::StepsStatusesController < Leads::StepsController
   def cancel
     cancel_step(@lead, @step)
   end
- 
-  def destroy
-    destroy_step(@lead, @step)
-  end
- 
 end

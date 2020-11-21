@@ -29,7 +29,6 @@ Rails.application.routes.draw do
         patch 'complete/:completed_id' => 'steps_statuses#complete', as: :complete
         patch 'start' => 'steps_statuses#start', as: :start
         patch 'cancel' => 'steps_statuses#cancel', as: :cancel
-        delete 'destroy' => 'steps_statuses#destroy', as: :destroy
         patch 'statuses_make_step_not_yet'
        # patch 'complete_all_tasks'
         patch 'change_limit_check'
