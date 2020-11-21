@@ -12,7 +12,7 @@
           </p>
         </td>
         <% if step.status?("not_yet") %>
-          <td><%= render 'leads/step_statuses/start', step: step, completed_id: completed_step, new_task: true, task: @task, roop_ok: nil, button_name: "完了予定日を設定して開始する" %></td>
+          <td><%= render 'leads/step_statuses/start', step: step, completed_id: completed_step, new_task: true, task: @task, loop_ok: nil, button_name: "完了予定日を設定して開始する" %></td>
         <% elsif step.status?("inactive") %>
           <td>
             <p>
@@ -22,7 +22,7 @@
             </p>
             <div id="collapseStep<%= step.id %>" class="collapse">
             	<div class="well">
-                <%= render 'leads/step_statuses/start', step: step, completed_id: completed_step, new_task: nil, task: @task, roop_ok: nil, button_name: "完了予定日を再設定して再開する" %>
+                <%= render 'leads/step_statuses/start', step: step, completed_id: completed_step, new_task: nil, task: @task, loop_ok: nil, button_name: "完了予定日を再設定して再開する" %>
             	</div>
             </div>
           </td>
@@ -43,7 +43,7 @@
             </p>
             <div id="collapseStep<%= step.id %>" class="collapse">
             	<div class="well">
-                <%= render 'leads/step_statuses/start', step: step, completed_id: completed_step, new_task: true, task: @task, roop_ok: nil, button_name: "完了予定日を再設定して再開する" %>
+                <%= render 'leads/step_statuses/start', step: step, completed_id: completed_step, new_task: true, task: @task, loop_ok: nil, button_name: "完了予定日を再設定して再開する" %>
             	</div>
             </div>
           </td>

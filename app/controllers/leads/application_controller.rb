@@ -44,13 +44,12 @@ class Leads::ApplicationController < Users::ApplicationController
       flash[:danger] = "#{flash[:danger]}#{step.errors.full_messages.first}" if step.errors.present?
       flash[:danger] = "#{flash[:danger]}#{@task.errors.full_messages.first}" if @task.present? && @task.errors.present?
     end
-    roop_ok = params[:roop_ok]
     if params[:completed_id].present? && lead.errors.blank? && step.errors.blank? && ((@task.present? && @task.errors.blank?) || @task.nil?)
       check_status_and_redirect_to(@completed_step, step, nil)
     elsif params[:completed_id].present?
       check_status_and_redirect_to(@completed_step, step, "true")
     else
-      check_status_and_redirect_to(step, step, roop_ok)
+      check_status_and_redirect_to(step, step, params[:loop_ok])
     end
   end
   
@@ -249,8 +248,8 @@ class Leads::ApplicationController < Users::ApplicationController
   end
 
   #$through_check_statusに応じてリダイレクト先を選択する
-  def check_status_and_redirect_to(step, redirect_to_step, roop_ok)
-    if (roop_ok.present? && roop_ok == "true") || ($through_check_status == false)
+  def check_status_and_redirect_to(step, redirect_to_step, loop_ok)
+    if (loop_ok.present? && loop_ok == "true") || ($through_check_status == false)
       $through_check_status = true
       redirect_to check_status_and_get_url(step, redirect_to_step)
     else

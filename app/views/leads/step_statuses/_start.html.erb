@@ -1,4 +1,4 @@
-<%= form_with(url: start_step_path(step, completed_id: completed_id, new_task: new_task, task: task, roop_ok: roop_ok), model: step, local: true) do |form| %>
+<%= form_with(url: start_step_path(step, completed_id: completed_id, new_task: new_task, task: task, loop_ok: loop_ok), model: step, local: true) do |form| %>
   <div class="field">
     <%= form.label :scheduled_complete_date %>
     <%= form.date_field :scheduled_complete_date, value: step.scheduled_complete_date %>
