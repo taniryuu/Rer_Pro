@@ -59,8 +59,7 @@
         <tbody>
           <% @leads.each do |lead| %>
             <tr>
-              <td><%= link_to 'このテンプレを使う', template_copy_lead_path(lead), method: :patch, class: "btn btn-primary btn-sm", 
-                data: { confirm: "【確認】このテンプレートの進捗及びタスクを丸ごとコピーします。よろしいですか？" } %></td>
+              <td><%= link_to 'このテンプレを使う', new_lead_path(template_id: lead), class: "btn btn-primary btn-sm" %></td>
               <td><%= lead.template_name %></td>
               <td><%= @users.find(lead.user_id).name %></td>
               <td><%= "#{lead.room_name} / #{lead.room_num}号室" %></td>

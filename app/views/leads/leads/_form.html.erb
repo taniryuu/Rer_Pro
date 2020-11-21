@@ -1,17 +1,8 @@
 <% must = "＜入力必須＞" %>
+<% template_id = params[:template_id] %>
 
-<%= form_with(model: lead, local: true) do |form| %>
-  <% if lead.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(lead.errors.count, "error") %> prohibited this lead from being saved:</h2>
-
-      <ul>
-      <% lead.errors.full_messages.each do |message| %>
-        <li><%= message %></li>
-      <% end %>
-      </ul>
-    </div>
-  <% end %>
+<%= form_with(model: lead, local: true, template_id: template_id) do |form| %>
+  <%= render 'devise/shared/error_messages', resource: lead %>
 
   担当者：<%= current_user.name %>
 
@@ -50,20 +41,23 @@
        ↑ 終了済の案件の場合、入力必須
     </div>
   <% end %>
+  
+  <% @template_lead = Lead.find(template_id) if template_id.present? %>
+  <% @date_difference = (Date.current - Date.parse(@template_lead.created_date)).to_i if template_id.present? %>
 
   <div class="field">
     <%= form.label :scheduled_resident_date %><%= must %>
-    <%= form.date_field :scheduled_resident_date, value: @lead.scheduled_resident_date %>
+    <%= form.date_field :scheduled_resident_date, value: modified_date(@lead.scheduled_resident_date, @template_lead.try(:scheduled_resident_date), @date_difference) %>
   </div>
 
   <div class="field">
     <%= form.label :scheduled_payment_date %><%= must %>
-    <%= form.date_field :scheduled_payment_date, value: @lead.scheduled_payment_date %>
+    <%= form.date_field :scheduled_payment_date, value: modified_date(@lead.scheduled_payment_date, @template_lead.try(:scheduled_payment_date), @date_difference) %>
   </div>
 
   <div class="field">
     <%= form.label :scheduled_contract_date %>
-    <%= form.date_field :scheduled_contract_date, value: @lead.scheduled_contract_date %>
+    <%= form.date_field :scheduled_contract_date, value: modified_date(@lead.scheduled_contract_date, @template_lead.try(:scheduled_contract_date), @date_difference) %>
   </div>
 
   <div class="field">
