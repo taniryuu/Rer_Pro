@@ -40,7 +40,7 @@ module LeadsHelper
       elsif inactive_step.present?
         return inactive_step
       else
-        return lead.steps.in_progress.order(:created_at).last
+        return lead.steps.all.order(:created_at).last
       end
     end
   end

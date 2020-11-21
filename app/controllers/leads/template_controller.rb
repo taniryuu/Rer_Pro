@@ -19,7 +19,7 @@ class Leads::TemplateController < Leads::ApplicationController
       created_date: new_criteria_date.to_s,
       customer_name: "#{@lead.customer_name}(#{@lead.template_name}のコピー)",
       room_name: "#{@lead.room_name}(#{@lead.template_name}のコピー)",
-      room_num:	"#{@lead.room_num}(#{@lead.template_name}のコピー)",
+      room_num: "#{@lead.room_num}(#{@lead.template_name}のコピー)",
       scheduled_resident_date: (Date.parse(@lead.scheduled_resident_date) + date_difference).to_s,
       scheduled_payment_date: (Date.parse(@lead.scheduled_payment_date) + date_difference).to_s,
     )
@@ -43,7 +43,7 @@ class Leads::TemplateController < Leads::ApplicationController
       end
     end
     flash[:success] = "テンプレートをコピーしました。名前を変更してください。"
-    redirect_to edit_lead_path(new_lead)
+    redirect_to edit_lead_url(new_lead)
   end
   
   private
