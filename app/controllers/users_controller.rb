@@ -27,7 +27,7 @@ class UsersController < NotificationsController
   end
 
   def show
-    @myleads_in_progress = current_user.leads.todo
+    @myleads_in_progress = current_user.leads.in_progress
     @myleads = @myleads_in_progress.limit(3)
   end
 
