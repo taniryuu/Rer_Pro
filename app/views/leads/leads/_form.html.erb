@@ -1,8 +1,9 @@
 <% must = "＜入力必須＞" %>
-<% template_id = params[:template_id] %>
 
-<%= form_with(model: lead, local: true, template_id: template_id) do |form| %>
+<%= form_with(model: lead, local: true) do |form| %>
   <%= render 'devise/shared/error_messages', resource: lead %>
+  
+  <%= form.hidden_field :template_id, value: @template_lead.try(:id) %>
 
   担当者：<%= current_user.name %>
 
@@ -42,9 +43,6 @@
     </div>
   <% end %>
   
-  <% @template_lead = Lead.find(template_id) if template_id.present? %>
-  <% @date_difference = (Date.current - Date.parse(@template_lead.created_date)).to_i if template_id.present? %>
-
   <div class="field">
     <%= form.label :scheduled_resident_date %><%= must %>
     <%= form.date_field :scheduled_resident_date, value: modified_date(@lead.scheduled_resident_date, @template_lead.try(:scheduled_resident_date), @date_difference) %>
