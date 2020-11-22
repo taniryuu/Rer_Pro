@@ -26,7 +26,6 @@ Rails.application.routes.draw do
       patch 'update_user_id'
       patch 'start/:step_id' => 'leads_statuses#start', as: :start
       patch 'cancel' => 'leads_statuses#cancel', as: :cancel
-      patch 'template/copy'
     end
     resources :steps do
       member do
