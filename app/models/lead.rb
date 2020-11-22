@@ -20,7 +20,7 @@ class Lead < ApplicationRecord
     model.validates :template_name, presence: true, length: { minimum: 2 }
   end
   validate :match_steps_status, on: :check_steps_status
-  enum status:[:in_progress, :completed, :inactive] # 案件ステータス
+  enum status:[:in_progress, :completed, :inactive, :template] # 案件ステータス
   
   # 案件検索機能。
   def Lead.search(search_column, search_word)

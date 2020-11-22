@@ -227,6 +227,7 @@ ja:
         in_progress: "進捗中"
         completed: "完了済"
         inactive: "凍結中"
+        template: "テンプレート"
     step:
       status:
         not_yet: "未"

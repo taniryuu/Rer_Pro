@@ -26,4 +26,5 @@ module ApplicationHelper
   def company_name(user)
     Company.find(user.company_id).name
   end
+  
 end

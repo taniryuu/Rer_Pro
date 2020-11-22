@@ -18,6 +18,9 @@ Rails.application.routes.draw do
 
   # 案件フォルダ群（Leads::ApplicationControllerを継承）lead, step, task関連
   resources :leads, shallow: true, module: 'leads' do
+    collection do
+      get 'template/index'
+    end
     member do
       get 'edit_user_id'
       patch 'update_user_id'
