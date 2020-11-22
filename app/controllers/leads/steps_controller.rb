@@ -48,7 +48,7 @@ class Leads::StepsController < Leads::ApplicationController
   def create
     @step = @lead.steps.new(step_params)
     @task = @step.tasks.new(task_params)
-    if save_and_errors_of(@lead, @step).blank?
+    if save_step_errors(@lead, @step).blank?
       flash[:success] = "#{flash[:success]}#{@step.name}を作成しました。"
       if params[:step][:status].present? && params[:step][:status] == "completed"
         flash[:danger] = "「完了」タスクが無い、進捗は「完了」ステータスで新規作成しようとしています。「完了」タスクを自動で生成しました。"
@@ -69,7 +69,7 @@ class Leads::StepsController < Leads::ApplicationController
   # PATCH/PUT /steps/1.json
   def update
     @task = Task.new(task_params)
-    if update_and_errors_of(@lead, @step).blank?
+    if update_step_errors(@lead, @step).blank?
       flash[:success] = "#{flash[:success]}#{@step.name}を更新しました。"
       check_status_and_redirect_to(@step, @step, nil)
     else
@@ -133,7 +133,7 @@ class Leads::StepsController < Leads::ApplicationController
     end
     
     # クリエイト処理
-    def save_and_errors_of(lead, step)
+    def save_step_errors(lead, step)
       errors = []
       ActiveRecord::Base.transaction do
         # 作成処理（バリデーションなし）
@@ -166,7 +166,7 @@ class Leads::StepsController < Leads::ApplicationController
     end
     
     # アップデート処理
-    def update_and_errors_of(lead, step)
+    def update_step_errors(lead, step)
       errors = []
       ActiveRecord::Base.transaction do
         # 更新処理（バリデーションなし）

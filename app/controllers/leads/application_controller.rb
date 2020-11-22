@@ -249,6 +249,27 @@ class Leads::ApplicationController < Users::ApplicationController
 
 
   private
+    # 案件一覧を取得
+    def set_leads(leads)
+      user_ids_all = @users.pluck(:id)
+      user_ids = params[:user_searchword].present? ? params[:user_searchword] : user_ids_all
+      params_sort = params[:sort].present? ? params[:sort] : "created_date desc"
+      @leads = leads.where(user_id: user_ids)
+                    .search("template_name", params[:template_name_searchword])
+                    .search("room_name", params[:room_searchword])
+                    .search("customer_name", params[:customer_searchword])
+                    .order(params_sort)
+      case leads_count = @leads.count
+      when 0
+        flash.now[:danger] = "該当する案件はありません。検索条件を見直しください。"
+      when leads.where(user_id: user_ids_all).count
+        flash.now[:success] = "全件表示中（全#{leads_count}件）"
+      else
+        flash.now[:success] = "#{leads_count}件ヒットしました。"
+      end
+      @leads = @leads.page(params[:page])
+    end
+    
     # 進捗一覧を取得
     def set_steps
       @steps = @lead.steps.all.ord
