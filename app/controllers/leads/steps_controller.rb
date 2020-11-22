@@ -209,5 +209,4 @@ class Leads::StepsController < Leads::ApplicationController
         end
       end
     end
-    
 end

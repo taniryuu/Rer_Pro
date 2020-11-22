@@ -188,10 +188,4 @@ class Leads::TasksController < Leads::ApplicationController
     def revive_from_canceled_list_params
       params.require(:task).permit(:scheduled_complete_date)
     end
-    
-    # day空でなく、今日より前ならtrue
-    def prohibit_future(day)
-      day.blank? ? false : Date.parse(day) < Date.current
-    end
-
 end
