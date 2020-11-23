@@ -12,12 +12,10 @@ class Leads::LeadsController < Leads::ApplicationController
   before_action :correct_or_admin_user, only: %i(destroy)
 
   # GET /leads
-  # GET /leads.json
   def index
   end
 
   # GET /leads/1
-  # GET /leads/1.json
   def show
   end
 
@@ -36,7 +34,6 @@ class Leads::LeadsController < Leads::ApplicationController
   end
 
   # POST /leads
-  # POST /leads.json
   def create
     @lead = current_user.leads.new(lead_params)
     if save_lead_errors(@lead).blank?
@@ -51,19 +48,15 @@ class Leads::LeadsController < Leads::ApplicationController
   end
 
   # PATCH/PUT /leads/1
-  # PATCH/PUT /leads/1.json
   def update
-    respond_to do |format|
-      if @lead.update(lead_params) && update_steps_rate(@lead)
-        check_status_inactive_or_not(@lead)
-        check_status_completed_or_not(@lead, nil)
-        @lead.update_attribute(:notice_change_limit, true) if @lead.saved_change_to_scheduled_resident_date? || @lead.saved_change_to_scheduled_payment_date?
-        format.html { redirect_to step_path(working_step_in(@lead)), notice: 'Lead was successfully updated.' }
-        format.json { render :show, status: :ok, location: @lead }
-      else
-        format.html { render :edit }
-        format.json { render json: @lead.errors, status: :unprocessable_entity }
-      end
+    if update_lead_errors(@lead).blank?
+      @lead.update_attribute(:notice_change_limit, true) if @lead.saved_change_to_scheduled_resident_date? || @lead.saved_change_to_scheduled_payment_date?
+      flash[:success] = "案件を編集しました。#{flash[:success]}"
+      redirect_to step_url(working_step_in(@lead))
+    else
+      flash.delete(:success)
+      flash.now[:danger] = "#{@lead.errors.full_messages.first}" if @lead.errors.present?
+      render :edit
     end
   end
 
@@ -84,10 +77,8 @@ class Leads::LeadsController < Leads::ApplicationController
   # DELETE /leads/1.json
   def destroy
     @lead.destroy
-    respond_to do |format|
-      format.html { redirect_to leads_url, notice: 'Lead was successfully destroyed.' }
-      format.json { head :no_content }
-    end
+    flash[:success] = "案件(#{@lead.customer_name}様/#{@lead.room_name}-#{@lead.room_num}号室)を削除しました。#{flash[:success]}"
+    redirect_to leads_url
   end
 
   private
@@ -147,13 +138,13 @@ class Leads::LeadsController < Leads::ApplicationController
             # （ある程度決まったプロセスなのに一から進捗をつくるのはUXとして非現実的。）↓は仮。
             lead.steps.create!(
               name: "進捗(仮)",
-              status: 2,
+              status: lead.status,
               order: 1,
               scheduled_complete_date: "#{Date.current}",
             )
           end
-    
           # 矛盾を解消
+          check_status_template_or_not(lead)
           check_status_inactive_or_not(lead)
           check_status_completed_or_not(lead, nil)
           # バリデーション確認
@@ -166,4 +157,21 @@ class Leads::LeadsController < Leads::ApplicationController
       errors.presence || nil
     end
     
+    # アップデート処理
+    def update_lead_errors(lead)
+      errors = []
+      ActiveRecord::Base.transaction do
+        # 作成処理（バリデーションなし）
+        lead.update(lead_params)
+        # 矛盾を解消
+        check_status_template_or_not(lead)
+        check_status_inactive_or_not(lead)
+        check_status_completed_or_not(lead, nil)
+        # バリデーション確認
+        errors << lead.errors.full_messages if lead.invalid?(:check_steps_status)
+        raise ActiveRecord::Rollback if errors.present?
+      end
+      errors.presence || nil
+    end
+
 end

@@ -145,7 +145,7 @@ end
     lead_id: 1,
     name: "進捗#{i+2}",
     memo: "進捗#{i+2}のメモ",
-    status: 0,
+    status: "not_yet",
     order: i+2,
     scheduled_complete_date: (Date.current + 3 + 3*i).to_s,
   )
