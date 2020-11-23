@@ -21,6 +21,9 @@ class Leads::ApplicationController < Users::ApplicationController
         flash[:success] = "#{step.name}は既に進捗中です。"
       else
         flash[:success] = "#{step.name}を開始しました。" if step.update_attributes(status: "in_progress", scheduled_complete_date: scheduled_complete_date, completed_date: "", canceled_date: "")
+        if prohibit_future(step.scheduled_complete_date)
+          flash[:danger] = "#{flash[:danger]}進捗の完了予定日に過去の日付を入力しようとしています。"
+        end
       end
       # 完了する進捗がある場合の処理
       if params[:completed_id].present?
@@ -31,7 +34,7 @@ class Leads::ApplicationController < Users::ApplicationController
       if (step.status?("in_progress") || step.status?("inactive")) && step.tasks.not_yet.blank?
         @task = step.tasks.create(task_simple_params)
         if prohibit_future(@task.scheduled_complete_date)
-          flash[:danger] = "タスクの完了予定日に過去の日付を入力しようとしています。"
+          flash[:danger] = "#{flash[:danger]}タスクの完了予定日に過去の日付を入力しようとしています。"
         end
       end
       # 案件を再開する場合の処理
