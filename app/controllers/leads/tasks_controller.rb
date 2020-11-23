@@ -33,7 +33,7 @@ class Leads::TasksController < Leads::ApplicationController
 
   def create
     @task = Task.new(task_params)
-    if prohibit_future(@task.scheduled_complete_date)
+    if prohibit_past(@task.scheduled_complete_date)
       flash[:danger] = "完了予定日に過去の日付を入力しようとしています。"
     end
     if @task.save
@@ -52,11 +52,11 @@ class Leads::TasksController < Leads::ApplicationController
       @task.date_blank_then_today("completed")
       # 中止にした日が空なら今日の日付を入れる
       @task.date_blank_then_today("canceled")
-      if prohibit_future(@task.scheduled_complete_date) && prohibit_future(@task.completed_date)
+      if prohibit_past(@task.scheduled_complete_date) && prohibit_past(@task.completed_date)
         flash[:danger] = "完了予定日と完了日に過去の日付を入力しようとしています。"
-      elsif prohibit_future(@task.scheduled_complete_date)
+      elsif prohibit_past(@task.scheduled_complete_date)
         flash[:danger] = "完了予定日に過去の日付を入力しようとしています。"
-      elsif prohibit_future(@task.completed_date)
+      elsif prohibit_past(@task.completed_date)
         flash[:danger] = "完了日に過去の日付を入力しようとしています。"
       end
       check_status_and_redirect_to(@step, @step, nil)
@@ -124,7 +124,7 @@ class Leads::TasksController < Leads::ApplicationController
   # 復活ボタンを押した画面から更新ボタンを押した後の処理
   def update_revive_from_canceled_list
     if @task.update_attributes(revive_from_canceled_list_params)
-      if prohibit_future(@task.scheduled_complete_date)
+      if prohibit_past(@task.scheduled_complete_date)
         flash[:danger] = "完了予定日に過去の日付を入力しようとしています。"
       end
       @task.update_attribute(:status, "not_yet")

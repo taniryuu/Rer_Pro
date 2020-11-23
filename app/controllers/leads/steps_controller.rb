@@ -48,6 +48,12 @@ class Leads::StepsController < Leads::ApplicationController
   def create
     @step = @lead.steps.new(step_params)
     @task = @step.tasks.new(task_params)
+    if prohibit_past(@task.scheduled_complete_date)
+      flash[:danger] = "#{flash[:danger]}タスクの完了予定日に過去の日付を入力しようとしています。"
+    end
+    if prohibit_past(@task.completed_date)
+      flash[:danger] = "#{flash[:danger]}タスクの完了日に過去の日付を入力しようとしています。"
+    end
     if save_step_errors(@lead, @step).blank?
       flash[:success] = "#{flash[:success]}#{@step.name}を作成しました。"
       if params[:step][:status].present? && params[:step][:status] == "completed"
@@ -139,6 +145,12 @@ class Leads::StepsController < Leads::ApplicationController
         # 作成処理（バリデーションなし）
         prepare_order(lead.steps.count + 1, step.order)
         errors << step.errors.full_messages unless step.save
+        if prohibit_past(step.scheduled_complete_date)
+          flash[:danger] = "#{flash[:danger]}進捗の完了予定日に過去の日付を入力しようとしています。"
+        end
+        if prohibit_past(step.completed_date)
+          flash[:danger] = "#{flash[:danger]}進捗の完了日に過去の日付を入力しようとしています。"
+        end
         # 完了する進捗がある場合の処理
         if params[:step][:completed_id].present?
           @completed_step = Step.find(params[:step][:completed_id]) # 完了処理に失敗したら、改めてオブジェクトを渡す必要があるのでインスタンス変数を使用。
