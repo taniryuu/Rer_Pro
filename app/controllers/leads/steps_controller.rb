@@ -184,10 +184,22 @@ class Leads::StepsController < Leads::ApplicationController
         # 更新処理（バリデーションなし）
         prepare_order(step.order, params[:step][:order].to_i)
         step.update(step_params)
+        if prohibit_past(step.scheduled_complete_date)
+          flash[:danger] = "#{flash[:danger]}進捗の完了予定日に過去の日付を入力しようとしています。"
+        end
+        if prohibit_past(step.completed_date)
+          flash[:danger] = "#{flash[:danger]}進捗の完了日に過去の日付を入力しようとしています。"
+        end
         lead.update_attribute(:notice_change_limit, true) if step.saved_change_to_scheduled_complete_date?
         # 新規タスク作成
         if (step.status?("in_progress") || step.status?("inactive")) && step.tasks.not_yet.blank?
           @task =Task.create(task_params)
+          if prohibit_past(@task.scheduled_complete_date)
+            flash[:danger] = "#{flash[:danger]}タスクの完了予定日に過去の日付を入力しようとしています。"
+          end
+          if prohibit_past(@task.completed_date)
+            flash[:danger] = "#{flash[:danger]}タスクの完了日に過去の日付を入力しようとしています。"
+          end
         end
         # 矛盾を解消
         check_status_inactive_or_not(step)
