@@ -38,7 +38,7 @@ class Leads::TasksController < Leads::ApplicationController
     end
     if @task.save
       update_completed_tasks_rate(@step)
-      check_status_and_redirect_to(@step, @step)
+      check_status_and_redirect_to(@step, @step, nil)
     else
       render :new 
     end
@@ -59,7 +59,7 @@ class Leads::TasksController < Leads::ApplicationController
       elsif prohibit_future(@task.completed_date)
         flash[:danger] = "完了日に過去の日付を入力しようとしています。"
       end
-      check_status_and_redirect_to(@step, @step)
+      check_status_and_redirect_to(@step, @step, nil)
     else
       render :edit
     end
@@ -68,7 +68,7 @@ class Leads::TasksController < Leads::ApplicationController
   def destroy
     @task.destroy
     update_completed_tasks_rate(@step)
-    check_status_and_redirect_to(@step, @step)
+    check_status_and_redirect_to(@step, @step, nil)
   end
 
   # 「To Do リスト」にチェックを入れて「更新」ボタンを押したときに実行されるアクション
@@ -106,7 +106,7 @@ class Leads::TasksController < Leads::ApplicationController
         end
       end
     end
-    check_status_and_redirect_to(@step, @step)
+    check_status_and_redirect_to(@step, @step, nil)
   end
 
   # 「To Do リスト」で中止ボタンを押して「中止」リストに入れる処理
@@ -114,7 +114,7 @@ class Leads::TasksController < Leads::ApplicationController
     @task.update_attribute(:status, "canceled")
     update_completed_tasks_rate(@step)
     @task.update_attribute(:canceled_date, "#{Date.current}") if @task.canceled_date.blank?
-    check_status_and_redirect_to(@step, @step)
+    check_status_and_redirect_to(@step, @step, nil)
   end
 
   # 復活ボタンを押したときに実行されるアクション
@@ -132,7 +132,7 @@ class Leads::TasksController < Leads::ApplicationController
     else
       flash[:danger] = "#{@task.name}の更新は失敗しました。" + @task.errors.full_messages[0]
     end
-    check_status_and_redirect_to(@step, @step)
+    check_status_and_redirect_to(@step, @step, nil)
   end
 
   def edit_continue_or_destroy_step
@@ -188,10 +188,4 @@ class Leads::TasksController < Leads::ApplicationController
     def revive_from_canceled_list_params
       params.require(:task).permit(:scheduled_complete_date)
     end
-    
-    # day空でなく、今日より前ならtrue
-    def prohibit_future(day)
-      day.blank? ? false : Date.parse(day) < Date.current
-    end
-
 end

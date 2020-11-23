@@ -56,7 +56,7 @@ class Leads::StepsController < Leads::ApplicationController
         Task.create!(step_id: @step.id ,name: "completed_task", status: "completed", scheduled_complete_date: scheduled_complete_date, completed_date: params[:step][:completed_date])
       end
       # 編集-完了から進捗を新規作成した場合
-      @completed_step.present? ? check_status_and_redirect_to(@completed_step, @step) : check_status_and_redirect_to(@step, @step)
+      @completed_step.present? ? check_status_and_redirect_to(@completed_step, @step, nil) : check_status_and_redirect_to(@step, @step, nil)
     else
       flash.delete(:success)
       flash.now[:danger] = "#{@lead.errors.full_messages.first}" if @lead.errors.present?
@@ -71,7 +71,7 @@ class Leads::StepsController < Leads::ApplicationController
     @task = Task.new(task_params)
     if update_step_errors(@lead, @step).blank?
       flash[:success] = "#{flash[:success]}#{@step.name}を更新しました。"
-      check_status_and_redirect_to(@step, @step)
+      check_status_and_redirect_to(@step, @step, nil)
     else
       flash.delete(:success)
       flash.now[:danger] = @lead.errors.full_messages.first if @lead.errors.present?
@@ -209,5 +209,4 @@ class Leads::StepsController < Leads::ApplicationController
         end
       end
     end
-    
 end
