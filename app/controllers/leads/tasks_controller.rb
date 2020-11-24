@@ -33,12 +33,10 @@ class Leads::TasksController < Leads::ApplicationController
 
   def create
     @task = Task.new(task_params)
-    if prohibit_future(@task.scheduled_complete_date)
-      flash[:danger] = "完了予定日に過去の日付を入力しようとしています。"
-    end
+    flash[:danger] = "完了予定日に過去の日付を入力しようとしています。" if prohibit_past(@task.scheduled_complete_date)
     if @task.save
       update_completed_tasks_rate(@step)
-      check_status_and_redirect_to(@step, @step)
+      check_status_and_redirect_to(@step, @step, nil)
     else
       render :new 
     end
@@ -52,14 +50,9 @@ class Leads::TasksController < Leads::ApplicationController
       @task.date_blank_then_today("completed")
       # 中止にした日が空なら今日の日付を入れる
       @task.date_blank_then_today("canceled")
-      if prohibit_future(@task.scheduled_complete_date) && prohibit_future(@task.completed_date)
-        flash[:danger] = "完了予定日と完了日に過去の日付を入力しようとしています。"
-      elsif prohibit_future(@task.scheduled_complete_date)
-        flash[:danger] = "完了予定日に過去の日付を入力しようとしています。"
-      elsif prohibit_future(@task.completed_date)
-        flash[:danger] = "完了日に過去の日付を入力しようとしています。"
-      end
-      check_status_and_redirect_to(@step, @step)
+      flash[:danger] = "#{flash[:danger]}完了予定日に過去の日付を入力しようとしています。" if prohibit_past(@task.scheduled_complete_date)
+      flash[:danger] = "#{flash[:danger]}完了日に過去の日付を入力しようとしています。" if prohibit_past(@task.completed_date)
+      check_status_and_redirect_to(@step, @step, nil)
     else
       render :edit
     end
@@ -68,7 +61,7 @@ class Leads::TasksController < Leads::ApplicationController
   def destroy
     @task.destroy
     update_completed_tasks_rate(@step)
-    check_status_and_redirect_to(@step, @step)
+    check_status_and_redirect_to(@step, @step, nil)
   end
 
   # 「To Do リスト」にチェックを入れて「更新」ボタンを押したときに実行されるアクション
@@ -106,7 +99,7 @@ class Leads::TasksController < Leads::ApplicationController
         end
       end
     end
-    check_status_and_redirect_to(@step, @step)
+    check_status_and_redirect_to(@step, @step, nil)
   end
 
   # 「To Do リスト」で中止ボタンを押して「中止」リストに入れる処理
@@ -114,7 +107,7 @@ class Leads::TasksController < Leads::ApplicationController
     @task.update_attribute(:status, "canceled")
     update_completed_tasks_rate(@step)
     @task.update_attribute(:canceled_date, "#{Date.current}") if @task.canceled_date.blank?
-    check_status_and_redirect_to(@step, @step)
+    check_status_and_redirect_to(@step, @step, nil)
   end
 
   # 復活ボタンを押したときに実行されるアクション
@@ -124,15 +117,13 @@ class Leads::TasksController < Leads::ApplicationController
   # 復活ボタンを押した画面から更新ボタンを押した後の処理
   def update_revive_from_canceled_list
     if @task.update_attributes(revive_from_canceled_list_params)
-      if prohibit_future(@task.scheduled_complete_date)
-        flash[:danger] = "完了予定日に過去の日付を入力しようとしています。"
-      end
+      flash[:danger] = "完了予定日に過去の日付を入力しようとしています。" if prohibit_past(@task.scheduled_complete_date)
       @task.update_attribute(:status, "not_yet")
       update_completed_tasks_rate(@step)
     else
       flash[:danger] = "#{@task.name}の更新は失敗しました。" + @task.errors.full_messages[0]
     end
-    check_status_and_redirect_to(@step, @step)
+    check_status_and_redirect_to(@step, @step, nil)
   end
 
   def edit_continue_or_destroy_step
@@ -188,10 +179,4 @@ class Leads::TasksController < Leads::ApplicationController
     def revive_from_canceled_list_params
       params.require(:task).permit(:scheduled_complete_date)
     end
-    
-    # day空でなく、今日より前ならtrue
-    def prohibit_future(day)
-      day.blank? ? false : Date.parse(day) < Date.current
-    end
-
 end

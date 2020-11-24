@@ -14,7 +14,7 @@ class Leads::StepsStatusesController < Leads::StepsController
         raise ActiveRecord::Rollback if @lead.invalid?(:check_steps_status)
       end
       if @lead.errors.blank?
-        check_status_and_redirect_to(completed_step, @step)
+        check_status_and_redirect_to(completed_step, @step, nil)
       else
         flash[:danger] = "#{flash[:danger]}#{@lead.errors.full_messages.first}"
         redirect_to completed_step
@@ -31,5 +31,4 @@ class Leads::StepsStatusesController < Leads::StepsController
   def cancel
     cancel_step(@lead, @step)
   end
-  
 end

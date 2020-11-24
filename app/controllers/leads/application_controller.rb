@@ -21,6 +21,7 @@ class Leads::ApplicationController < Users::ApplicationController
         flash[:success] = "#{step.name}は既に進捗中です。"
       else
         flash[:success] = "#{step.name}を開始しました。" if step.update_attributes(status: "in_progress", scheduled_complete_date: scheduled_complete_date, completed_date: "", canceled_date: "")
+        flash[:danger] = "#{flash[:danger]}進捗の完了予定日に過去の日付を入力しようとしています。" if prohibit_past(step.scheduled_complete_date)
       end
       # 完了する進捗がある場合の処理
       if params[:completed_id].present?
@@ -30,6 +31,7 @@ class Leads::ApplicationController < Users::ApplicationController
       # 新規タスク作成
       if (step.status?("in_progress") || step.status?("inactive")) && step.tasks.not_yet.blank?
         @task = step.tasks.create(task_simple_params)
+        flash[:danger] = "#{flash[:danger]}タスクの完了予定日に過去の日付を入力しようとしています。" if prohibit_past(@task.scheduled_complete_date)
       end
       # 案件を再開する場合の処理
       start_lead(lead) unless lead.status?("in_progress")
@@ -44,11 +46,12 @@ class Leads::ApplicationController < Users::ApplicationController
       flash[:danger] = "#{flash[:danger]}#{step.errors.full_messages.first}" if step.errors.present?
       flash[:danger] = "#{flash[:danger]}#{@task.errors.full_messages.first}" if @task.present? && @task.errors.present?
     end
-    
-    if params[:completed_id].present? && lead.errors.blank? && step.errors.blank? && (@task.present? && @task.errors.blank?)
-      check_status_and_redirect_to(@completed_step, step)
-    else 
-      redirect_to step
+    if params[:completed_id].present? && lead.errors.blank? && step.errors.blank? && ((@task.present? && @task.errors.blank?) || @task.nil?)
+      check_status_and_redirect_to(@completed_step, step, nil)
+    elsif params[:completed_id].present?
+      check_status_and_redirect_to(@completed_step, step, "true")
+    else
+      check_status_and_redirect_to(step, step, params[:loop_ok])
     end
   end
   
@@ -244,8 +247,8 @@ class Leads::ApplicationController < Users::ApplicationController
   end
 
   #$through_check_statusに応じてリダイレクト先を選択する
-  def check_status_and_redirect_to(step, redirect_to_step)
-    unless $through_check_status
+  def check_status_and_redirect_to(step, redirect_to_step, loop_ok)
+    if loop_ok == "true" || !$through_check_status
       $through_check_status = true
       redirect_to check_status_and_get_url(step, redirect_to_step)
     else
@@ -253,6 +256,10 @@ class Leads::ApplicationController < Users::ApplicationController
     end
   end
 
+  # day空でなく、今日より前ならtrue
+  def prohibit_past(day)
+    day.blank? ? false : Date.parse(day) < Date.current
+  end
 
   private
     # 案件一覧を取得
