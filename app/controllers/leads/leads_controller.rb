@@ -62,14 +62,11 @@ class Leads::LeadsController < Leads::ApplicationController
 
   # 案件の担当者を変更（上長のみ）
   def update_user_id
-    respond_to do |format|
-      if @lead.update(lead_params_only_user_id)
-        format.html { redirect_to @lead, notice: 'User of Lead was successfully updated.' }
-        format.json { render :show, status: :ok, location: @lead }
-      else
-        format.html { render :edit }
-        format.json { render json: @lead.errors, status: :unprocessable_entity }
-      end
+    if @lead.update(lead_params_only_user_id)
+      flash[:success] = "担当者を#{User.find(@lead.user_id_before_last_save).name}から#{User.find(@lead.user_id).name}へ変更しました。#{flash[:success]}"
+      redirect_to step_url(working_step_in(@lead))
+    else
+      render :edit_user_id
     end
   end
   
@@ -88,6 +85,7 @@ class Leads::LeadsController < Leads::ApplicationController
       @user = User.find(@lead.user_id)
     end
     
+    # template_idから変数を定義（@template_lead及び@date_difference）
     def set_template_lead_and_date_difference(template_id)
       if template_id.present?
         @template_lead = Lead.find(template_id)
