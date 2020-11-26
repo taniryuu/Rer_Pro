@@ -52,8 +52,7 @@ class ApplicationController < ActionController::Base
 
   # @userの企業IDとログイン中のユーザーの企業IDを識別し違った場合実行されるアクセス制限
   def only_same_company_id?
-    user = current_user.users_in_company.find_by(id: params[:id])
-    unless user.present? && user.company_id == current_user.company_id
+    unless @user.company_id == current_user.company_id
       redirect_to current_user
       flash[:danger] = "無効なアクセスが確認されました。"
     end
