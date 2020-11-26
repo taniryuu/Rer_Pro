@@ -3,8 +3,7 @@
 class Users::RegistrationsController < Devise::RegistrationsController
   prepend_before_action :authenticate_scope!, only: %i(edit update)
   prepend_before_action :set_minimum_password_length, only: %i(edit)
-  before_action :set_users, only: %i(edit update)
-  before_action :only_same_company_id?, only: %i(edit update)
+  before_action :set_users, :only_same_company_id?, only: %i(edit update)
   before_action :configure_account_update_params, only: [:update]
 
   # GET /resource/sign_up
@@ -19,7 +18,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
 
   # GET /resource/edit
   def edit
-    if by_admin_user?(params) && @users.find_by(params[:id]).try(:id)
+    if by_admin_user?(params)
       self.resource = resource_class.to_adapter.get(params[:id])
     else
       authenticate_scope!
@@ -29,7 +28,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
 
   # PUT /resource
   def update
-    if by_admin_user?(params) && @users.find_by(params[:id]).try(:id)
+    if by_admin_user?(params)
       self.resource = resource_class.to_adapter.get(params[:id])
     else
       self.resource = resource_class.to_adapter.get(send(:"current_#{resource_name}").to_key)
