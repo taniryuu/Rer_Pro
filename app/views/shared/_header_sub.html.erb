@@ -1,7 +1,7 @@
 <div class="nav-scroller bg-white shadow-sm">
   <nav class="nav nav-underline">
     <%= link_to "進行中の案件数", leads_path(user_searchword: current_user.id), class: "nav-link active" %>
-    <span class="badge badge-pill bg-light align-text-bottom"><%= link_to "#{Lead.where(user_id: current_user.id).count}", leads_path(user_searchword: current_user.id), class: "nav-link active" %></span>
+    <span class="badge badge-pill bg-light align-text-bottom"><%= link_to "#{current_user.lead_count}", leads_path(user_searchword: current_user.id), class: "nav-link active" %></span>
     <%= link_to "案件新規作成", new_lead_path, class: "nav-link active" %>
     <%= link_to "案件をテンプレートから作成", template_index_leads_path, class: "nav-link active" %>
   </nav>
