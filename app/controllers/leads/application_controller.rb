@@ -185,6 +185,13 @@ class Leads::ApplicationController < Users::ApplicationController
     
   end
   
+  # 案件がテンプレ―トとして作成された場合、チェックを入れる
+  def check_status_template_or_not(lead)
+    if lead.status?("template") && !lead.template
+      lead.update_attribute(:template, true)
+    end
+  end
+  
   # leadの進捗率を更新
   def update_steps_rate(lead)
     lead.update_attribute(:steps_rate, calculate_rate(lead.steps.completed.count, lead.steps.todo.count))
@@ -269,9 +276,9 @@ class Leads::ApplicationController < Users::ApplicationController
       when 0
         flash.now[:danger] = "該当する案件はありません。検索条件を見直しください。"
       when leads.where(user_id: user_ids_all).count
-        flash.now[:success] = "全件表示中（全#{leads_count}件）"
+        flash.now[:info] = "全件表示中（全#{leads_count}件）"
       else
-        flash.now[:success] = "#{leads_count}件ヒットしました。"
+        flash.now[:info] = "#{leads_count}件ヒットしました。"
       end
       @leads = @leads.page(params[:page])
     end

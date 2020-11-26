@@ -1,31 +1,30 @@
-<h1>Editing User Lead</h1>
+<h1>担当者の変更</h1>
+<h5>
+  <%= "#{@lead.customer_name} 様が「" %>
+  <%= link_to @lead.room_name, leads_path(room_searchword: @lead.room_name) %>
+  <%= "(#{@lead.room_num})」に入居予定の案件の担当営業マンを変更します。" %>
+</h5>
+<br>
 
 <%= form_with(model: @lead, url: update_user_id_lead_path(@lead), local: true) do |form| %>
-  <% if @lead.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@lead.errors.count, "error") %> prohibited this lead from being saved:</h2>
-
-      <ul>
-      <% @lead.errors.full_messages.each do |message| %>
-        <li><%= message %></li>
-      <% end %>
-      </ul>
-    </div>
-  <% end %>
+  <%= render 'devise/shared/error_messages', resource: @lead %>
 
   変更者：<%= current_user.name %><br>
+  <br>
+  <h4>
+    現在の担当者：<%= @user.name %><br>
+    <%= "↓" %><br>
+    <div class="field">
+      変更後の担当者：
+      <%= form.select :user_id, users_list(@users), selected: @user.id, class: "form-control-search" %>
+    </div>
   
-  現在の担当者：<%= @user.name %><br>
-
-  <div class="field">
-    変更後の担当者：
-    <%= form.number_field :user_id, autofocus: true %>
-  </div>
-
-  <div class="actions">
-    <%= form.submit %>
-  </div>
+    <div class="actions">
+      <%= form.submit %>
+    </div>
+  </h4>
 <% end %>
 
-<%= link_to 'Show', @lead %> |
-<%= link_to 'Back', leads_path %>
+<br>
+
+<%= link_to '案件詳細へ戻る', step_path(working_step_in(@lead)) %>
