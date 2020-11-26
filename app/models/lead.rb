@@ -20,7 +20,7 @@ class Lead < ApplicationRecord
     model.validates :template_name, presence: true, length: { minimum: 2 }
   end
   validate :match_steps_status, on: :check_steps_status
-  enum status:[:in_progress, :completed, :inactive] # 案件ステータス
+  enum status:[:in_progress, :completed, :inactive, :template] # 案件ステータス
   
   # 案件検索機能。
   def Lead.search(search_column, search_word)
@@ -36,6 +36,10 @@ class Lead < ApplicationRecord
       errors.add(:status, ":完了済の案件には、完了済の進捗が少なくとも一つ以上必要です。")
     elsif self.status?("inactive") && self.steps.inactive.blank?
       errors.add(:status, ":凍結中の案件には、凍結中の進捗が必要です。")
+    elsif self.status?("template") && self.steps.template.blank?
+      errors.add(:status, ":テンプレートの案件には、テンプレートの進捗が少なくとも一つ以上必要です。")
+    elsif !self.status?("template") && self.steps.template.present?
+      errors.add(:status, ":通常の案件に、テンプレートの進捗を作成することはできません。")
     end
   end
   

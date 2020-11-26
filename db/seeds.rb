@@ -75,8 +75,9 @@ puts "Userテスト用サンプルレコード作成完了"
 5.times do |j|
   if user = User.find_by(name: "サンプル太郎(#{j})")
     user_id = user.id
+    # 通常の案件を作成
     7.times do |i|
-      Lead.create!(
+      lead = Lead.create!(
         user_id: user_id,
         created_date: (Date.current - i).to_s,
       #  completed_date:	"",
@@ -95,13 +96,43 @@ puts "Userテスト用サンプルレコード作成完了"
       #  steps_rate: 進捗率
       )
       Step.create!(
-        lead_id: 1 + i + 7*j,
+        lead_id: lead.id,
         name: "進捗#{1 + i + 7*j}-1",
         memo: "進捗#{1 + i + 7*j}-1のメモ",
         status: "in_progress",
         order: 1,
         scheduled_complete_date: (Date.current + 3).to_s,
         notice_change_limit: true, # 完了予定日変更時通知
+      )
+    end
+    # テンプレートの案件を作成
+    7.times do |i|
+      lead = Lead.create!(
+        user_id: user_id,
+        created_date: (Date.current - i).to_s,
+      #  completed_date:	"",
+        customer_name: "お客様#{j+1}#{i+1}",
+        room_name: "物件#{i*j + 1}",
+        room_num:	"#{100 + i + j}",
+        template: true,
+        template_name: "テンプレート#{j+1}#{i+1}",
+      #  memo: "",
+        status: "template",
+      #  notice_created: 新規申込時通知
+      #  notice_change_limit: true, # 通知テストの為一時的にtrueに変更してます。
+        scheduled_resident_date: (Date.current + 21 - i).to_s,
+        scheduled_payment_date: (Date.current + 14 - i).to_s,
+      #  scheduled_contract_date: Date.current,
+      #  steps_rate: 進捗率
+      )
+      Step.create!(
+        lead_id: lead.id,
+        name: "進捗#{1 + i + 7*j}-1",
+        memo: "進捗#{1 + i + 7*j}-1のメモ",
+        status: "template",
+        order: 1,
+        scheduled_complete_date: (Date.current + 3).to_s,
+#        notice_change_limit: true, # 完了予定日変更時通知
       )
     end
     puts "「サンプル太郎(#{j})」の案件作成完了"
@@ -114,7 +145,7 @@ end
     lead_id: 1,
     name: "進捗#{i+2}",
     memo: "進捗#{i+2}のメモ",
-    status: 0,
+    status: "not_yet",
     order: i+2,
     scheduled_complete_date: (Date.current + 3 + 3*i).to_s,
   )
@@ -156,3 +187,9 @@ end
   )
 end
 puts "「SampleUser0」の案件「お客様１」の「進捗１」のタスク作成完了"
+
+puts "初期値設定中"
+User.all.each do |user|
+  user.update_attribute(:lead_count, user.leads.in_progress.count)
+end
+puts "初期値設定完了"

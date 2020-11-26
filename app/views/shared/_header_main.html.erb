@@ -15,6 +15,7 @@
             <% elsif current_user.superior? %>
               <%= link_to "担当者一覧", users_path, class: "dropdown-item" %>
             <% else %>
+              <%= link_to "マイテンプレート一覧", template_index_leads_path(user_searchword: current_user.id), class: "dropdown-item" %>
               <%= link_to "担当案件一覧", leads_path(user_searchword: current_user.id), class: "dropdown-item" %>
             <% end %>
             <%= link_to "マイアカウント", edit_other_user_registration_path(current_user), class: "dropdown-item" %>

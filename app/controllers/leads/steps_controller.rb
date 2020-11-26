@@ -48,7 +48,9 @@ class Leads::StepsController < Leads::ApplicationController
   def create
     @step = @lead.steps.new(step_params)
     @task = @step.tasks.new(task_params)
-    if save_and_errors_of(@lead, @step).blank?
+    flash[:danger] = "#{flash[:danger]}タスクの完了予定日に過去の日付を入力しようとしています。" if prohibit_past(@task.scheduled_complete_date)
+    flash[:danger] = "#{flash[:danger]}タスクの完了日に過去の日付を入力しようとしています。" if prohibit_past(@task.completed_date)
+    if save_step_errors(@lead, @step).blank?
       flash[:success] = "#{flash[:success]}#{@step.name}を作成しました。"
       if params[:step][:status].present? && params[:step][:status] == "completed"
         flash[:danger] = "「完了」タスクが無い、進捗は「完了」ステータスで新規作成しようとしています。「完了」タスクを自動で生成しました。"
@@ -56,7 +58,7 @@ class Leads::StepsController < Leads::ApplicationController
         Task.create!(step_id: @step.id ,name: "completed_task", status: "completed", scheduled_complete_date: scheduled_complete_date, completed_date: params[:step][:completed_date])
       end
       # 編集-完了から進捗を新規作成した場合
-      @completed_step.present? ? check_status_and_redirect_to(@completed_step, @step) : check_status_and_redirect_to(@step, @step)
+      @completed_step.present? ? check_status_and_redirect_to(@completed_step, @step, nil) : check_status_and_redirect_to(@step, @step, nil)
     else
       flash.delete(:success)
       flash.now[:danger] = "#{@lead.errors.full_messages.first}" if @lead.errors.present?
@@ -69,9 +71,9 @@ class Leads::StepsController < Leads::ApplicationController
   # PATCH/PUT /steps/1.json
   def update
     @task = Task.new(task_params)
-    if update_and_errors_of(@lead, @step).blank?
+    if update_step_errors(@lead, @step).blank?
       flash[:success] = "#{flash[:success]}#{@step.name}を更新しました。"
-      check_status_and_redirect_to(@step, @step)
+      check_status_and_redirect_to(@step, @step, nil)
     else
       flash.delete(:success)
       flash.now[:danger] = @lead.errors.full_messages.first if @lead.errors.present?
@@ -133,12 +135,14 @@ class Leads::StepsController < Leads::ApplicationController
     end
     
     # クリエイト処理
-    def save_and_errors_of(lead, step)
+    def save_step_errors(lead, step)
       errors = []
       ActiveRecord::Base.transaction do
         # 作成処理（バリデーションなし）
         prepare_order(lead.steps.count + 1, step.order)
         errors << step.errors.full_messages unless step.save
+        flash[:danger] = "#{flash[:danger]}進捗の完了予定日に過去の日付を入力しようとしています。" if prohibit_past(step.scheduled_complete_date)
+        flash[:danger] = "#{flash[:danger]}進捗の完了日に過去の日付を入力しようとしています。" if prohibit_past(step.completed_date)
         # 完了する進捗がある場合の処理
         if params[:step][:completed_id].present?
           @completed_step = Step.find(params[:step][:completed_id]) # 完了処理に失敗したら、改めてオブジェクトを渡す必要があるのでインスタンス変数を使用。
@@ -166,16 +170,20 @@ class Leads::StepsController < Leads::ApplicationController
     end
     
     # アップデート処理
-    def update_and_errors_of(lead, step)
+    def update_step_errors(lead, step)
       errors = []
       ActiveRecord::Base.transaction do
         # 更新処理（バリデーションなし）
         prepare_order(step.order, params[:step][:order].to_i)
         step.update(step_params)
+        flash[:danger] = "#{flash[:danger]}進捗の完了予定日に過去の日付を入力しようとしています。" if prohibit_past(step.scheduled_complete_date)
+        flash[:danger] = "#{flash[:danger]}進捗の完了日に過去の日付を入力しようとしています。" if prohibit_past(step.completed_date)
         lead.update_attribute(:notice_change_limit, true) if step.saved_change_to_scheduled_complete_date?
         # 新規タスク作成
         if (step.status?("in_progress") || step.status?("inactive")) && step.tasks.not_yet.blank?
           @task =Task.create(task_params)
+          flash[:danger] = "#{flash[:danger]}タスクの完了予定日に過去の日付を入力しようとしています。" if prohibit_past(@task.scheduled_complete_date)
+          flash[:danger] = "#{flash[:danger]}タスクの完了日に過去の日付を入力しようとしています。" if prohibit_past(@task.completed_date)
         end
         # 矛盾を解消
         check_status_inactive_or_not(step)
@@ -209,5 +217,4 @@ class Leads::StepsController < Leads::ApplicationController
         end
       end
     end
-    
 end

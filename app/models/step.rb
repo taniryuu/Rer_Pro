@@ -21,7 +21,7 @@ class Step < ApplicationRecord
   def order_is_serial_number
     steps_of_same_lead = Step.where(lead_id: self.lead_id)
     if steps_of_same_lead.present?
-      unless steps_of_same_lead.pluck(:order).max <= steps_of_same_lead.count
+      if steps_of_same_lead.pluck(:order).max > steps_of_same_lead.count
         errors.add(:order, "が「1から始まる連番」になっていません。")
       end
     end
