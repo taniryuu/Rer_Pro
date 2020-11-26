@@ -63,7 +63,11 @@ class Leads::LeadsController < Leads::ApplicationController
   # 案件の担当者を変更（上長のみ）
   def update_user_id
     if @lead.update(lead_params_only_user_id)
-      flash[:success] = "担当者を#{User.find(@lead.user_id_before_last_save).name}から#{User.find(@lead.user_id).name}へ変更しました。#{flash[:success]}"
+      pre_user = User.find(@lead.user_id_before_last_save)
+      new_user = User.find(@lead.user_id)
+      update_lead_count(pre_user)
+      update_lead_count(current_user)
+      flash[:success] = "担当者を#{pre_user.name}から#{new_user.name}へ変更しました。#{flash[:success]}"
       redirect_to step_url(working_step_in(@lead))
     else
       render :edit_user_id
@@ -74,6 +78,7 @@ class Leads::LeadsController < Leads::ApplicationController
   # DELETE /leads/1.json
   def destroy
     @lead.destroy
+    update_lead_count(current_user)
     flash[:success] = "案件(#{@lead.customer_name}様/#{@lead.room_name}-#{@lead.room_num}号室)を削除しました。#{flash[:success]}"
     redirect_to leads_url
   end
@@ -142,6 +147,7 @@ class Leads::LeadsController < Leads::ApplicationController
             )
           end
           # 矛盾を解消
+          update_lead_count(current_user)
           check_status_template_or_not(lead)
           check_status_inactive_or_not(lead)
           check_status_completed_or_not(lead, nil)
