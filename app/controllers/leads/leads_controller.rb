@@ -66,7 +66,7 @@ class Leads::LeadsController < Leads::ApplicationController
       pre_user = User.find(@lead.user_id_before_last_save)
       new_user = User.find(@lead.user_id)
       update_lead_count(pre_user)
-      update_lead_count(current_user)
+      update_lead_count(new_user)
       flash[:success] = "担当者を#{pre_user.name}から#{new_user.name}へ変更しました。#{flash[:success]}"
       redirect_to step_url(working_step_in(@lead))
     else
@@ -78,7 +78,7 @@ class Leads::LeadsController < Leads::ApplicationController
   # DELETE /leads/1.json
   def destroy
     @lead.destroy
-    update_lead_count(current_user)
+    update_lead_count(@user)
     flash[:success] = "案件(#{@lead.customer_name}様/#{@lead.room_name}-#{@lead.room_num}号室)を削除しました。#{flash[:success]}"
     redirect_to leads_url
   end
