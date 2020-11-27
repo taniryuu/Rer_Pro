@@ -16,7 +16,7 @@ class Leads::ApplicationController < Users::ApplicationController
   def start_step(lead, step)
     ActiveRecord::Base.transaction do
       # 進捗開始処理
-      scheduled_complete_date = params[:step].present? ? params[:step][:scheduled_complete_date] : "#{Date.current}"
+      scheduled_complete_date = params[:step][:scheduled_complete_date].present? ? params[:step][:scheduled_complete_date] : "#{Date.current}"
       if step.status?("in_progress")
         flash[:success] = "#{step.name}は既に進捗中です。"
       else

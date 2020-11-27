@@ -1,40 +1,38 @@
-<p>
-  <strong>Step_id:</strong>
-  <%= @task.step_id %>
-</p>
-
-<p>
-  <strong>Name:</strong>
-  <%= @task.name %>
-</p>
-
-<p>
-  <strong>Memo:</strong>
-  <%= @task.memo %>
-</p>
-
-<p>
-  <strong>Status:</strong>
-  <%= @task.status %>
-</p>
-
-<p>
-  <strong>Scheduled_complete_date:</strong>
-  <%= @task.scheduled_complete_date %>
-</p>
-
-<p>
-  <strong>Completed_date:</strong>
-  <%= @task.completed_date %>
-</p>
-
-<p>
-  <strong>Canceled_date</strong>
-  <%= @task.canceled_date %>
-</p>
-
-
+<h1>タスク詳細</h1>
+<div>
+  <table class="table table-condensed task-show-table">
+    <tr>
+      <th>進捗ID</th>
+      <td><%= @task.step_id %></td>
+    </tr>
+    <tr>
+      <th>タスク名</th>
+      <td><%= @task.name %></td>
+    </tr>
+    <tr>
+      <th>タスク詳細</th>
+      <td><%= @task.memo %></td>
+    </tr>
+    <tr>
+      <th>タスクステータス</th>
+      <td><%= I18n.t("enums.task.status.#{@task.status}") %></td>
+    </tr>
+    <tr>
+      <th>完了予定日</th>
+      <td><%= @task.scheduled_complete_date %></td>
+    </tr>
+    <tr>
+      <th>完了日</th>
+      <td><%= @task.completed_date %></td>
+    </tr>
+    <tr>
+      <th>中止にした日</th>
+      <td><%= @task.canceled_date %></td>
+    </tr>
+  </table>
+</div>
 <%= link_to '編集', edit_task_path(@task) %>
 <%= link_to '削除', task_path(@task), method: :delete, data: { confirm: "「#{@task.name}」を削除してよろしいですか？" } %>
 <!-- steps#showに戻る -->
 <%= link_to '戻る', step_path(@step) %>
+
