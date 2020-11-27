@@ -70,13 +70,13 @@
 ----------------------------------------------------------------
 
   <div class="field">
-    <%= form.label :template %>
-    <%= form.check_box :template %>←テンプレートにする場合はチェック
+    <%= form.check_box :template %>ここにチェックを入れると、今後テンプレートとして使用できます。
   </div>
 
   <div class="field">
     <%= form.label :template_name %>
-    <%= form.text_field :template_name %>
+    <%= form.text_field :template_name %><br>
+     ↑ ステータスがテンプレートまたはテンプレートにチェックで入力必須。
   </div>
 
   <div class="actions">

@@ -145,7 +145,7 @@ end
     lead_id: 1,
     name: "進捗#{i+2}",
     memo: "進捗#{i+2}のメモ",
-    status: 0,
+    status: "not_yet",
     order: i+2,
     scheduled_complete_date: (Date.current + 3 + 3*i).to_s,
   )
@@ -187,3 +187,9 @@ end
   )
 end
 puts "「SampleUser0」の案件「お客様１」の「進捗１」のタスク作成完了"
+
+puts "初期値設定中"
+User.all.each do |user|
+  user.update_attribute(:lead_count, user.leads.in_progress.count)
+end
+puts "初期値設定完了"
