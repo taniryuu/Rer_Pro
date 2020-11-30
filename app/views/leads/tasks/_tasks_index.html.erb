@@ -20,7 +20,7 @@
       <% end %>
       <tr>
         <td>
-        <%= f.submit "済にする" %>
+          <%= f.submit "済にする", {disabled: @tasks.blank? ? true : false} %>
         </td>
       </tr>
     <% end %>
