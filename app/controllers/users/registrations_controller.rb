@@ -3,8 +3,7 @@
 class Users::RegistrationsController < Devise::RegistrationsController
   prepend_before_action :authenticate_scope!, only: %i(edit update)
   prepend_before_action :set_minimum_password_length, only: %i(edit)
-  before_action :set_users, only: %i(edit update)
-  before_action :only_same_company_id?, only: %i(edit update)
+  before_action :set_user, :set_users, :only_same_company_id?, only: %i(edit update)
   before_action :configure_account_update_params, only: [:update]
 
   # GET /resource/sign_up
@@ -19,7 +18,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
 
   # GET /resource/edit
   def edit
-    if by_admin_user?(params) && @users.find_by(params[:id]).try(:id)
+    if by_admin_user?(params)
       self.resource = resource_class.to_adapter.get(params[:id])
     else
       authenticate_scope!
@@ -29,7 +28,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
 
   # PUT /resource
   def update
-    if by_admin_user?(params) && @users.find_by(params[:id]).try(:id)
+    if by_admin_user?(params)
       self.resource = resource_class.to_adapter.get(params[:id])
     else
       self.resource = resource_class.to_adapter.get(send(:"current_#{resource_name}").to_key)
@@ -75,37 +74,43 @@ class Users::RegistrationsController < Devise::RegistrationsController
   #   super
   # end
 
+  private
+
+    def set_user
+      @user = User.find(params[:id])
+    end
+
   protected
 
-  # If you have extra params to permit, append them to the sanitizer.
-  def configure_account_update_params
-    devise_parameter_sanitizer.permit(:account_update, keys: [:attribute])
-  end
-
-  # The path used after sign up.
-  def by_admin_user?(params)
-    params[:id].present? && current_user_is_admin?
-  end
-
-  def current_user_is_admin?
-    user_signed_in? && current_user.admin?
-  end
-
-  # The path used after update.
-  def after_update_path_for(resource)
-    if current_user_is_admin?
-      users_path
-    else
-      user_path(resource)
+    # If you have extra params to permit, append them to the sanitizer.
+    def configure_account_update_params
+      devise_parameter_sanitizer.permit(:account_update, keys: [:attribute])
     end
-  end
 
-  def update_resource_without_password(resource, params)
-    resource.update_without_password(params)
-  end
+    # The path used after sign up.
+    def by_admin_user?(params)
+      params[:id].present? && current_user_is_admin?
+    end
 
-  # The path used after sign up for inactive accounts.
-  def after_inactive_sign_up_path_for(resource)
-    super(resource)
-  end
+    def current_user_is_admin?
+      user_signed_in? && current_user.admin?
+    end
+
+    # The path used after update.
+    def after_update_path_for(resource)
+      if current_user_is_admin?
+        users_path
+      else
+        user_path(resource)
+      end
+    end
+
+    def update_resource_without_password(resource, params)
+      resource.update_without_password(params)
+    end
+
+    # The path used after sign up for inactive accounts.
+    def after_inactive_sign_up_path_for(resource)
+      super(resource)
+    end
 end
