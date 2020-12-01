@@ -71,6 +71,7 @@ class Leads::StepsController < Leads::ApplicationController
   # PATCH/PUT /steps/1.json
   def update
     @task = Task.new(task_params)
+    @task.update_attributes(step_id: @step.id)
     if update_step_errors(@lead, @step).blank?
       flash[:success] = "#{flash[:success]}#{@step.name}を更新しました。"
       check_status_and_redirect_to(@step, @step, nil)
@@ -131,7 +132,7 @@ class Leads::StepsController < Leads::ApplicationController
     end
 
     def task_params
-      params.require(:task).permit(:step_id, :name, :memo, :status, :scheduled_complete_date, :completed_date, :canceled_date)
+      params.require(:task).permit(:name, :memo, :status, :scheduled_complete_date, :completed_date, :canceled_date)
     end
     
     # クリエイト処理
@@ -182,6 +183,7 @@ class Leads::StepsController < Leads::ApplicationController
         # 新規タスク作成
         if (step.status?("in_progress") || step.status?("inactive")) && step.tasks.not_yet.blank?
           @task =Task.create(task_params)
+          @task.update_attributes(step_id: @step.id)
           flash[:danger] = "#{flash[:danger]}タスクの完了予定日に過去の日付を入力しようとしています。" if prohibit_past(@task.scheduled_complete_date)
           flash[:danger] = "#{flash[:danger]}タスクの完了日に過去の日付を入力しようとしています。" if prohibit_past(@task.completed_date)
         end

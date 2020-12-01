@@ -9,8 +9,6 @@
     <%= fields_for task do |t| %>
       <%= render 'devise/shared/error_messages', resource: task %>
 
-      <%= t.hidden_field :step_id, value: step.id %>
-
       <div class="field">
         <%= t.label :name %>
         <%= t.text_field :name %>
