@@ -292,6 +292,6 @@ class Leads::ApplicationController < Users::ApplicationController
     end
 
     def task_simple_params
-      params.require(:task).permit(:name, :status, :scheduled_complete_date)
+      params.require(:task).permit(:step_id, :name, :status, :scheduled_complete_date)
     end
 end
