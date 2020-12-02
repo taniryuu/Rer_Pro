@@ -70,8 +70,9 @@ class Leads::StepsController < Leads::ApplicationController
   # PATCH/PUT /steps/1
   # PATCH/PUT /steps/1.json
   def update
-    @task = Task.new(task_params)
-    @task.update_attributes(step_id: @step.id)
+    @tasks_not_yet_present = @step.tasks.not_yet.present? ? true : false
+    # タスク新規作成
+    @task = @step.tasks.new(task_params)
     if update_step_errors(@lead, @step).blank?
       flash[:success] = "#{flash[:success]}#{@step.name}を更新しました。"
       check_status_and_redirect_to(@step, @step, nil)
@@ -180,10 +181,10 @@ class Leads::StepsController < Leads::ApplicationController
         flash[:danger] = "#{flash[:danger]}進捗の完了予定日に過去の日付を入力しようとしています。" if prohibit_past(step.scheduled_complete_date)
         flash[:danger] = "#{flash[:danger]}進捗の完了日に過去の日付を入力しようとしています。" if prohibit_past(step.completed_date)
         lead.update_attribute(:notice_change_limit, true) if step.saved_change_to_scheduled_complete_date?
-        # 新規タスク作成
-        if (step.status?("in_progress") || step.status?("inactive")) && step.tasks.not_yet.blank?
-          @task =Task.create(task_params)
-          @task.update_attributes(step_id: @step.id)
+        #stepにタスクがすでにある場合またはstepが「未」または「完了」のときはtaskを作らない
+        if @tasks_not_yet_present || step.status?("not_yet") || step.status?("completed")
+          @task.destroy
+        else
           flash[:danger] = "#{flash[:danger]}タスクの完了予定日に過去の日付を入力しようとしています。" if prohibit_past(@task.scheduled_complete_date)
           flash[:danger] = "#{flash[:danger]}タスクの完了日に過去の日付を入力しようとしています。" if prohibit_past(@task.completed_date)
         end

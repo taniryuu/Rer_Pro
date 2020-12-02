@@ -46,7 +46,6 @@ class Leads::TasksController < Leads::ApplicationController
 
   def update
     if @task.update(task_params)
-      @task.update_attributes(step_id: @step.id)
       update_completed_tasks_rate(@step)
       # 完了日が空なら今日の日付を入れる
       @task.date_blank_then_today("completed")
