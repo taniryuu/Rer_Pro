@@ -32,6 +32,7 @@ class Leads::ApplicationController < Users::ApplicationController
       if (step.status?("in_progress") || step.status?("inactive")) && step.tasks.not_yet.blank?
         @task = step.tasks.create(task_simple_params)
         flash[:danger] = "#{flash[:danger]}タスクの完了予定日に過去の日付を入力しようとしています。" if prohibit_past(@task.scheduled_complete_date)
+        update_completed_tasks_rate(step)
       end
       # 案件を再開する場合の処理
       start_lead(lead) unless lead.status?("in_progress")

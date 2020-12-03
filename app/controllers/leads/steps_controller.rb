@@ -56,6 +56,7 @@ class Leads::StepsController < Leads::ApplicationController
         flash[:danger] = "「完了」タスクが無い、進捗は「完了」ステータスで新規作成しようとしています。「完了」タスクを自動で生成しました。"
         scheduled_complete_date = params[:step][:scheduled_complete_date].present? ? params[:step][:scheduled_complete_date] : "#{Date.current}"
         Task.create!(step_id: @step.id ,name: "completed_task", status: "completed", scheduled_complete_date: scheduled_complete_date, completed_date: params[:step][:completed_date])
+        update_completed_tasks_rate(@step)
       end
       # 編集-完了から進捗を新規作成した場合
       @completed_step.present? ? check_status_and_redirect_to(@completed_step, @step, nil) : check_status_and_redirect_to(@step, @step, nil)
@@ -70,11 +71,6 @@ class Leads::StepsController < Leads::ApplicationController
   # PATCH/PUT /steps/1
   # PATCH/PUT /steps/1.json
   def update
-    @tasks_not_yet_present = @step.tasks.not_yet.present? ? true : false
-    unless @tasks_not_yet_present
-      # タスク新規作成
-      @task = @step.tasks.new(task_params)
-    end
     if update_step_errors(@lead, @step).blank?
       flash[:success] = "#{flash[:success]}#{@step.name}を更新しました。"
       check_status_and_redirect_to(@step, @step, nil)
@@ -160,6 +156,7 @@ class Leads::StepsController < Leads::ApplicationController
         # stepが「未」または「完了」のときはtaskを作らない
         if step.status?("not_yet") || step.status?("completed")
           @task.destroy
+          update_completed_tasks_rate(step)
         end
         # 矛盾を解消
         check_status_inactive_or_not(step)
@@ -183,21 +180,23 @@ class Leads::StepsController < Leads::ApplicationController
         flash[:danger] = "#{flash[:danger]}進捗の完了予定日に過去の日付を入力しようとしています。" if prohibit_past(step.scheduled_complete_date)
         flash[:danger] = "#{flash[:danger]}進捗の完了日に過去の日付を入力しようとしています。" if prohibit_past(step.completed_date)
         lead.update_attribute(:notice_change_limit, true) if step.saved_change_to_scheduled_complete_date?
-        #stepにタスクが無く、かつstepが「未」または「完了」のときはtaskを作らない
-        if !@tasks_not_yet_present && (step.status?("not_yet") || step.status?("completed"))
-          @task.destroy
-        #stepにタスクが無く、かつ進捗を「進捗中」または「保留」にするとき
-        elsif !@tasks_not_yet_present && (step.status?("inprogress") || step.status?("in_active"))
+        tasks_not_yet_blank = step.tasks.not_yet.blank? ? true : false
+        if tasks_not_yet_blank && (step.status?("in_progress") || step.status?("inactive"))
+          # タスク新規作成
+          @task = step.tasks.new(task_params)
+        end
+        if tasks_not_yet_blank && (step.status?("in_progress") || step.status?("inactive"))
           flash[:danger] = "#{flash[:danger]}タスクの完了予定日に過去の日付を入力しようとしています。" if prohibit_past(@task.scheduled_complete_date)
           flash[:danger] = "#{flash[:danger]}タスクの完了日に過去の日付を入力しようとしています。" if prohibit_past(@task.completed_date)
         end
+        update_completed_tasks_rate(step)
         # 矛盾を解消
         check_status_inactive_or_not(step)
         check_status_completed_or_not(lead, step)
         # バリデーション確認
         errors << lead.errors.full_messages if lead.invalid?(:check_steps_status)
         errors << step.errors.full_messages if step.invalid?(:check_order)
-        errors << @task.errors.full_messages if @task.present? && @task.invalid?
+        #errors << @task.errors.full_messages if @task.present? && @task.invalid?
         raise ActiveRecord::Rollback if errors.present?
       end
       errors.presence || nil
