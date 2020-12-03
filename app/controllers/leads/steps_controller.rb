@@ -106,7 +106,7 @@ class Leads::StepsController < Leads::ApplicationController
       @lead.update(notice_change_limit: false) if @lead.steps.where(notice_change_limit: true).blank?
       flash[:success] = "確認しました。"
     else
-      flash[:danger] = "確認処理に失敗しました。"
+      flash[:danger] = "指定されたユーザーしか確認できません。"
     end
     redirect_to @step
   end
