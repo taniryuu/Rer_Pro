@@ -47,9 +47,6 @@ class Leads::StepsController < Leads::ApplicationController
   # POST /steps.json
   def create
     @step = @lead.steps.new(step_params)
-    @task = @step.tasks.new(task_params)
-    flash[:danger] = "#{flash[:danger]}タスクの完了予定日に過去の日付を入力しようとしています。" if prohibit_past(@task.scheduled_complete_date)
-    flash[:danger] = "#{flash[:danger]}タスクの完了日に過去の日付を入力しようとしています。" if prohibit_past(@task.completed_date)
     if save_step_errors(@lead, @step).blank?
       flash[:success] = "#{flash[:success]}#{@step.name}を作成しました。"
       if params[:step][:status].present? && params[:step][:status] == "completed"
@@ -153,10 +150,12 @@ class Leads::StepsController < Leads::ApplicationController
           @start_lead_flag = true
           errors << lead.errors.full_messages unless start_lead(lead)
         end
-        # stepが「未」または「完了」のときはtaskを作らない
-        if step.status?("not_yet") || step.status?("completed")
-          @task.destroy
+        if step.status?("in_progress") || step.status?("inactive")
+          # タスク新規作成
+          @task = step.tasks.new(task_params)
           update_completed_tasks_rate(step)
+          flash[:danger] = "#{flash[:danger]}タスクの完了予定日に過去の日付を入力しようとしています。" if prohibit_past(@task.scheduled_complete_date)
+          flash[:danger] = "#{flash[:danger]}タスクの完了日に過去の日付を入力しようとしています。" if prohibit_past(@task.completed_date)
         end
         # 矛盾を解消
         check_status_inactive_or_not(step)
@@ -164,7 +163,7 @@ class Leads::StepsController < Leads::ApplicationController
         # バリデーション確認
         errors << lead.errors.full_messages if lead.invalid?(:check_steps_status)
         errors << step.errors.full_messages if step.invalid?(:check_order)
-        errors << @task.errors.full_messages if @task.invalid?
+        #errors << @task.errors.full_messages if @task.present? && @task.invalid?
         raise ActiveRecord::Rollback if errors.present?
       end
       errors.presence || nil
@@ -184,12 +183,10 @@ class Leads::StepsController < Leads::ApplicationController
         if tasks_not_yet_blank && (step.status?("in_progress") || step.status?("inactive"))
           # タスク新規作成
           @task = step.tasks.new(task_params)
-        end
-        if tasks_not_yet_blank && (step.status?("in_progress") || step.status?("inactive"))
+          update_completed_tasks_rate(step)
           flash[:danger] = "#{flash[:danger]}タスクの完了予定日に過去の日付を入力しようとしています。" if prohibit_past(@task.scheduled_complete_date)
           flash[:danger] = "#{flash[:danger]}タスクの完了日に過去の日付を入力しようとしています。" if prohibit_past(@task.completed_date)
         end
-        update_completed_tasks_rate(step)
         # 矛盾を解消
         check_status_inactive_or_not(step)
         check_status_completed_or_not(lead, step)
