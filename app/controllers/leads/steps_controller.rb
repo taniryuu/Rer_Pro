@@ -165,7 +165,7 @@ class Leads::StepsController < Leads::ApplicationController
         # バリデーション確認
         errors << lead.errors.full_messages if lead.invalid?(:check_steps_status)
         errors << step.errors.full_messages if step.invalid?(:check_order)
-        errors << @task.errors.full_messages if @task.invalid?
+        errors << @task.errors.full_messages if @task.present? && @task.invalid?
         raise ActiveRecord::Rollback if errors.present?
       end
       errors.presence || nil
@@ -181,7 +181,7 @@ class Leads::StepsController < Leads::ApplicationController
         flash[:danger] = "#{flash[:danger]}進捗の完了予定日に過去の日付を入力しようとしています。" if prohibit_past(step.scheduled_complete_date)
         flash[:danger] = "#{flash[:danger]}進捗の完了日に過去の日付を入力しようとしています。" if prohibit_past(step.completed_date)
         lead.update_attribute(:notice_change_limit, true) if step.saved_change_to_scheduled_complete_date?
-        #stepにタスクがすでにある場合またはstepが「未」または「完了」のときはtaskを作らない
+        #stepにタスクがすでにある場合作る必要が無く、stepが「未」または「完了」のときタスクがあればバリデーションに反するので削除する
         if @tasks_not_yet_present || step.status?("not_yet") || step.status?("completed")
           @task.destroy
         else
@@ -194,7 +194,7 @@ class Leads::StepsController < Leads::ApplicationController
         # バリデーション確認
         errors << lead.errors.full_messages if lead.invalid?(:check_steps_status)
         errors << step.errors.full_messages if step.invalid?(:check_order)
-        errors << @task.errors.full_messages if @task.invalid?
+        errors << @task.errors.full_messages if @task.present? && @task.invalid?
         raise ActiveRecord::Rollback if errors.present?
       end
       errors.presence || nil
