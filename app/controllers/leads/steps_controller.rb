@@ -163,7 +163,6 @@ class Leads::StepsController < Leads::ApplicationController
         # バリデーション確認
         errors << lead.errors.full_messages if lead.invalid?(:check_steps_status)
         errors << step.errors.full_messages if step.invalid?(:check_order)
-        #errors << @task.errors.full_messages if @task.present? && @task.invalid?
         raise ActiveRecord::Rollback if errors.present?
       end
       errors.presence || nil
@@ -193,7 +192,6 @@ class Leads::StepsController < Leads::ApplicationController
         # バリデーション確認
         errors << lead.errors.full_messages if lead.invalid?(:check_steps_status)
         errors << step.errors.full_messages if step.invalid?(:check_order)
-        #errors << @task.errors.full_messages if @task.present? && @task.invalid?
         raise ActiveRecord::Rollback if errors.present?
       end
       errors.presence || nil
