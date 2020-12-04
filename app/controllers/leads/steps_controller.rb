@@ -178,8 +178,7 @@ class Leads::StepsController < Leads::ApplicationController
         flash[:danger] = "#{flash[:danger]}進捗の完了予定日に過去の日付を入力しようとしています。" if prohibit_past(step.scheduled_complete_date)
         flash[:danger] = "#{flash[:danger]}進捗の完了日に過去の日付を入力しようとしています。" if prohibit_past(step.completed_date)
         lead.update_attribute(:notice_change_limit, true) if step.saved_change_to_scheduled_complete_date?
-        tasks_not_yet_blank = step.tasks.not_yet.blank? ? true : false
-        if tasks_not_yet_blank && (step.status?("in_progress") || step.status?("inactive"))
+        if step.tasks.not_yet.blank? && (step.status?("in_progress") || step.status?("inactive"))
           # タスク新規作成
           @task = step.tasks.new(task_params)
           update_completed_tasks_rate(step)
