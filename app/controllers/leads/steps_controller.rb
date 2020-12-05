@@ -70,7 +70,7 @@ class Leads::StepsController < Leads::ApplicationController
   # PATCH/PUT /steps/1
   # PATCH/PUT /steps/1.json
   def update
-    @tasks_not_yet_present = @step.tasks.not_yet.present? ? true : false
+    @present_not_yet_tasks = @step.tasks.not_yet.present? ? true : false
     # タスク新規作成
     @task = @step.tasks.new(task_params)
     if update_step_errors(@lead, @step).blank?
@@ -182,7 +182,7 @@ class Leads::StepsController < Leads::ApplicationController
         flash[:danger] = "#{flash[:danger]}進捗の完了日に過去の日付を入力しようとしています。" if prohibit_past(step.completed_date)
         lead.update_attribute(:notice_change_limit, true) if step.saved_change_to_scheduled_complete_date?
         #stepにタスクがすでにある場合作る必要が無く、stepが「未」または「完了」のときタスクがあればバリデーションに反するので削除する
-        if @tasks_not_yet_present || step.status?("not_yet") || step.status?("completed")
+        if @present_not_yet_tasks || step.status?("not_yet") || step.status?("completed")
           @task.destroy
         else
           flash[:danger] = "#{flash[:danger]}タスクの完了予定日に過去の日付を入力しようとしています。" if prohibit_past(@task.scheduled_complete_date)
