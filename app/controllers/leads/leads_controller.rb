@@ -145,6 +145,7 @@ class Leads::LeadsController < Leads::ApplicationController
               order: 1,
               scheduled_complete_date: "#{Date.current}",
             )
+            flash[:success] = "現在仮の進捗が登録されていますので、必要な進捗に見直してください。"
           end
           # 矛盾を解消
           update_lead_count(current_user)

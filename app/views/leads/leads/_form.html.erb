@@ -29,13 +29,10 @@
 
 ----------------------------------------------------------------
 
-  <% unless @lead.new_record? %>
-    <div class="field">
-      <%= form.label :status %>
-      <%= form.select :status, Lead.statuses.keys.map { |k| [I18n.t("enums.lead.status.#{k}"), k]} %>
-    </div>
-
-    <%# date_selectを使うと「undefined method `day' for "":String」エラーになるため、date_fieldを使用中 %>
+  <% if @lead.new_record? %>
+    <div class="field">ステータス：進捗中</div>
+  <% else %>
+    <div class="field">ステータス：<%= lead.status_i18n %></div>
     <div class="field">
       <%= form.label :completed_date %>
       <%= form.date_field :completed_date, value: @lead.completed_date %><br>
@@ -58,13 +55,10 @@
     <%= form.date_field :scheduled_contract_date, value: modified_date(@lead.scheduled_contract_date, @template_lead.try(:scheduled_contract_date), @date_difference) %>
   </div>
 
+  <% value_created_date = @lead.new_record? ? Date.current : @lead.created_date %>
   <div class="field">
     <%= form.label :created_date %><%= must %>
-    <% if @lead.new_record? %>
-      <%= form.date_field :created_date, value: Date.current %>
-    <% else %>
-      <%= form.date_field :created_date, value: @lead.created_date %>
-    <% end %>
+    <%= form.date_field :created_date, value: value_created_date %>
   </div>
 
 ----------------------------------------------------------------
