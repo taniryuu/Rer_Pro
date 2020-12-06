@@ -46,6 +46,7 @@ class Leads::StepsController < Leads::ApplicationController
   # POST /steps
   # POST /steps.json
   def create
+    flash.delete(:info)
     @step = @lead.steps.new(step_params)
     @task = @step.tasks.new(task_params)
     flash[:danger] = "#{flash[:danger]}タスクの完了予定日に過去の日付を入力しようとしています。" if prohibit_past(@task.scheduled_complete_date)
@@ -61,7 +62,6 @@ class Leads::StepsController < Leads::ApplicationController
       @completed_step.present? ? check_status_and_redirect_to(@completed_step, @step, nil) : check_status_and_redirect_to(@step, @step, nil)
     else
       flash.delete(:success)
-      flash.delete(:info) if flash.now[:info] = flash[:info]
       flash.now[:danger] = "#{@lead.errors.full_messages.first}" if @lead.errors.present?
       flash.now[:danger] = "#{flash.now[:danger]}#{@completed_step.errors.full_messages.first}" if @completed_step.present? && @completed_step.errors.present?
       render :new
@@ -133,7 +133,7 @@ class Leads::StepsController < Leads::ApplicationController
     end
 
     def task_params
-      params.require(:task).permit(:step_id, :name, :memo, :status, :scheduled_complete_date, :completed_date, :canceled_date)
+      params.require(:task).permit(:name, :memo, :status, :scheduled_complete_date, :completed_date, :canceled_date)
     end
     
     # クリエイト処理
@@ -165,7 +165,7 @@ class Leads::StepsController < Leads::ApplicationController
         # バリデーション確認
         errors << lead.errors.full_messages if lead.invalid?(:check_steps_status)
         errors << step.errors.full_messages if step.invalid?(:check_order)
-        errors << @task.errors.full_messages if @task.invalid?
+        errors << @task.errors.full_messages if @task.present? && @task.invalid?
         raise ActiveRecord::Rollback if errors.present?
       end
       errors.presence || nil
@@ -180,15 +180,16 @@ class Leads::StepsController < Leads::ApplicationController
         step.update(step_params)
         flash[:danger] = "#{flash[:danger]}進捗の完了予定日に過去の日付を入力しようとしています。" if prohibit_past(step.scheduled_complete_date)
         flash[:danger] = "#{flash[:danger]}進捗の完了日に過去の日付を入力しようとしています。" if prohibit_past(step.completed_date)
+        #stepにタスクがすでにある場合作る必要が無く、stepが「未」または「完了」のときタスクがあればバリデーションに反するので削除する
+        if @present_not_yet_tasks || step.status?("not_yet") || step.status?("completed")
+          @task.destroy
+        else
+          flash[:danger] = "#{flash[:danger]}タスクの完了予定日に過去の日付を入力しようとしています。" if prohibit_past(@task.scheduled_complete_date)
+          flash[:danger] = "#{flash[:danger]}タスクの完了日に過去の日付を入力しようとしています。" if prohibit_past(@task.completed_date)
+        end
         if step.saved_change_to_scheduled_complete_date?
           step.update_attribute(:notice_change_limit, true)
           lead.update_attribute(:notice_change_limit, true)
-        end
-        # 新規タスク作成
-        if (step.status?("in_progress") || step.status?("inactive")) && step.tasks.not_yet.blank?
-          @task =Task.create(task_params)
-          flash[:danger] = "#{flash[:danger]}タスクの完了予定日に過去の日付を入力しようとしています。" if prohibit_past(@task.scheduled_complete_date)
-          flash[:danger] = "#{flash[:danger]}タスクの完了日に過去の日付を入力しようとしています。" if prohibit_past(@task.completed_date)
         end
         # 矛盾を解消
         check_status_inactive_or_not(step)
@@ -196,7 +197,13 @@ class Leads::StepsController < Leads::ApplicationController
         # バリデーション確認
         errors << lead.errors.full_messages if lead.invalid?(:check_steps_status)
         errors << step.errors.full_messages if step.invalid?(:check_order)
-        errors << @task.errors.full_messages if @task.invalid?
+        # 矛盾を解消
+        check_status_inactive_or_not(step)
+        check_status_completed_or_not(lead, step)
+        # バリデーション確認
+        errors << lead.errors.full_messages if lead.invalid?(:check_steps_status)
+        errors << step.errors.full_messages if step.invalid?(:check_order)
+        errors << @task.errors.full_messages if @task.present? && @task.invalid?
         raise ActiveRecord::Rollback if errors.present?
       end
       errors.presence || nil
