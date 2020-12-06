@@ -61,6 +61,7 @@ class Leads::StepsController < Leads::ApplicationController
       @completed_step.present? ? check_status_and_redirect_to(@completed_step, @step, nil) : check_status_and_redirect_to(@step, @step, nil)
     else
       flash.delete(:success)
+      flash.delete(:info) if flash.now[:info] = flash[:info]
       flash.now[:danger] = "#{@lead.errors.full_messages.first}" if @lead.errors.present?
       flash.now[:danger] = "#{flash.now[:danger]}#{@completed_step.errors.full_messages.first}" if @completed_step.present? && @completed_step.errors.present?
       render :new
@@ -70,6 +71,7 @@ class Leads::StepsController < Leads::ApplicationController
   # PATCH/PUT /steps/1
   # PATCH/PUT /steps/1.json
   def update
+    flash.delete(:info)
     @task = Task.new(task_params)
     if update_step_errors(@lead, @step).blank?
       flash[:success] = "#{flash[:success]}#{@step.name}を更新しました。"
