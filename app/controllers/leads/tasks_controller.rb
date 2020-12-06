@@ -32,8 +32,6 @@ class Leads::TasksController < Leads::ApplicationController
   end
 
   def create
-    #@task = Task.new(task_params)
-    #@task.update_attributes(step_id: @step.id)
     @task = @step.tasks.new(task_params)
     flash[:danger] = "完了予定日に過去の日付を入力しようとしています。" if prohibit_past(@task.scheduled_complete_date)
     if @task.save

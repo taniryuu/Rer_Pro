@@ -27,37 +27,38 @@
   </tbody>
 </table>
 
-<!-- 入力フォーム -->
+<% if @user.id == current_user.id %>
+  <!-- 入力フォーム -->
 
-<%= form_with(model: @task, url: step_tasks_path(step_id: @step), method: :post, local: true) do |f| %>
+  <%= form_with(model: @task, url: step_tasks_path(step_id: @step), method: :post, local: true) do |f| %>
 
-  <%= render 'devise/shared/error_messages', resource: @task %>
+    <%= render 'devise/shared/error_messages', resource: @task %>
 
-  <div class="row">
-    <div class="col-2">
-      <div class="form-group">
-        <%= f.label :name, class: "label-#{yield(:class_text)}"%>
-        <%= f.text_field :name, class: "form-control" %>
+    <div class="row">
+      <div class="col-2">
+        <div class="form-group">
+          <%= f.label :name, class: "label-#{yield(:class_text)}"%>
+          <%= f.text_field :name, class: "form-control" %>
+        </div>
       </div>
-    </div>
-    <div class="col-2">
-      <div class="form-group">
-        <%= f.label :scheduled_complete_date, class: "label-#{yield(:class_text)}" %>
-        <%= f.date_field :scheduled_complete_date, class: 'form-control' %>
+      <div class="col-2">
+        <div class="form-group">
+          <%= f.label :scheduled_complete_date, class: "label-#{yield(:class_text)}" %>
+          <%= f.date_field :scheduled_complete_date, class: 'form-control' %>
+        </div>
       </div>
-    </div>
 
-    <div class="col-2 align-self-end">
-      <div class="form-group">
-        <%= f.submit yield(:button_text), class: "btn-#{yield(:class_text)}" %>
+      <div class="col-2 align-self-end">
+        <div class="form-group">
+          <%= f.submit yield(:button_text), class: "btn-#{yield(:class_text)}" %>
+        </div>
       </div>
+
     </div>
 
-    <%= f.hidden_field :step_id, class: "form-control", value: @step.id %>
+  <% end %>
 
-  </div>
-
-<% end %>
+<%  end %>
 
 <!--p>済 リスト</p-->
 <div class="panel-group" id="accordion">
