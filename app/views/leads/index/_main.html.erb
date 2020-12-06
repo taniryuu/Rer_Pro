@@ -51,7 +51,18 @@
       <tbody>
         <% leads.each do |lead| %>
           <tr>
-            <td><%= "#{lead.status_i18n}" %><br>(ここに遅延状況を表示)</td>
+            <td>
+              <h4><%= "#{lead.status_i18n}" %></h4>
+              遅延：
+              <% steps_delay = lead.steps.todo.where("scheduled_complete_date <= ?", @users.find(lead.user_id).limit_date) %>
+              <% if steps_delay.present? %>
+                <% steps_delay.each do |step| %>
+                  <div class="mb-0"><%= link_to "#{step.name}", step_path(step) %></div>
+                <% end %>
+              <% else %>
+                なし
+              <% end %>
+            </td>
             <td><%= @users.find(lead.user_id).name %></td>
             <td><%= "#{lead.room_name} / #{lead.room_num}号室" %></td>
             <td><%= lead.customer_name %></td>

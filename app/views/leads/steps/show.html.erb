@@ -68,7 +68,8 @@
 <br><br><br>////////////////////////////////////////////////////////////////////////////////////////////////////////////<br>
 ページはここまで。以下はメモです。（最終プルリク上げる前に削除）
 
-期限変更：<%= @lead.notice_change_limit %>
+案件の期限変更：<%= @lead.notice_change_limit %>
+進捗の期限変更：<%= @step.notice_change_limit %>
 <br>
 <%= link_to '進捗編集', edit_step_path(@step) %> |
 <%= link_to '進捗一覧', lead_steps_path(@lead) %>
