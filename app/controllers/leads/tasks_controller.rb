@@ -32,7 +32,7 @@ class Leads::TasksController < Leads::ApplicationController
   end
 
   def create
-    @task = Task.new(task_params)
+    @task = @step.tasks.new(task_params)
     flash[:danger] = "完了予定日に過去の日付を入力しようとしています。" if prohibit_past(@task.scheduled_complete_date)
     if @task.save
       update_completed_tasks_rate(@step)
@@ -44,7 +44,7 @@ class Leads::TasksController < Leads::ApplicationController
 
 
   def update
-    if @task.update(task_params) 
+    if @task.update(task_params)
       update_completed_tasks_rate(@step)
       # 完了日が空なら今日の日付を入れる
       @task.date_blank_then_today("completed")
@@ -173,7 +173,7 @@ class Leads::TasksController < Leads::ApplicationController
     end
 
     def task_params
-      params.require(:task).permit(:step_id, :name, :memo, :status, :scheduled_complete_date, :completed_date, :canceled_date)
+      params.require(:task).permit(:name, :memo, :status, :scheduled_complete_date, :completed_date, :canceled_date)
     end
 
     def revive_from_canceled_list_params

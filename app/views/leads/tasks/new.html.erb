@@ -14,8 +14,6 @@
 
   <%= f.submit yield(:button_text), class: "btn-#{yield(:class_text)}" %>
 
-  <%= f.hidden_field :step_id, class: "form-control", value: @step.id %>
-
 <% end %>
 
 <!-- steps#showに戻る -->
