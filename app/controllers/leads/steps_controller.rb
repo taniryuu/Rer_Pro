@@ -2,10 +2,15 @@ class Leads::StepsController < Leads::ApplicationController
   # オブジェクトの準備
   before_action :set_step, except: %i(index new create)
   before_action :set_lead_and_user_by_lead_id, only: %i(index new create)
-  before_action :set_steps, only: %i(show)
+  before_action :set_steps, only: %i(show edit_complete_or_continue_step)
+  before_action :set_new_task, only: %i(edit_continue_or_destroy_step edit_complete_or_continue_step edit_change_status_or_complete_task)
   # フィルター（アクセス権限）
   before_action :only_same_company_id?
   before_action :correct_user, except: %i(index show change_limit_check)
+  before_action :correct_not_yet_completed_nil_status, only: :edit_continue_or_destroy_step
+  before_action :correct_not_yet_nil_completed_present_status, only: :edit_complete_or_continue_step
+  before_action :correct_not_yet_present_completed_step_status, only: :edit_change_status_or_complete_task
+
   # 後処理
   # after_action :sort_order, only: %i(destroy index)
 
@@ -108,6 +113,16 @@ class Leads::StepsController < Leads::ApplicationController
     redirect_to @step
   end
 
+  def edit_continue_or_destroy_step
+  end
+
+  def edit_complete_or_continue_step
+  end
+
+  def edit_change_status_or_complete_task
+  end
+
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_step
@@ -120,6 +135,10 @@ class Leads::StepsController < Leads::ApplicationController
     def set_lead_and_user_by_lead_id
       @lead = Lead.find(params[:lead_id])
       @user = User.find(@lead.user_id)
+    end
+
+    def set_new_task
+      @task = @step.tasks.new
     end
 
     # Only allow a list of trusted parameters through.
@@ -214,6 +233,24 @@ class Leads::StepsController < Leads::ApplicationController
             next_step.update_attribute(:order, order_num + 1)
           end
         end
+      end
+    end
+
+    def correct_not_yet_completed_nil_status
+      unless @step.tasks.find_by(status: "not_yet").nil? && @step.tasks.find_by(status: "completed").nil?
+        redirect_to @step
+      end
+    end
+
+    def correct_not_yet_nil_completed_present_status
+      unless @step.tasks.find_by(status: "not_yet").nil? && @step.tasks.find_by(status: "completed").present?
+        redirect_to @step
+      end
+    end
+
+    def correct_not_yet_present_completed_step_status
+      unless @step.tasks.find_by(status: "not_yet").present? && @step.status?("completed")
+        redirect_to @step
       end
     end
 end
