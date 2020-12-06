@@ -181,4 +181,23 @@ class Leads::TasksController < Leads::ApplicationController
     def revive_from_canceled_list_params
       params.require(:task).permit(:scheduled_complete_date)
     end
+
+        def correct_not_yet_completed_nil_status
+      unless @step.tasks.find_by(status: "not_yet").nil? && @step.tasks.find_by(status: "completed").nil?
+        redirect_to @step
+      end
+    end
+
+    def correct_not_yet_nil_completed_present_status
+      unless @step.tasks.find_by(status: "not_yet").nil? && @step.tasks.find_by(status: "completed").present?
+        redirect_to @step
+      end
+    end
+
+    def correct_not_yet_present_completed_step_status
+      unless @step.tasks.find_by(status: "not_yet").present? && @step.status?("completed")
+        redirect_to @step
+      end
+    end
+
 end
