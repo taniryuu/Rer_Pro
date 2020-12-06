@@ -9,7 +9,9 @@ class Leads::TasksController < Leads::ApplicationController
   before_action :set_new_task, only: %i(edit_continue_or_destroy_step edit_complete_or_continue_step edit_change_status_or_complete_task)
   # アクセス制限
   before_action :correct_user, except: %i(index show)
-
+  before_action :correct_not_yet_completed_nil_status, only: :edit_continue_or_destroy_step
+  before_action :correct_not_yet_nil_completed_present_status, only: :edit_complete_or_continue_step
+  before_action :correct_not_yet_present_completed_step_status, only: :edit_change_status_or_complete_task
 
   def index
     # タスクステータスが「未」のリスト
