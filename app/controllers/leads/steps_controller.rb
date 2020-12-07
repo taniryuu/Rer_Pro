@@ -46,6 +46,7 @@ class Leads::StepsController < Leads::ApplicationController
   # POST /steps
   # POST /steps.json
   def create
+    flash.delete(:info)
     @step = @lead.steps.new(step_params)
     @task = @step.tasks.new(task_params)
     flash[:danger] = "#{flash[:danger]}タスクの完了予定日に過去の日付を入力しようとしています。" if prohibit_past(@task.scheduled_complete_date)
@@ -70,6 +71,7 @@ class Leads::StepsController < Leads::ApplicationController
   # PATCH/PUT /steps/1
   # PATCH/PUT /steps/1.json
   def update
+    flash.delete(:info)
     @present_not_yet_tasks = @step.tasks.not_yet.present? ? true : false
     # タスク新規作成
     @task = @step.tasks.new(task_params)
@@ -180,13 +182,14 @@ class Leads::StepsController < Leads::ApplicationController
         step.update(step_params)
         flash[:danger] = "#{flash[:danger]}進捗の完了予定日に過去の日付を入力しようとしています。" if prohibit_past(step.scheduled_complete_date)
         flash[:danger] = "#{flash[:danger]}進捗の完了日に過去の日付を入力しようとしています。" if prohibit_past(step.completed_date)
-        #stepにタスクがすでにある場合作る必要が無く、stepが「未」または「完了」のときタスクがあればバリデーションに反するので削除する
+        # stepにタスクがすでにある場合作る必要が無く、stepが「未」または「完了」のときタスクがあればバリデーションに反するので削除する
         if @present_not_yet_tasks || step.status?("not_yet") || step.status?("completed")
           @task.destroy
         else
           flash[:danger] = "#{flash[:danger]}タスクの完了予定日に過去の日付を入力しようとしています。" if prohibit_past(@task.scheduled_complete_date)
           flash[:danger] = "#{flash[:danger]}タスクの完了日に過去の日付を入力しようとしています。" if prohibit_past(@task.completed_date)
         end
+        # 完了予定日の変更があれば通知
         if step.saved_change_to_scheduled_complete_date?
           step.update_attribute(:notice_change_limit, true)
           lead.update_attribute(:notice_change_limit, true)

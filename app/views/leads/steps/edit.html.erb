@@ -1,7 +1,6 @@
-<h1>Editing Step</h1>
+<h1>進捗を直接編集</h1>
 
 <%= render 'form', lead: nil, step: @step %>
 
-<%= link_to 'Show', @step %> |
-<%= link_to 'Destroy', step_path(@step), method: :delete, data: { confirm: 'Are you sure?' } %> |
-<%= link_to 'Back', lead_steps_path(@lead) %>
+<%= link_to '案件詳細に戻る', @step %> |
+<%= link_to 'この進捗を削除', step_path(@step), method: :delete, data: { confirm: 'この進捗を完全に削除します。よろしいですか？' } %>

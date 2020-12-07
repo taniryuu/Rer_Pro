@@ -38,10 +38,10 @@
   <tr>
     <td>申込</td>
     <% @steps.each do |step| %>
-      <td><%= link_to ">", new_lead_step_path(@lead, order_num: step.order) %></td>
+      <td><%= @user != current_user ? ">" : (link_to ">", new_lead_step_path(@lead, order_num: step.order)) %></td>
       <td><%= link_to "#{step.order}", step_path(step), class: "btn #{step_button_color(step)} #{step_button_size(@step, step)}" %></td>
     <% end %>
-    <td><%= link_to ">", new_lead_step_path(@lead, order_num: @lead.steps.count + 1) %></td>
+    <td><%= @user != current_user ? ">" : (link_to ">", new_lead_step_path(@lead, order_num: @lead.steps.count + 1)) %></td>
     <td>完了！</td>
   </tr>
 </table>

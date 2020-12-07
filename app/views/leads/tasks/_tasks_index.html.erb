@@ -2,7 +2,7 @@
 <% provide(:button_text, '作成') %>
 <h3>タスク一覧 </h3>
 
-<h4 style="display:inline;">To Do リスト</h4><h5 style="display:inline;"><%= "<STEP#{@step.order}>完了まであと#{@tasks.count}件" %></h5>
+<h4 style="display:inline;">To Do リスト</h4><h5 style="display:inline;"><%= "<STEP#{@step.order}>完了まであと#{@tasks.count}件" %><%= "(#{@step.completed_tasks_rate}%)" %></h5>
 <br>
 <br>
 
