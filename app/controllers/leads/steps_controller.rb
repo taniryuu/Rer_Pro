@@ -170,6 +170,7 @@ class Leads::StepsController < Leads::ApplicationController
           @start_lead_flag = true
           errors << lead.errors.full_messages unless start_lead(lead)
         end
+        # stepが「未」または「完了」のときタスクがあればバリデーションに反するので作らない
         if step.status?("in_progress") || step.status?("inactive")
           # タスク新規作成
           @task = step.tasks.new(task_params)
@@ -197,6 +198,7 @@ class Leads::StepsController < Leads::ApplicationController
         step.update(step_params)
         flash[:danger] = "#{flash[:danger]}進捗の完了予定日に過去の日付を入力しようとしています。" if prohibit_past(step.scheduled_complete_date)
         flash[:danger] = "#{flash[:danger]}進捗の完了日に過去の日付を入力しようとしています。" if prohibit_past(step.completed_date)
+        # stepにタスクがすでにある場合作る必要が無く、stepが「未」または「完了」のときタスクがあればバリデーションに反するので作らない
         if step.tasks.not_yet.blank? && (step.status?("in_progress") || step.status?("inactive"))
           # タスク新規作成
           @task = step.tasks.new(task_params)
