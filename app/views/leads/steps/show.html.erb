@@ -1,63 +1,14 @@
 <p id="notice"><%= notice %></p>
 
-<%= render 'steps_notice' %>
+<%= render 'leads/steps/show/notice' %>
 
 <h1>案件詳細</h1>
-
 <%= render partial: 'leads/leads/lead_show' %>
 
 <hr>
 
-<%= render partial: 'leads/steps/steps_index' %>
-<div>
-  <h1 style="display:inline;"><%= "<STEP#{@step.order}> #{@step.name}" %></h1>
-  <a class="btn <%= step_button_color(@step) %> btn-lg" data-toggle="collapse" href="#collapse-step-status-edit">
-    <% case @step.status %>
-    <% when "not_yet" %>
-      <%= "未開始" %>
-    <% when "inactive" %>
-      <%= "#{l(Time.parse(@step.canceled_date), format: :shortdate)}に凍結済" %>
-    <% when "in_progress" %>
-      <%= "進捗中" %>
-      <%= "：#{l(Time.parse(@step.scheduled_complete_date), format: :shortdate)}迄" %>
-      <%= "（期限変更：上司未確認）" if @lead.notice_change_limit && @step.notice_change_limit && @user == current_user %>
-    <% when "completed" %>
-      <%= "#{l(Time.parse(@step.completed_date), format: :shortdate)}に完了済" %>
-    <% when "template" %>
-      <%= "テンプレート" %>
-    <% end %>
-  </a>
-  <a class="btn btn-default" data-toggle="collapse" href="#collapse-step-status-edit">
-    編集▼
-  </a>
-</div>
-<div id="collapse-step-status-edit" class="collapse">
-  <div class="well">
-    <h5 style="display:inline;">
-      <%= @step.memo %>
-    </h5>
-    <% if @user == current_user %>
-      <hr width="400" align="left">
-      <h5 style="display:inline;">
-        <% case @step.status %>
-        <% when "not_yet" %>
-          <%= render 'leads/step_statuses/start', step: @step, completed_id: nil, new_task: true, task: @task, loop_ok: nil, button_name: "開始" %>
-        <% when "inactive" %>
-          <%= render 'leads/step_statuses/start', step: @step, completed_id: nil, new_task: nil, task: @task, loop_ok: nil, button_name: "再開" %>
-          <%= link_to "案件自体を凍結", cancel_lead_path(@lead), class: "btn btn-danger btn-sm", method: :patch unless @lead.status?("inactive") %>
-        <% when "in_progress" %>
-          <%= render 'leads/step_statuses/complete', completed_step: @step, button_name: "完了" %>
-          <%= render 'leads/step_statuses/cancel', lead: @lead, step: @step, button_name: "保留" %>
-        <% when "completed" %>
-          <%= render 'leads/step_statuses/start', step: @step, completed_id: nil, new_task: true, task: @task, loop_ok: nil, button_name: "再開" %>
-        <% when "template" %>
-          <button type="button" class="btn btn-info">このテンプレートを使用して新規作成</button>
-        <% end %>
-        <%= link_to '直接編集', edit_step_path(@step) %>
-      </h5>
-    <% end %>
-  </div>
-</div>
+<%= render partial: 'leads/steps/show/index' %>
+<%= render partial: 'leads/steps/show/main' %>
 
 <br>
 <%= render partial: 'leads/tasks/tasks_index' %>

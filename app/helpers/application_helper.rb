@@ -27,7 +27,7 @@ module ApplicationHelper
     Company.find(user.company_id).name
   end
   
-  # 順番に存在確認し、存在する値を出力。ひとつ出力したらそれ以降は無視。全て存在しない場合のみnilを返す。引数は配列で渡すこと。
+  # 順番に存在確認し、存在する値を出力。ひとつ出力したらそれ以降は無視。全て存在しない場合のみnilを返す。引数は配列で渡すこと。（例）present_value([A, B])で、Aが存在すればAを返す、Aが存在しなければBを返す（Bが存在しなければnilを返す）
   def present_value(array)
     array.each do |obj|
       return obj if obj.present?
