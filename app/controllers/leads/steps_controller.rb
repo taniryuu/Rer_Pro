@@ -4,6 +4,7 @@ class Leads::StepsController < Leads::ApplicationController
   before_action :set_lead_and_user_by_lead_id, only: %i(index new create)
   before_action :set_steps, only: %i(show edit_complete_or_continue_step)
   before_action :set_new_task, only: %i(edit_continue_or_destroy_step edit_complete_or_continue_step edit_change_status_or_complete_task)
+  before_action :set_users, only: %i(show)
   # フィルター（アクセス権限）
   before_action :only_same_company_id?
   before_action :correct_user, except: %i(index show change_limit_check)
@@ -108,7 +109,7 @@ class Leads::StepsController < Leads::ApplicationController
       @lead.update(notice_change_limit: false) if @lead.steps.where(notice_change_limit: true).blank?
       flash[:success] = "確認しました。"
     else
-      flash[:danger] = "確認処理に失敗しました。"
+      flash[:danger] = "指定されたユーザーしか確認できません。"
     end
     redirect_to @step
   end
@@ -196,13 +197,16 @@ class Leads::StepsController < Leads::ApplicationController
         step.update(step_params)
         flash[:danger] = "#{flash[:danger]}進捗の完了予定日に過去の日付を入力しようとしています。" if prohibit_past(step.scheduled_complete_date)
         flash[:danger] = "#{flash[:danger]}進捗の完了日に過去の日付を入力しようとしています。" if prohibit_past(step.completed_date)
-        lead.update_attribute(:notice_change_limit, true) if step.saved_change_to_scheduled_complete_date?
         if step.tasks.not_yet.blank? && (step.status?("in_progress") || step.status?("inactive"))
           # タスク新規作成
           @task = step.tasks.new(task_params)
           update_completed_tasks_rate(step)
           flash[:danger] = "#{flash[:danger]}タスクの完了予定日に過去の日付を入力しようとしています。" if prohibit_past(@task.scheduled_complete_date)
           flash[:danger] = "#{flash[:danger]}タスクの完了日に過去の日付を入力しようとしています。" if prohibit_past(@task.completed_date)
+        end
+        if step.saved_change_to_scheduled_complete_date?
+          step.update_attribute(:notice_change_limit, true)
+          lead.update_attribute(:notice_change_limit, true)
         end
         # 矛盾を解消
         check_status_inactive_or_not(step)
