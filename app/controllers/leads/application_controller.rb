@@ -18,7 +18,7 @@ class Leads::ApplicationController < Users::ApplicationController
       # 進捗開始処理
       scheduled_complete_date = params[:step][:scheduled_complete_date].present? ? params[:step][:scheduled_complete_date] : "#{Date.current}"
       if step.status?("in_progress")
-        flash[:success] = "#{step.name}は既に進捗中です。"
+        flash[:info] = "#{step.name}は既に進捗中です。#{flash[:info]}"
       else
         flash[:success] = "#{step.name}を開始しました。" if step.update_attributes(status: "in_progress", scheduled_complete_date: scheduled_complete_date, completed_date: "", canceled_date: "")
         flash[:danger] = "#{flash[:danger]}進捗の完了予定日に過去の日付を入力しようとしています。" if prohibit_past(step.scheduled_complete_date)
@@ -155,14 +155,14 @@ class Leads::ApplicationController < Users::ApplicationController
         else
           step.update_attributes(completed_date: "")
         end
-        flash[:danger] = "#{flash[:danger]}未完了のタスクがあるため、#{step.name}を完了にできません。" if step.status?("completed")
+        flash[:info] = "#{flash[:info]}未完了のタスクがあるため、#{step.name}を完了にできません。" if step.status?("completed")
       elsif !step.status?("completed") && step.completed_tasks_rate == 100 # ここから完了状態に揃える処理
         if step.completed_date.blank?
           step.update_attributes(status: "completed", completed_date: "#{Date.current}")
         else
           step.update_attributes(status: "completed")
         end
-        flash[:success] = "#{flash[:success]}未完了のタスクがないため、#{step.name}は完了となりました。"
+        flash[:info] = "#{flash[:info]}未完了のタスクがないため、#{step.name}は完了となりました。"
       end
     end
     
@@ -174,14 +174,14 @@ class Leads::ApplicationController < Users::ApplicationController
       else 
         lead.update_attributes(status: "in_progress")
       end
-      flash[:danger] = "#{flash[:danger]}未完了の進捗があるため、案件を進捗中にしました。"
+      flash[:info] = "#{flash[:info]}未完了の進捗があるため、案件を進捗中にしました。"
     elsif lead.status?("in_progress") && lead.steps_rate == 100 # ここから完了状態に揃える処理
       if lead.completed_date.blank?
         lead.update_attributes(status: "completed", completed_date: "#{Date.current}")
       else
         lead.update_attributes(status: "completed")
       end
-      flash[:success] = "#{flash[:success]}未完了の進捗がないため、案件は終了済となりました。"
+      flash[:info] = "#{flash[:info]}未完了の進捗がないため、案件は終了済となりました。"
     end
     
   end
