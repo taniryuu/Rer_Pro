@@ -2,4 +2,4 @@
 
 <%= render 'form', lead: @lead, step: @step %>
 
-<%= link_to 'Back', lead_steps_path %>
+<%= link_to '案件詳細に戻る', step_path(working_step_in(@lead)) %>

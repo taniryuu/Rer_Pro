@@ -52,6 +52,7 @@ class Leads::StepsController < Leads::ApplicationController
   # POST /steps
   # POST /steps.json
   def create
+    flash.delete(:info)
     @step = @lead.steps.new(step_params)
     if save_step_errors(@lead, @step).blank?
       flash[:success] = "#{flash[:success]}#{@step.name}を作成しました。"
@@ -74,6 +75,7 @@ class Leads::StepsController < Leads::ApplicationController
   # PATCH/PUT /steps/1
   # PATCH/PUT /steps/1.json
   def update
+    flash.delete(:info)
     if update_step_errors(@lead, @step).blank?
       flash[:success] = "#{flash[:success]}#{@step.name}を更新しました。"
       check_status_and_redirect_to(@step, @step, nil)
@@ -206,6 +208,7 @@ class Leads::StepsController < Leads::ApplicationController
           flash[:danger] = "#{flash[:danger]}タスクの完了予定日に過去の日付を入力しようとしています。" if prohibit_past(@task.scheduled_complete_date)
           flash[:danger] = "#{flash[:danger]}タスクの完了日に過去の日付を入力しようとしています。" if prohibit_past(@task.completed_date)
         end
+        # 完了予定日の変更があれば通知
         if step.saved_change_to_scheduled_complete_date?
           step.update_attribute(:notice_change_limit, true)
           lead.update_attribute(:notice_change_limit, true)

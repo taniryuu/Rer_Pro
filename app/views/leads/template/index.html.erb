@@ -10,7 +10,7 @@
   <div class="row">
     <div class="col-md-3 col-md-offset-9">
       <%= form_with url: template_index_leads_path, method: :get, local: true do |f| %>
-        <%= f.submit "検索結果をリセット（全表示）", class: "btn btn-default btn-search" if params[:user_searchword].present? || params[:room_searchword].present? || params[:customer_searchword].present? %>
+        <%= f.submit "検索結果をリセット（全表示）", class: "btn btn-default btn-search" if params[:user_searchword].present? || params[:room_searchword].present? || params[:customer_searchword].present? || params[:template_name_searchword].present? %>
       <% end %>
     </div>
     <br>

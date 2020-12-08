@@ -10,8 +10,7 @@
   <div class="field">
     <%= form.label :order %>＜入力必須＞
     <% if step.new_record? %>
-      <% order_num = params[:order_num].present? ? params[:order_num].to_i : steps_count + 1 %>
-      <%= form.number_field :order, min: 1, max: steps_count + 1, value: order_num %>
+      <%= form.number_field :order, min: 1, max: steps_count + 1, value: present_value([params[:order_num], step.order, steps_count + 1]) %>
     <% else %>
       <%= form.number_field :order, min: 1, max: steps_count %>
     <% end %>
@@ -22,25 +21,24 @@
     <%= form.text_area :memo, size: "50x3" %>
   </div>
 
-----------------------------------------------------------------
+  <hr>
+  
   <%= form.hidden_field :start_lead_flag, value: true if @start_lead_flag %>
 
   <% if @completed_step.present? %>
 
     <%= form.hidden_field :completed_id, value: @completed_step.id %>
-
     <div class="field">
       <%= form.label :status %>：進捗中
       <%= form.hidden_field :status, value: "in_progress" %>
     </div>
-  
     <div class="field">
       <%= form.label :scheduled_complete_date %>＜入力必須＞
       <%= form.date_field :scheduled_complete_date, value: step.scheduled_complete_date %>
     </div>
-  
+
   <% else %>
-  
+
     <div class="field">
       <%= form.label :status %>
       <%= form.select :status, Step.statuses.keys.map { |k| [I18n.t("enums.step.status.#{k}"), k]} %>
