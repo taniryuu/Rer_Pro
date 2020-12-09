@@ -3,7 +3,7 @@ class Leads::TasksController < Leads::ApplicationController
   before_action :set_task, only: %i(show edit update destroy add_canceled_list 
                                     edit_revive_from_canceled_list update_revive_from_canceled_list)
   before_action :set_step, only: %i(index new create)
-  before_action :set_step_by_id, only: [:edit_add_delete_list, :update_add_delete_list, :complete_all_tasks] #, :edit_continue_or_destroy_step]
+  before_action :set_step_by_id, only: [:edit_add_delete_list, :update_add_delete_list, :complete_all_tasks]
   # アクセス制限
   before_action :correct_user, except: %i(index show)
 
