@@ -37,7 +37,6 @@ Rails.application.routes.draw do
         get 'edit_continue_or_destroy_step'
         get 'edit_complete_or_continue_step'
         get 'edit_change_status_or_complete_task'
-        #patch 'complete_all_tasks'
       end
       resources :tasks do
         member do

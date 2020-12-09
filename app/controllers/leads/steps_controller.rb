@@ -1,4 +1,5 @@
 class Leads::StepsController < Leads::ApplicationController
+  include ApplicationHelper
   # オブジェクトの準備
   before_action :set_step, except: %i(index new create)
   before_action :set_lead_and_user_by_lead_id, only: %i(index new create)
@@ -8,10 +9,7 @@ class Leads::StepsController < Leads::ApplicationController
   # フィルター（アクセス権限）
   before_action :only_same_company_id?
   before_action :correct_user, except: %i(index show change_limit_check)
-  before_action :correct_not_yet_completed_nil_status, only: :edit_continue_or_destroy_step
-  before_action :correct_not_yet_nil_completed_present_status, only: :edit_complete_or_continue_step
-  before_action :correct_not_yet_present_completed_step_status, only: :edit_change_status_or_complete_task
-
+  before_action :correct_status, only: %i(edit_continue_or_destroy_step edit_complete_or_continue_step edit_change_status_or_complete_task)
   # 後処理
   # after_action :sort_order, only: %i(destroy index)
 
@@ -56,12 +54,6 @@ class Leads::StepsController < Leads::ApplicationController
     @step = @lead.steps.new(step_params)
     if save_step_errors(@lead, @step).blank?
       flash[:success] = "#{flash[:success]}#{@step.name}を作成しました。"
-      if params[:step][:status].present? && params[:step][:status] == "completed"
-        flash[:danger] = "「完了」タスクが無い、進捗は「完了」ステータスで新規作成しようとしています。「完了」タスクを自動で生成しました。"
-        scheduled_complete_date = params[:step][:scheduled_complete_date].present? ? params[:step][:scheduled_complete_date] : "#{Date.current}"
-        Task.create!(step_id: @step.id ,name: "completed_task", status: "completed", scheduled_complete_date: scheduled_complete_date, completed_date: params[:step][:completed_date])
-        update_completed_tasks_rate(@step)
-      end
       # 編集-完了から進捗を新規作成した場合
       @completed_step.present? ? check_status_and_redirect_to(@completed_step, @step, nil) : check_status_and_redirect_to(@step, @step, nil)
     else
@@ -180,6 +172,13 @@ class Leads::StepsController < Leads::ApplicationController
           flash[:danger] = "#{flash[:danger]}タスクの完了予定日に過去の日付を入力しようとしています。" if prohibit_past(@task.scheduled_complete_date)
           flash[:danger] = "#{flash[:danger]}タスクの完了日に過去の日付を入力しようとしています。" if prohibit_past(@task.completed_date)
         end
+        if step.status?("completed")
+          flash[:danger] = "「完了」タスクが無い、進捗は「完了」ステータスで新規作成しようとしています。「完了」タスクを自動で生成しました。"
+          scheduled_complete_date = present_value([params[:step][:scheduled_complete_date], "#{Date.current}"])
+          @task = step.tasks.new(name: "completed_task", status: "completed", scheduled_complete_date: scheduled_complete_date, completed_date: params[:step][:completed_date])
+          update_completed_tasks_rate(step)
+        end
+
         # 矛盾を解消
         check_status_inactive_or_not(step)
         check_status_completed_or_not(lead, step)
@@ -245,21 +244,15 @@ class Leads::StepsController < Leads::ApplicationController
       end
     end
 
-    def correct_not_yet_completed_nil_status
-      unless @step.tasks.find_by(status: "not_yet").nil? && @step.tasks.find_by(status: "completed").nil?
+    # ”@stepに「未」のタスクも「完了」のタスクも無い”でなく、かつ
+    # ”@stepに「未」のタスクが無く「完了」のタスクが1つ以上ある”でなく、かつ
+    # ”@stepに「未」のタスクがあるにも関わらず、@stepのstatusが「完了」”でなければ、強制リダイレクト
+    def correct_status
+      if !(@step.tasks.not_yet.blank? && @step.tasks.completed.blank?) &&
+        !(@step.tasks.not_yet.blank? && @step.tasks.completed.present?) &&
+        !(@step.tasks.not_yet.present? && @step.status?("completed"))
         redirect_to @step
       end
     end
 
-    def correct_not_yet_nil_completed_present_status
-      unless @step.tasks.find_by(status: "not_yet").nil? && @step.tasks.find_by(status: "completed").present?
-        redirect_to @step
-      end
-    end
-
-    def correct_not_yet_present_completed_step_status
-      unless @step.tasks.find_by(status: "not_yet").present? && @step.status?("completed")
-        redirect_to @step
-      end
-    end
 end

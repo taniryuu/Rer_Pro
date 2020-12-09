@@ -4,9 +4,6 @@ class Leads::TasksController < Leads::ApplicationController
                                     edit_revive_from_canceled_list update_revive_from_canceled_list)
   before_action :set_step, only: %i(index new create)
   before_action :set_step_by_id, only: [:edit_add_delete_list, :update_add_delete_list, :complete_all_tasks] #, :edit_continue_or_destroy_step]
-  #                                      :edit_complete_or_continue_step, :edit_change_status_or_complete_task, :complete_all_tasks]
-  #before_action :set_steps, only: :edit_complete_or_continue_step
-  #before_action :set_new_task, only: %i(edit_continue_or_destroy_step edit_complete_or_continue_step edit_change_status_or_complete_task)
   # アクセス制限
   before_action :correct_user, except: %i(index show)
 
