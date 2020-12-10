@@ -230,15 +230,15 @@ class Leads::ApplicationController < Users::ApplicationController
     # タスク操作後、
 
     # 進捗に「未」のタスクが無く、かつ「完了」のタスクも無い場合、continue_or_destroy_stepのurlにリダイレクトする
-    if step.tasks.find_by(status: "not_yet").nil? && step.tasks.find_by(status: "completed").nil?
+    if continue_or_destroy_step?(step)
       edit_continue_or_destroy_step_step_url(step)
 
     #進捗に「未」のタスクが無く、かつ「完了」のタスクが１つ以上ある場合、complete_or_continue_stepのurlにリダイレクトする
-    elsif step.tasks.find_by(status: "not_yet").nil? && step.tasks.find_by(status: "completed").present?
+    elsif complete_or_continue_step?(step)
       edit_complete_or_continue_step_step_url(step)
 
     #進捗に「未」のタスクがあるにも関わらず、進捗のstatusが「完了」の場合、change_status_or_complete_taskのurlにリダイレクトする
-    elsif step.tasks.find_by(status: "not_yet").present? && step.status?("completed")
+    elsif change_status_or_complete_task?(step)
       edit_change_status_or_complete_task_step_url(step)
 
     #以上いずれでもない場合、steps#showにリダイレクトする
@@ -260,6 +260,18 @@ class Leads::ApplicationController < Users::ApplicationController
   # day空でなく、今日より前ならtrue
   def prohibit_past(day)
     day.blank? ? false : Date.parse(day) < Date.current
+  end
+
+  def continue_or_destroy_step?(step)
+    step.tasks.not_yet.blank? && step.tasks.completed.blank?
+  end
+
+  def complete_or_continue_step?(step)
+    step.tasks.not_yet.blank? && step.tasks.completed.present?
+  end
+
+  def change_status_or_complete_task?(step)
+    step.tasks.not_yet.present? && step.status?("completed")
   end
 
   private

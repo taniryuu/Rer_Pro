@@ -9,9 +9,9 @@ class Leads::StepsController < Leads::ApplicationController
   # フィルター（アクセス権限）
   before_action :only_same_company_id?
   before_action :correct_user, except: %i(index show change_limit_check)
-  before_action :correct_status, only: %i(edit_continue_or_destroy_step edit_complete_or_continue_step edit_change_status_or_complete_task)
-  # 後処理
-  # after_action :sort_order, only: %i(destroy index)
+  before_action ->{
+    correct_status(@step)
+  }, only: %i(edit_continue_or_destroy_step edit_complete_or_continue_step edit_change_status_or_complete_task)
 
 
   # GET /steps
@@ -185,6 +185,7 @@ class Leads::StepsController < Leads::ApplicationController
         # バリデーション確認
         errors << lead.errors.full_messages if lead.invalid?(:check_steps_status)
         errors << step.errors.full_messages if step.invalid?(:check_order)
+        errors << @task.errors.full_messages if @task.present? && @task.invalid?
         raise ActiveRecord::Rollback if errors.present?
       end
       errors.presence || nil
@@ -218,6 +219,7 @@ class Leads::StepsController < Leads::ApplicationController
         # バリデーション確認
         errors << lead.errors.full_messages if lead.invalid?(:check_steps_status)
         errors << step.errors.full_messages if step.invalid?(:check_order)
+        errors << @task.errors.full_messages if @task.present? && @task.invalid?
         raise ActiveRecord::Rollback if errors.present?
       end
       errors.presence || nil
@@ -247,10 +249,9 @@ class Leads::StepsController < Leads::ApplicationController
     # ”@stepに「未」のタスクも「完了」のタスクも無い”でなく、かつ
     # ”@stepに「未」のタスクが無く「完了」のタスクが1つ以上ある”でなく、かつ
     # ”@stepに「未」のタスクがあるにも関わらず、@stepのstatusが「完了」”でなければ、強制リダイレクト
-    def correct_status
-      if !(@step.tasks.not_yet.blank? && @step.tasks.completed.blank?) &&
-        !(@step.tasks.not_yet.blank? && @step.tasks.completed.present?) &&
-        !(@step.tasks.not_yet.present? && @step.status?("completed"))
+    def correct_status(step)
+      if !continue_or_destroy_step?(step) && !complete_or_continue_step?(step) && !change_status_or_complete_task?(step)
+        flash[:danger] = "タスク操作後のイベントの条件に合いません"
         redirect_to @step
       end
     end
