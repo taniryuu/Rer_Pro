@@ -1,13 +1,17 @@
 class Leads::StepsController < Leads::ApplicationController
+  include ApplicationHelper
   # オブジェクトの準備
   before_action :set_step, except: %i(index new create)
   before_action :set_lead_and_user_by_lead_id, only: %i(index new create)
-  before_action :set_steps, :set_users, only: %i(show)
+  before_action :set_steps, only: %i(show edit_complete_or_continue_step)
+  before_action :set_new_task, only: %i(edit_continue_or_destroy_step edit_complete_or_continue_step edit_change_status_or_complete_task)
+  before_action :set_users, only: %i(show)
   # フィルター（アクセス権限）
   before_action :only_same_company_id?
   before_action :correct_user, except: %i(index show change_limit_check)
-  # 後処理
-  # after_action :sort_order, only: %i(destroy index)
+  before_action ->{
+    correct_status(@step)
+  }, only: %i(edit_continue_or_destroy_step edit_complete_or_continue_step edit_change_status_or_complete_task)
 
 
   # GET /steps
@@ -48,16 +52,8 @@ class Leads::StepsController < Leads::ApplicationController
   def create
     flash.delete(:info)
     @step = @lead.steps.new(step_params)
-    @task = @step.tasks.new(task_params)
-    flash[:danger] = "#{flash[:danger]}タスクの完了予定日に過去の日付を入力しようとしています。" if prohibit_past(@task.scheduled_complete_date)
-    flash[:danger] = "#{flash[:danger]}タスクの完了日に過去の日付を入力しようとしています。" if prohibit_past(@task.completed_date)
     if save_step_errors(@lead, @step).blank?
       flash[:success] = "#{flash[:success]}#{@step.name}を作成しました。"
-      if params[:step][:status].present? && params[:step][:status] == "completed"
-        flash[:danger] = "「完了」タスクが無い、進捗は「完了」ステータスで新規作成しようとしています。「完了」タスクを自動で生成しました。"
-        scheduled_complete_date = params[:step][:scheduled_complete_date].present? ? params[:step][:scheduled_complete_date] : "#{Date.current}"
-        Task.create!(step_id: @step.id ,name: "completed_task", status: "completed", scheduled_complete_date: scheduled_complete_date, completed_date: params[:step][:completed_date])
-      end
       # 編集-完了から進捗を新規作成した場合
       @completed_step.present? ? check_status_and_redirect_to(@completed_step, @step, nil) : check_status_and_redirect_to(@step, @step, nil)
     else
@@ -72,9 +68,6 @@ class Leads::StepsController < Leads::ApplicationController
   # PATCH/PUT /steps/1.json
   def update
     flash.delete(:info)
-    @present_not_yet_tasks = @step.tasks.not_yet.present? ? true : false
-    # タスク新規作成
-    @task = @step.tasks.new(task_params)
     if update_step_errors(@lead, @step).blank?
       flash[:success] = "#{flash[:success]}#{@step.name}を更新しました。"
       check_status_and_redirect_to(@step, @step, nil)
@@ -115,6 +108,16 @@ class Leads::StepsController < Leads::ApplicationController
     redirect_to @step
   end
 
+  def edit_continue_or_destroy_step
+  end
+
+  def edit_complete_or_continue_step
+  end
+
+  def edit_change_status_or_complete_task
+  end
+
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_step
@@ -127,6 +130,10 @@ class Leads::StepsController < Leads::ApplicationController
     def set_lead_and_user_by_lead_id
       @lead = Lead.find(params[:lead_id])
       @user = User.find(@lead.user_id)
+    end
+
+    def set_new_task
+      @task = @step.tasks.new
     end
 
     # Only allow a list of trusted parameters through.
@@ -157,10 +164,21 @@ class Leads::StepsController < Leads::ApplicationController
           @start_lead_flag = true
           errors << lead.errors.full_messages unless start_lead(lead)
         end
-        # stepが「未」または「完了」のときはtaskを作らない
-        if step.status?("not_yet") || step.status?("completed")
-          @task.destroy
+        # stepが「未」または「完了」のときタスクがあればバリデーションに反するので作らない
+        if step.status?("in_progress") || step.status?("inactive")
+          # タスク新規作成
+          @task = step.tasks.new(task_params)
+          update_completed_tasks_rate(step)
+          flash[:danger] = "#{flash[:danger]}タスクの完了予定日に過去の日付を入力しようとしています。" if prohibit_past(@task.scheduled_complete_date)
+          flash[:danger] = "#{flash[:danger]}タスクの完了日に過去の日付を入力しようとしています。" if prohibit_past(@task.completed_date)
         end
+        if step.status?("completed")
+          flash[:danger] = "「完了」タスクが無い、進捗は「完了」ステータスで新規作成しようとしています。「完了」タスクを自動で生成しました。"
+          scheduled_complete_date = present_value([params[:step][:scheduled_complete_date], "#{Date.current}"])
+          @task = step.tasks.new(name: "completed_task", status: "completed", scheduled_complete_date: scheduled_complete_date, completed_date: params[:step][:completed_date])
+          update_completed_tasks_rate(step)
+        end
+
         # 矛盾を解消
         check_status_inactive_or_not(step)
         check_status_completed_or_not(lead, step)
@@ -182,10 +200,11 @@ class Leads::StepsController < Leads::ApplicationController
         step.update(step_params)
         flash[:danger] = "#{flash[:danger]}進捗の完了予定日に過去の日付を入力しようとしています。" if prohibit_past(step.scheduled_complete_date)
         flash[:danger] = "#{flash[:danger]}進捗の完了日に過去の日付を入力しようとしています。" if prohibit_past(step.completed_date)
-        # stepにタスクがすでにある場合作る必要が無く、stepが「未」または「完了」のときタスクがあればバリデーションに反するので削除する
-        if @present_not_yet_tasks || step.status?("not_yet") || step.status?("completed")
-          @task.destroy
-        else
+        # stepにタスクがすでにある場合作る必要が無く、stepが「未」または「完了」のときタスクがあればバリデーションに反するので作らない
+        if step.tasks.not_yet.blank? && (step.status?("in_progress") || step.status?("inactive"))
+          # タスク新規作成
+          @task = step.tasks.new(task_params)
+          update_completed_tasks_rate(step)
           flash[:danger] = "#{flash[:danger]}タスクの完了予定日に過去の日付を入力しようとしています。" if prohibit_past(@task.scheduled_complete_date)
           flash[:danger] = "#{flash[:danger]}タスクの完了日に過去の日付を入力しようとしています。" if prohibit_past(@task.completed_date)
         end
@@ -226,4 +245,15 @@ class Leads::StepsController < Leads::ApplicationController
         end
       end
     end
+
+    # ”@stepに「未」のタスクも「完了」のタスクも無い”でなく、かつ
+    # ”@stepに「未」のタスクが無く「完了」のタスクが1つ以上ある”でなく、かつ
+    # ”@stepに「未」のタスクがあるにも関わらず、@stepのstatusが「完了」”でなければ、強制リダイレクト
+    def correct_status(step)
+      if !continue_or_destroy_step?(step) && !complete_or_continue_step?(step) && !change_status_or_complete_task?(step)
+        flash[:danger] = "タスク操作後のイベントの条件に合いません"
+        redirect_to @step
+      end
+    end
+
 end

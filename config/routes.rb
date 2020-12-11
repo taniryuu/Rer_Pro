@@ -33,8 +33,10 @@ Rails.application.routes.draw do
         patch 'start' => 'steps_statuses#start', as: :start
         patch 'cancel' => 'steps_statuses#cancel', as: :cancel
         patch 'statuses_make_step_not_yet'
-       # patch 'complete_all_tasks'
         patch 'change_limit_check'
+        get 'edit_continue_or_destroy_step'
+        get 'edit_complete_or_continue_step'
+        get 'edit_change_status_or_complete_task'
       end
       resources :tasks do
         member do
@@ -43,9 +45,6 @@ Rails.application.routes.draw do
           patch 'update_revive_from_canceled_list'
           get 'edit_add_delete_list'
           post 'update_add_delete_list'
-          get 'edit_continue_or_destroy_step'
-          get 'edit_complete_or_continue_step'
-          get 'edit_change_status_or_complete_task'
           patch 'complete_all_tasks'
         end
       end

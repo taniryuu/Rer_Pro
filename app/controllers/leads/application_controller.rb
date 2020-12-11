@@ -32,6 +32,7 @@ class Leads::ApplicationController < Users::ApplicationController
       if (step.status?("in_progress") || step.status?("inactive")) && step.tasks.not_yet.blank?
         @task = step.tasks.create(task_simple_params)
         flash[:danger] = "#{flash[:danger]}タスクの完了予定日に過去の日付を入力しようとしています。" if prohibit_past(@task.scheduled_complete_date)
+        update_completed_tasks_rate(step)
       end
       # 案件を再開する場合の処理
       start_lead(lead) unless lead.status?("in_progress")
@@ -229,16 +230,16 @@ class Leads::ApplicationController < Users::ApplicationController
     # タスク操作後、
 
     # 進捗に「未」のタスクが無く、かつ「完了」のタスクも無い場合、continue_or_destroy_stepのurlにリダイレクトする
-    if step.tasks.find_by(status: "not_yet").nil? && step.tasks.find_by(status: "completed").nil?
-      edit_continue_or_destroy_step_task_url(step)
+    if continue_or_destroy_step?(step)
+      edit_continue_or_destroy_step_step_url(step)
 
     #進捗に「未」のタスクが無く、かつ「完了」のタスクが１つ以上ある場合、complete_or_continue_stepのurlにリダイレクトする
-    elsif step.tasks.find_by(status: "not_yet").nil? && step.tasks.find_by(status: "completed").present?
-      edit_complete_or_continue_step_task_url(step)
+    elsif complete_or_continue_step?(step)
+      edit_complete_or_continue_step_step_url(step)
 
     #進捗に「未」のタスクがあるにも関わらず、進捗のstatusが「完了」の場合、change_status_or_complete_taskのurlにリダイレクトする
-    elsif step.tasks.find_by(status: "not_yet").present? && step.status?("completed")
-      edit_change_status_or_complete_task_task_url(step)
+    elsif change_status_or_complete_task?(step)
+      edit_change_status_or_complete_task_step_url(step)
 
     #以上いずれでもない場合、steps#showにリダイレクトする
     else
@@ -259,6 +260,18 @@ class Leads::ApplicationController < Users::ApplicationController
   # day空でなく、今日より前ならtrue
   def prohibit_past(day)
     day.blank? ? false : Date.parse(day) < Date.current
+  end
+
+  def continue_or_destroy_step?(step)
+    step.tasks.not_yet.blank? && step.tasks.completed.blank?
+  end
+
+  def complete_or_continue_step?(step)
+    step.tasks.not_yet.blank? && step.tasks.completed.present?
+  end
+
+  def change_status_or_complete_task?(step)
+    step.tasks.not_yet.present? && step.status?("completed")
   end
 
   private

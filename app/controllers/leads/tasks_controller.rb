@@ -3,13 +3,9 @@ class Leads::TasksController < Leads::ApplicationController
   before_action :set_task, only: %i(show edit update destroy add_canceled_list 
                                     edit_revive_from_canceled_list update_revive_from_canceled_list)
   before_action :set_step, only: %i(index new create)
-  before_action :set_step_by_id, only: [:edit_add_delete_list, :update_add_delete_list, :edit_continue_or_destroy_step,
-                                        :edit_complete_or_continue_step, :edit_change_status_or_complete_task, :complete_all_tasks]
-  before_action :set_steps, only: :edit_complete_or_continue_step
-  before_action :set_new_task, only: %i(edit_continue_or_destroy_step edit_complete_or_continue_step edit_change_status_or_complete_task)
+  before_action :set_step_by_id, only: [:edit_add_delete_list, :update_add_delete_list, :complete_all_tasks]
   # アクセス制限
   before_action :correct_user, except: %i(index show)
-
 
   def index
     # タスクステータスが「未」のリスト
@@ -126,15 +122,6 @@ class Leads::TasksController < Leads::ApplicationController
     check_status_and_redirect_to(@step, @step, nil)
   end
 
-  def edit_continue_or_destroy_step
-  end
-
-  def edit_complete_or_continue_step
-  end
-
-  def edit_change_status_or_complete_task
-  end
-
   # 「未」のタスクをすべて「完了」とする
   def complete_all_tasks
     #現在の進捗の「未」のタスクをすべて「完了」とし、「完了日」を本日とし、その後complete_or_continueのurlへ飛ぶ
@@ -179,4 +166,5 @@ class Leads::TasksController < Leads::ApplicationController
     def revive_from_canceled_list_params
       params.require(:task).permit(:scheduled_complete_date)
     end
+
 end
