@@ -3,7 +3,7 @@ class Leads::TasksController < Leads::ApplicationController
   before_action :set_task, only: %i(show edit update destroy add_canceled_list 
                                     edit_revive_from_canceled_list update_revive_from_canceled_list)
   before_action :set_step, only: %i(index new create)
-  before_action :set_step_by_id, only: [:edit_add_delete_list, :update_add_delete_list, :complete_all_tasks]
+  before_action :set_step_by_id, only: [:add_delete_list, :complete_all_tasks]
   # アクセス制限
   before_action :correct_user, except: %i(index show)
 
@@ -55,17 +55,14 @@ class Leads::TasksController < Leads::ApplicationController
   end
 
   def destroy
+    flash[:success] = "#{@task.name}を削除しました。"
     @task.destroy
     update_completed_tasks_rate(@step)
     check_status_and_redirect_to(@step, @step, nil)
   end
 
-  # 「To Do リスト」にチェックを入れて「更新」ボタンを押したときに実行されるアクション
-  def edit_add_delete_list
-  end
-
   # 「To Do リスト」にチェックを入れて「完了」リストに入れる処理
-  def update_add_delete_list
+  def add_delete_list
     checkbox_array = []
     checkbox_array = params[:task][:delete_task]
     n = checkbox_array.size
