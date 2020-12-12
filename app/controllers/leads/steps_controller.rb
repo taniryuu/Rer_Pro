@@ -84,18 +84,6 @@ class Leads::StepsController < Leads::ApplicationController
     destroy_step(@lead, @step)
   end
 
-  # 進捗を未にする
-  def statuses_make_step_not_yet
-    errors = []
-    ActiveRecord::Base.transaction do
-      errors << @step.errors.full_messages unless @step.update_attributes(status: "not_yet")
-      update_steps_rate(@lead)
-      errors << @lead.errors.full_messages if @lead.invalid?(:check_steps_status)
-      raise ActiveRecord::Rollback if errors.present?
-    end
-    redirect_to check_status_and_get_url(@step, @step)
-  end
-
   # Stepの期限変更通知をfalseに更新
   def change_limit_check
     if @user.superior_id == current_user.id

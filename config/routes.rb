@@ -32,7 +32,8 @@ Rails.application.routes.draw do
         patch 'complete/:completed_id' => 'steps_statuses#complete', as: :complete
         patch 'start' => 'steps_statuses#start', as: :start
         patch 'cancel' => 'steps_statuses#cancel', as: :cancel
-        patch 'statuses_make_step_not_yet'
+#        patch 'statuses_make_step_not_yet'
+        patch 'back_to_not_yet' => 'steps_statuses#back_to_not_yet', as: :statuses_make_step_not_yet
         patch 'change_limit_check'
         get 'edit_continue_or_destroy_step'
         get 'edit_complete_or_continue_step'
