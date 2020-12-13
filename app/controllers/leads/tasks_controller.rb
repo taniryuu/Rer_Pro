@@ -3,7 +3,7 @@ class Leads::TasksController < Leads::ApplicationController
   before_action :set_task, only: %i(show edit update destroy add_canceled_list 
                                     edit_revive_from_canceled_list update_revive_from_canceled_list)
   before_action :set_step, only: %i(index new create)
-  before_action :set_step_by_id, only: [:edit_add_delete_list, :update_add_delete_list, :complete_all_tasks]
+  before_action :set_step_by_id, only: [:add_delete_list, :complete_all_tasks]
   # アクセス制限
   before_action :correct_user, except: %i(index show)
 
@@ -55,32 +55,25 @@ class Leads::TasksController < Leads::ApplicationController
   end
 
   def destroy
+    flash[:success] = "#{@task.name}を削除しました。"
     @task.destroy
     update_completed_tasks_rate(@step)
     check_status_and_redirect_to(@step, @step, nil)
   end
 
-  # 「To Do リスト」にチェックを入れて「更新」ボタンを押したときに実行されるアクション
-  def edit_add_delete_list
-  end
-
   # 「To Do リスト」にチェックを入れて「完了」リストに入れる処理
-  def update_add_delete_list
-    checkbox_array = []
+  def add_delete_list
     checkbox_array = params[:task][:delete_task]
-    n = checkbox_array.size
     # チェックボックスの配列で"true"の前に差し込まれた"false"を削除している
-    n.times do |i|
+    checkbox_array.size.times do |i|
       if checkbox_array[i] == "true"
         checkbox_array.delete_at(i - 1)
       end
     end
-    n1 = checkbox_array.size
-    i2 = 0
     # タスクステータスが「完了」のリスト
     @completed_tasks = @step.tasks.completed.order(:completed_date)
-
-    n1.times do |i1|
+    i2 = 0
+    checkbox_array.size.times do |i1|
       if checkbox_array[i1] == "true"
         # (i1-i2)番目のタスクステータスが「未」のタスクの１個の要素からなるActiveRecordAsociation?Relationがdeleted_tasks(配列のようなもの)
         # 下でタスクステータスを「未」から「完了」に変えているのでi2(checkbox=="true"の数)だけi1から引いている

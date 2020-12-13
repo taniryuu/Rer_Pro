@@ -1,6 +1,6 @@
 <% provide(:class_text, 'task--new') %>
 <% provide(:button_text, '作成') %>
-<h3>タスク一覧 </h3>
+<h3>タスク一覧</h3>
 
 <h4 style="display:inline;">To Do リスト</h4><h5 style="display:inline;"><%= "<STEP#{@step.order}>完了まであと#{@tasks.count}件" %><%= "(#{@step.completed_tasks_rate}%)" %></h5>
 <br>
@@ -8,13 +8,13 @@
 
 <table>
   <tbody>
-    <%= form_with(model: @tasks, url: update_add_delete_list_task_path(@step), local: true, mothod: :post) do |f| %>
+    <%= form_with(model: @tasks, url: add_delete_list_task_path(@step), local: true, method: :patch) do |f| %>
       <% @tasks.each do |task| %>
         <tr>
           <td><%= f.check_box(:delete_task, { multiple: true, class: "check_box"}, checked_value = "true", unchecked_value = "false") %></td>
           <td><%= link_to "#{task.name}", task_path(task) %></td>
           <td><%= l(Time.parse(task.scheduled_complete_date), format: :shortdate) %></td>
-          <td><%= link_to '中止', add_canceled_list_task_path(task), data: { confirm: "「#{task.name}」を中止リストに移動してよろ>しいですか？" } %></td>
+          <td><%= link_to '中止', add_canceled_list_task_path(task), method: :patch, data: { confirm: "「#{task.name}」を中止リストに移動してよろ>しいですか？" } %></td>
           <td><%= link_to '削除', task_path(task), method: :delete, data: { confirm: "「#{task.name}」を削除してよろしいですか？" } %></td>
         </tr>
       <% end %>

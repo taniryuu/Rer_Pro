@@ -41,11 +41,10 @@ Rails.application.routes.draw do
       end
       resources :tasks do
         member do
-          get 'add_canceled_list'
+          patch 'add_canceled_list'
           get 'edit_revive_from_canceled_list'
           patch 'update_revive_from_canceled_list'
-          get 'edit_add_delete_list'
-          post 'update_add_delete_list'
+          patch 'add_delete_list'
           patch 'complete_all_tasks'
         end
       end
