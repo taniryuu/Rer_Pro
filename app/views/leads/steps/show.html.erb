@@ -16,133 +16,135 @@
 <hr>
 <%= link_to '案件一覧へ戻る', leads_path %>
 
-<br><br><br>////////////////////////////////////////////////////////////////////////////////////////////////////////////<br>
-ページはここまで。以下はメモです。（最終プルリク上げる前に削除）
-
-案件の期限変更：<%= @lead.notice_change_limit %>
-進捗の期限変更：<%= @step.notice_change_limit %>
-<br>
-<%= link_to '進捗編集', edit_step_path(@step) %> |
-<%= link_to '進捗一覧', lead_steps_path(@lead) %>
-
-<div class="row">
-  <div class="col-md-12 col-md-offset-1">
-    <table id="table-lead-index-show">
-      <thead>
-        <tr>
-          <th colspan="1">申込日</th>
-          <th colspan="1">最後に進捗を完了した日</th>
-          <th colspan="1">現在の進捗（進捗率）</th>
-          <th colspan="1">入居予定日</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><%= l(Time.parse(@lead.created_date), format: :shortdate) %></td>
-          <td><%= l(Time.parse(last_update_date(@lead)), format: :shortdate) %></td>
-          <td>
-            <%= latest_step_in(@lead).name %>
-            <%= "(#{@lead.steps_rate}%)" %>
-          </td>
-          <td><%= l(Time.parse(@lead.scheduled_resident_date), format: :shortdate) %></td>
-        </tr>
-      </tbody>
-    </table>
+<% if Rails.env.development? %>
+  <br><br><br>////////////////////////////////////////////////////////////////////////////////////////////////////////////<br>
+  ページはここまで。以下はメモです。（最終プルリク上げる前に削除）
+  
+  案件の期限変更：<%= @lead.notice_change_limit %>
+  進捗の期限変更：<%= @step.notice_change_limit %>
+  <br>
+  <%= link_to '進捗編集', edit_step_path(@step) %> |
+  <%= link_to '進捗一覧', lead_steps_path(@lead) %>
+  
+  <div class="row">
+    <div class="col-md-12 col-md-offset-1">
+      <table id="table-lead-index-show">
+        <thead>
+          <tr>
+            <th colspan="1">申込日</th>
+            <th colspan="1">最後に進捗を完了した日</th>
+            <th colspan="1">現在の進捗（進捗率）</th>
+            <th colspan="1">入居予定日</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><%= l(Time.parse(@lead.created_date), format: :shortdate) %></td>
+            <td><%= l(Time.parse(last_update_date(@lead)), format: :shortdate) %></td>
+            <td>
+              <%= latest_step_in(@lead).name %>
+              <%= "(#{@lead.steps_rate}%)" %>
+            </td>
+            <td><%= l(Time.parse(@lead.scheduled_resident_date), format: :shortdate) %></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
-</div>
-<%= link_to '編集', edit_lead_path(@lead), class: "btn btn-primary btn-sm" if @lead.user_id == current_user.id %>
-
-
-<%= "あなたの案件です。" if @lead.user_id == current_user.id %>
-<%= @lead.customer_name %>様→
-<%= @lead.room_name %><%= @lead.room_num %>号室
-（担当：<%= link_to "#{@user.name}", user_path(@user) %>）
-<p>
-  <strong>入居予定日:</strong>
-  <%= @lead.scheduled_resident_date %>
-</p>
-
-<p>
-  <strong>入金予定日:</strong>
-  <%= @lead.scheduled_payment_date %>
-</p>
-
-<p>
-  <strong>契約予定日:</strong>
-  <%= @lead.scheduled_contract_date %>
-</p>
-
-<p>
-  <strong>Created date:</strong>
-  <%= @lead.created_date %>
-</p>
-
-<p>
-  <strong>Completed date:</strong>
-  <%= @lead.completed_date %>
-</p>
-
-<p>
-  <strong>canceled_date:</strong>
-  <%= @lead.canceled_date %>
-</p>
-
-
-<%= link_to "担当者を変更する", edit_user_id_lead_path(@lead) if current_user.superior? %>
-
-
-<%= link_to 'Step-index', lead_steps_path(@lead) %> |
-<%= link_to 'Edit', edit_lead_path(@lead) %> |
-<%= link_to 'Back', leads_path %>
-
-
-
-<br>
-
-
-
-
-<p>
-  <strong>Lead:</strong>
-  <%= @step.lead_id %>
-</p>
-
-<p>
-  <strong>Name:</strong>
-  <%= @step.name %>
-</p>
-
-<p>
-  <strong>Memo:</strong>
-  <%= @step.memo %>
-</p>
-
-<p>
-  <strong>Status:</strong>
-  <%= @step.status %>
-</p>
-
-<p>
-  <strong>Order:</strong>
-  <%= @step.order %>
-</p>
-
-<p>
-  <strong>Scheduled complete date:</strong>
-  <%= @step.scheduled_complete_date %>
-</p>
-
-<p>
-  <strong>Completed date:</strong>
-  <%= @step.completed_date %>
-</p>
-
-<p>
-  <strong>Canceled date:</strong>
-  <%= @step.canceled_date %>
-</p>
-
-<p>
-  <strong>Completed tasks rate:</strong>
-  <%= @step.completed_tasks_rate %>
-</p>
+  <%= link_to '編集', edit_lead_path(@lead), class: "btn btn-primary btn-sm" if @lead.user_id == current_user.id %>
+  
+  
+  <%= "あなたの案件です。" if @lead.user_id == current_user.id %>
+  <%= @lead.customer_name %>様→
+  <%= @lead.room_name %><%= @lead.room_num %>号室
+  （担当：<%= link_to "#{@user.name}", user_path(@user) %>）
+  <p>
+    <strong>入居予定日:</strong>
+    <%= @lead.scheduled_resident_date %>
+  </p>
+  
+  <p>
+    <strong>入金予定日:</strong>
+    <%= @lead.scheduled_payment_date %>
+  </p>
+  
+  <p>
+    <strong>契約予定日:</strong>
+    <%= @lead.scheduled_contract_date %>
+  </p>
+  
+  <p>
+    <strong>Created date:</strong>
+    <%= @lead.created_date %>
+  </p>
+  
+  <p>
+    <strong>Completed date:</strong>
+    <%= @lead.completed_date %>
+  </p>
+  
+  <p>
+    <strong>canceled_date:</strong>
+    <%= @lead.canceled_date %>
+  </p>
+  
+  
+  <%= link_to "担当者を変更する", edit_user_id_lead_path(@lead) if current_user.superior? %>
+  
+  
+  <%= link_to 'Step-index', lead_steps_path(@lead) %> |
+  <%= link_to 'Edit', edit_lead_path(@lead) %> |
+  <%= link_to 'Back', leads_path %>
+  
+  
+  
+  <br>
+  
+  
+  
+  
+  <p>
+    <strong>Lead:</strong>
+    <%= @step.lead_id %>
+  </p>
+  
+  <p>
+    <strong>Name:</strong>
+    <%= @step.name %>
+  </p>
+  
+  <p>
+    <strong>Memo:</strong>
+    <%= @step.memo %>
+  </p>
+  
+  <p>
+    <strong>Status:</strong>
+    <%= @step.status %>
+  </p>
+  
+  <p>
+    <strong>Order:</strong>
+    <%= @step.order %>
+  </p>
+  
+  <p>
+    <strong>Scheduled complete date:</strong>
+    <%= @step.scheduled_complete_date %>
+  </p>
+  
+  <p>
+    <strong>Completed date:</strong>
+    <%= @step.completed_date %>
+  </p>
+  
+  <p>
+    <strong>Canceled date:</strong>
+    <%= @step.canceled_date %>
+  </p>
+  
+  <p>
+    <strong>Completed tasks rate:</strong>
+    <%= @step.completed_tasks_rate %>
+  </p>
+<% end %>

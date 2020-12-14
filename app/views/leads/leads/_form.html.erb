@@ -27,7 +27,7 @@
     <%= form.text_area :memo, size: "50x3" %>
   </div>
 
-----------------------------------------------------------------
+  <hr>
 
   <% if @lead.new_record? %>
     <div class="field">ステータス：進捗中</div>
@@ -61,7 +61,7 @@
     <%= form.date_field :created_date, value: value_created_date %>
   </div>
 
-----------------------------------------------------------------
+  <hr>
 
   <div class="field">
     <%= form.check_box :template %>ここにチェックを入れると、今後テンプレートとして使用できます。

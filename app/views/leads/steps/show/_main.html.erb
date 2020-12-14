@@ -3,7 +3,7 @@
   <a class="btn <%= step_button_color(@step) %> btn-lg" data-toggle="collapse" href="#collapse-step-status-edit">
     <% case @step.status %>
     <% when "not_yet" %>
-      <%= "未開始" %>
+      <%= "開始する" %>
     <% when "inactive" %>
       <%= "#{l(Time.parse(@step.canceled_date), format: :shortdate)}に凍結済" %>
     <% when "in_progress" %>

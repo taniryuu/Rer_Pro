@@ -37,7 +37,7 @@
       <%= form.date_field :scheduled_complete_date, value: step.scheduled_complete_date %>
     </div>
 
-  <% else %>
+  <% elsif step.new_record? || step.status?("in_progress") %>
 
     <div class="field">
       <%= form.label :status %>
@@ -55,8 +55,28 @@
       <%= form.date_field :completed_date, value: step.completed_date %><br>
       ↑ 完了済の進捗の場合、入力必須<br>
     </div>
+
+  <% else %>
+
+    <div class="field">
+      <%= form.label :status %>：<%= step.status_i18n %>
+    </div>
+  
+    <div class="field">
+      <%= form.label :scheduled_complete_date %>：<%= step.scheduled_complete_date %>
+    </div>
+  
+    <div class="field">
+      <% if step.completed_date.present? %>
+        <%= form.label :completed_date %>
+        ＜入力必須＞
+        <%= form.date_field :completed_date, value: step.completed_date %>
+      <% end %>
+    </div>
     
   <% end %>
+  
+  
   <% if @step.tasks.not_yet.blank? %>
 
     <hr>

@@ -2,12 +2,28 @@
 
 <%= render 'form', lead: @lead %>
 
-<%= link_to 'Show', @lead %> |
-<%= link_to 'Back', leads_path %>
-<br>
-<%= link_to "本案件を完全に削除", 
-  lead_path(@lead), 
-  method: :delete, 
-  data: {confirm: "本案件の情報を全て削除します。よろしいですか？"}, 
-  class: "btn btn-danger btn-xs"
-%>
+<hr>
+
+<p>
+	<a class="btn btn-default" data-toggle="collapse" href="#collapseSample1">
+		この案件を削除
+	</a>
+</p>
+<div id="collapseSample1" class="collapse">
+	<div class="well">
+		この案件を完全に削除します。<br>
+		※　元には戻せません。<br>
+		※　登録されている進捗及びタスクも同時に削除されます。<br>
+    <%= link_to "削除", 
+      lead_path(@lead), 
+      method: :delete, 
+      data: {confirm: "本案件の情報を全て削除します。よろしいですか？"}, 
+      class: "btn btn-danger btn-xs"
+    %>
+	</div>
+</div>
+
+<hr>
+
+<%= link_to '案件詳細へ', step_path(working_step_in(@lead)) %> |
+<%= link_to '案件一覧へ', leads_path %>
