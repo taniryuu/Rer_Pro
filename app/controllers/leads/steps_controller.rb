@@ -12,6 +12,9 @@ class Leads::StepsController < Leads::ApplicationController
   before_action ->{
     correct_status(@step)
   }, only: %i(edit_continue_or_destroy_step edit_complete_or_continue_step edit_change_status_or_complete_task)
+  before_action ->{
+    contradiction_detection(@step)
+  }, only: :show
 
 
   # GET /steps
@@ -256,4 +259,14 @@ class Leads::StepsController < Leads::ApplicationController
       end
     end
 
+    def contradiction_detection(step)
+      if (step.status?("in_progress") || step.status?("inactive")) && step.tasks.not_yet.blank? && step.tasks.completed.blank?
+        redirect_to edit_continue_or_destroy_step_step_url(step)
+      elsif (step.status?("in_progress") || step.status?("inactive")) && step.tasks.not_yet.blank? && step.tasks.completed.present?
+        redirect_to edit_complete_or_continue_step_step_url(step)
+      elsif step.status?("completed") && step.tasks.not_yet.present?
+        redirect_to edit_change_status_or_complete_task_step_url(step)
+      end
+    end
+ 
 end
