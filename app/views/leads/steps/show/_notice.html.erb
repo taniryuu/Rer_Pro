@@ -1,11 +1,12 @@
 <% if @steps_notice_list.present? %>
   <div class="alert alert-info" role="alert">
     <h4 class="alert-heading">期限変更</h4>
-    <p>確認者: <%= @users.find(@user.superior_id).name %></p>
+    <% superior = @users.find(@user.superior_id) %>
+    <p>確認者: <%= superior.name %></p>
     <% @steps_notice_list.each do |step| %>
       <hr>
       <div class="mb-0">
-        <%= link_to "確認", change_limit_check_step_path(step), method: :patch, data: { confirm: "期限の変更を確認します。"}, class: "btn btn-sm btn-primary" %>
+        <%= link_to "確認", change_limit_check_step_path(step), method: :patch, data: { confirm: "期限の変更を確認します。"}, class: "btn btn-sm btn-primary #{"disabled" unless correct_user?(superior) }" %>
         : <%= link_to "#{step.name}", step_path(step) %>
       </div>
     <% end %>
