@@ -260,11 +260,11 @@ class Leads::StepsController < Leads::ApplicationController
     end
 
     def contradiction_detection(step)
-      if (step.status?("in_progress") || step.status?("inactive")) && step.tasks.not_yet.blank? && step.tasks.completed.blank?
+      if (step.status?("in_progress") || step.status?("inactive")) && continue_or_destroy_step?(step)
         redirect_to edit_continue_or_destroy_step_step_url(step)
-      elsif (step.status?("in_progress") || step.status?("inactive")) && step.tasks.not_yet.blank? && step.tasks.completed.present?
+      elsif (step.status?("in_progress") || step.status?("inactive")) && complete_or_continue_step?(step)
         redirect_to edit_complete_or_continue_step_step_url(step)
-      elsif step.status?("completed") && step.tasks.not_yet.present?
+      elsif change_status_or_complete_task?(step)
         redirect_to edit_change_status_or_complete_task_step_url(step)
       end
     end
