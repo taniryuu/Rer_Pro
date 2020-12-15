@@ -10,8 +10,14 @@ class Leads::StepsController < Leads::ApplicationController
   before_action :only_same_company_id?
   before_action :correct_user, except: %i(index show change_limit_check)
   before_action ->{
-    correct_status(@step)
-  }, only: %i(edit_continue_or_destroy_step edit_complete_or_continue_step edit_change_status_or_complete_task)
+    correct_continue_or_destroy_step_status(@step)
+  }, only: :edit_continue_or_destroy_step
+  before_action ->{
+    correct_complete_or_continue_step_status(@step)
+  }, only: :edit_complete_or_continue_step
+  before_action ->{
+    correct_change_status_or_complete_task_status(@step)
+  }, only: :edit_change_status_or_complete_task
   before_action ->{
     contradiction_detection(@step)
   }, only: :show
@@ -249,15 +255,31 @@ class Leads::StepsController < Leads::ApplicationController
       end
     end
 
-    # ”@stepに「未」のタスクも「完了」のタスクも無い”でなく、かつ
-    # ”@stepに「未」のタスクが無く「完了」のタスクが1つ以上ある”でなく、かつ
-    # ”@stepに「未」のタスクがあるにも関わらず、@stepのstatusが「完了」”でなければ、強制リダイレクト
-    def correct_status(step)
-      if !continue_or_destroy_step?(step) && !complete_or_continue_step?(step) && !change_status_or_complete_task?(step)
-        flash[:danger] = "タスク操作後のイベントの条件に合いません"
-        redirect_to @step
+
+    # 進捗新規作成時イベントページを要求したとき、「stepに「未」のタスクも「完了」のタスクも無い」でなければ、強制リダイレクト
+    def correct_continue_or_destroy_step_status(step)
+      if !continue_or_destroy_step?(step)
+        flash[:danger] = "進捗新規作成時イベントの条件に合いません"
+        redirect_to step
       end
     end
+
+    # 進捗完了時イベントページを要求したとき、「「未」のタスクが無く「完了」のタスクが1つ以上ある」でなければ、強制リダイレクト
+    def correct_complete_or_continue_step_status(step)
+      if !complete_or_continue_step?(step)
+        flash[:danger] = "進捗完了時イベントの条件に合いません"
+        redirect_to step
+      end
+    end
+
+    # 完了済進捗編集時イベントページを要求したとき、「stepに「未」のタスクがあるにも関わらず、@stepのstatusが「完了」」でなく、かつ$through_check_status変数がfalseなら、強制リダイクト
+    def correct_change_status_or_complete_task_status(step)
+      if !change_status_or_complete_task?(step) && !$through_check_status
+        flash[:danger] = "完了済進捗編集時イベントの条件に合いません"
+        redirect_to step
+      end
+    end
+
 
     def contradiction_detection(step)
       if (step.status?("in_progress") || step.status?("inactive")) && continue_or_destroy_step?(step)
