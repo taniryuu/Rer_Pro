@@ -1,6 +1,6 @@
 <p id="notice"><%= notice %></p>
 
-<%= render 'leads/steps/show/notice' %>
+<%= render 'leads/steps/show/notice' if @steps_notice_list.present? %>
 
 <h1>案件詳細</h1>
 <%= render partial: 'leads/leads/lead_show' %>
