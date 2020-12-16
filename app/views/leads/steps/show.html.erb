@@ -2,7 +2,9 @@
 
 <%= render 'leads/steps/show/notice' %>
 
-<h1>案件詳細</h1>
+<h1 style="display:inline;">案件詳細</h1>
+<h3 style="display:inline;"><%= "(テンプレート「#{@lead.template_name}」として使用可能)" if @lead.template %></h3>
+
 <%= render partial: 'leads/leads/lead_show' %>
 
 <hr>

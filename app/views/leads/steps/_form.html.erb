@@ -36,7 +36,7 @@
       <%= form.label :scheduled_complete_date %>＜入力必須＞
       <%= form.date_field :scheduled_complete_date, value: step.scheduled_complete_date %>
     </div>
-
+    
   <% elsif step.new_record? || step.status?("in_progress") %>
 
     <div class="field">
@@ -77,7 +77,7 @@
   <% end %>
   
   
-  <% if @step.tasks.not_yet.blank? %>
+  <% if @step.tasks.not_yet.blank? && (step.new_record? || step.status?("in_progress")) %>
 
     <hr>
 

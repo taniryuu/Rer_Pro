@@ -1,0 +1,1 @@
+<%= link_to "#{button_name}", cancel_lead_path(lead), class: "btn btn-danger btn-sm", method: :patch unless lead.status?("inactive") %>

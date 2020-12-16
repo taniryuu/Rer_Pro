@@ -34,9 +34,11 @@
   <% else %>
     <div class="field">ステータス：<%= lead.status_i18n %></div>
     <div class="field">
-      <%= form.label :completed_date %>
-      <%= form.date_field :completed_date, value: @lead.completed_date %><br>
-       ↑ 終了済の案件の場合、入力必須
+      <% if lead.status?("completed") %>
+        <%= form.label :completed_date %>
+        <%= form.date_field :completed_date, value: @lead.completed_date %><br>
+         ↑ 終了済の案件の場合、入力必須
+      <% end %>
     </div>
   <% end %>
   
