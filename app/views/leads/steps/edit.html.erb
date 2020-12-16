@@ -14,10 +14,10 @@
 		この進捗を完全に削除します。<br>
 		※　元には戻せません。<br>
 		※　登録されているタスクも同時に削除されます。<br>
-    <%= link_to '削除', step_path(@step), method: :delete, 
-      data: { confirm: 'この進捗を完全に削除します。よろしいですか？' }, 
-      class: "btn btn-danger btn-xs"
-    %>
+		<%= link_to '削除', step_path(@step), method: :delete, 
+			data: { confirm: 'この進捗を完全に削除します。よろしいですか？' }, 
+			class: "btn btn-danger btn-xs"
+		%>
 	</div>
 </div>
 

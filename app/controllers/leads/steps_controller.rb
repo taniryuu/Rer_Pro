@@ -210,7 +210,7 @@ class Leads::StepsController < Leads::ApplicationController
         errors << @task.errors.full_messages if @task.present? && @task.invalid?
         raise ActiveRecord::Rollback if errors.present?
       end
-      return errors.presence || nil
+      errors.presence || nil
     end
     
     # 〇番(pre_order)だったデータを避難し、×番(new_order)を空けておく処理

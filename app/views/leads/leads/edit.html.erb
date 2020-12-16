@@ -14,12 +14,12 @@
 		この案件を完全に削除します。<br>
 		※　元には戻せません。<br>
 		※　登録されている進捗及びタスクも同時に削除されます。<br>
-    <%= link_to "削除", 
-      lead_path(@lead), 
-      method: :delete, 
-      data: {confirm: "本案件の情報を全て削除します。よろしいですか？"}, 
-      class: "btn btn-danger btn-xs"
-    %>
+		<%= link_to "削除", 
+			lead_path(@lead), 
+			method: :delete, 
+			data: {confirm: "本案件の情報を全て削除します。よろしいですか？"}, 
+			class: "btn btn-danger btn-xs"
+		%>
 	</div>
 </div>
 
