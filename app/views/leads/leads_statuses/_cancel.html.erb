@@ -1,1 +1,4 @@
-<%= link_to "#{button_name}", cancel_lead_path(lead), class: "btn btn-danger btn-sm", method: :patch unless lead.status?("inactive") %>
+<%= link_to "#{button_name}", cancel_lead_path(lead), method: :patch, 
+  data: { confirm: "本案件を凍結し、通知対象から外します。本当によろしいですか？（いつでも再開できます。）" }, 
+  class: "btn btn-danger btn-sm" unless lead.status?("inactive")
+%>

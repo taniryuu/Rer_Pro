@@ -13,7 +13,7 @@
     <h2 style="display:inline;"><%= "進捗率：#{@lead.steps_rate}%" %></h2>
     <h4 style="display:inline;"><%= " (現在：<STEP#{working_step_in(@lead).order}> #{@lead.status?("in_progress") ? working_step_in(@lead).name : @lead.status_i18n})" %></h4>
     <% if @lead.status?("in_progress") %>
-      <%= render 'leads/leads_statuses/cancel', lead: @lead, button_name: "凍結する" %>
+      <%= render 'leads/leads_statuses/cancel', lead: @lead, button_name: "凍結する" if @lead.steps.inactive.present? %>
     <% else %>
       <%= render 'leads/leads_statuses/start', lead: @lead, button_name: "再開する" %>
     <% end %>
