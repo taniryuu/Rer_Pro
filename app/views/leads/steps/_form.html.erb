@@ -64,7 +64,7 @@
     ↓進捗ステータスで「進捗中」、または「保留」を選んだ場合、「タスク名」、「完了予定日」は入力必須<br>
     ↓それ以外は、空欄可<br><br>
     <%= fields_for @task do |t| %>
-      <%= render 'devise/shared/error_messages', resource: @task if @task.present? %>
+      <%= render 'devise/shared/error_messages', resource: @task %>
 
       <div class="field">
         <%= t.label :name %>

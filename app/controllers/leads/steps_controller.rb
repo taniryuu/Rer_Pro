@@ -274,7 +274,7 @@ class Leads::StepsController < Leads::ApplicationController
 
     # 完了済進捗編集時イベントページを要求したとき、「stepに「未」のタスクがあるにも関わらず、@stepのstatusが「完了」」でなく、かつ$through_check_status変数がfalseなら、強制リダイクト
     def correct_change_status_or_complete_task_status(step)
-      if !change_status_or_complete_task?(step) && !$through_check_status
+      if !change_status_or_complete_task?(step)
         flash[:danger] = "完了済進捗編集時イベントの条件に合いません"
         redirect_to step
       end
