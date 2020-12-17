@@ -8,4 +8,9 @@ module UsersHelper
   def delete_judgment(user)
     user.admin? || user.company_id != current_user.company_id ? false : true
   end
+
+  # 引数のユーザーがcurrent_userと同じか判定
+  def correct_user?(user)
+    user == current_user ? true : false
+  end
 end
