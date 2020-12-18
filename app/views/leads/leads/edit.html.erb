@@ -5,22 +5,22 @@
 <hr>
 
 <p>
-	<a class="btn btn-default" data-toggle="collapse" href="#collapseSample1">
-		この案件を削除
-	</a>
+  <a class="btn btn-default" data-toggle="collapse" href="#collapseSample1">
+    この案件を削除
+  </a>
 </p>
 <div id="collapseSample1" class="collapse">
-	<div class="well">
-		この案件を完全に削除します。<br>
-		※　元には戻せません。<br>
-		※　登録されている進捗及びタスクも同時に削除されます。<br>
-		<%= link_to "削除", 
-			lead_path(@lead), 
-			method: :delete, 
-			data: {confirm: "本案件の情報を全て削除します。よろしいですか？"}, 
-			class: "btn btn-danger btn-xs"
-		%>
-	</div>
+  <div class="well">
+    この案件を完全に削除します。<br>
+    ※　元には戻せません。<br>
+    ※　登録されている進捗及びタスクも同時に削除されます。<br>
+    <%= link_to "削除", 
+      lead_path(@lead), 
+      method: :delete, 
+      data: {confirm: "本案件の情報を全て削除します。よろしいですか？"}, 
+      class: "btn btn-danger btn-xs"
+    %>
+  </div>
 </div>
 
 <hr>
