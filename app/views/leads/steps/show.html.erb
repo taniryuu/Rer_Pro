@@ -1,6 +1,6 @@
 <p id="notice"><%= notice %></p>
 
-<%= render 'leads/steps/show/notice' %>
+<%= render 'leads/steps/show/notice' if @steps_notice_list.present? %>
 
 <h1 style="display:inline;">案件詳細</h1>
 <h3 style="display:inline;"><%= "(テンプレート「#{@lead.template_name}」として使用可能)" if @lead.template %></h3>
