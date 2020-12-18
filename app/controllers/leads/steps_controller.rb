@@ -246,7 +246,7 @@ class Leads::StepsController < Leads::ApplicationController
 
     # 進捗新規作成時イベントページを要求したとき、「stepに「未」のタスクも「完了」のタスクも無い」でなければ、強制リダイレクト
     def correct_continue_or_destroy_step_status(step)
-      if !continue_or_destroy_step?(step)
+      unless continue_or_destroy_step?(step)
         flash[:danger] = "進捗新規作成時イベントの条件に合いません"
         redirect_to step
       end
@@ -254,21 +254,21 @@ class Leads::StepsController < Leads::ApplicationController
 
     # 進捗完了時イベントページを要求したとき、「「未」のタスクが無く「完了」のタスクが1つ以上ある」でなければ、強制リダイレクト
     def correct_complete_or_continue_step_status(step)
-      if !complete_or_continue_step?(step)
+      unless complete_or_continue_step?(step)
         flash[:danger] = "進捗完了時イベントの条件に合いません"
         redirect_to step
       end
     end
 
-    # 完了済進捗編集時イベントページを要求したとき、「stepに「未」のタスクがあるにも関わらず、@stepのstatusが「完了」」でなく、かつ$through_check_status変数がfalseなら、強制リダイクト
+    # 完了済進捗編集時イベントページを要求したとき、「stepに「未」のタスクがあるにも関わらず、@stepのstatusが「完了」」でなければ、強制リダイクト
     def correct_change_status_or_complete_task_status(step)
-      if !change_status_or_complete_task?(step)
+      unless change_status_or_complete_task?(step)
         flash[:danger] = "完了済進捗編集時イベントの条件に合いません"
         redirect_to step
       end
     end
 
-
+    # leads/steps#show画面を表示する前にタスク-進捗が矛盾した状態にあれば各タスク操作後のイベントページにリダイレクトする
     def contradiction_detection(step)
       if (step.status?("in_progress") || step.status?("inactive")) && continue_or_destroy_step?(step)
         redirect_to edit_continue_or_destroy_step_step_url(step)
