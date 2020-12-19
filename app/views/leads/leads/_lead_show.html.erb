@@ -1,12 +1,21 @@
-<h4><%= "#{@lead.customer_name} 様：「" %><%= link_to @lead.room_name, leads_path(room_searchword: @lead.room_name) %><%= "(#{@lead.room_num})」に入居予定" %></h4>
-<h5>
-  <%= "(担当：" %><%= link_to @user.name, leads_path(user_searchword: @user.id) %><%= "）" %>
-  <%= "：あなたの案件です。" if @lead.user_id == current_user.id %>
-  <%= link_to "：担当者を変更する", edit_user_id_lead_path(@lead) if current_user.superior? %>
-  <%= link_to '編集', edit_lead_path(@lead) if @lead.user_id == current_user.id %>
-</h5>
-
-<h2 style="display:inline;"><%= "進捗率：#{@lead.steps_rate}%" %></h2>
-<h4 style="display:inline;"><%= " (現在：<STEP#{working_step_in(@lead).order}> #{@lead.status?("in_progress") ? working_step_in(@lead).name : @lead.status_i18n})" %></h4>
-<%= render 'leads/leads_statuses/start', lead: @lead, button_name: "再開" unless @lead.status?("in_progress") %>
-<br>
+<div>
+  <h4><%= "#{@lead.customer_name} 様：「" %><%= link_to @lead.room_name, leads_path(room_searchword: @lead.room_name) %><%= "(#{@lead.room_num})」に入居予定" %></h4>
+  <h5>
+    <%= @lead.status?("template") ? "(テンプレート作成者：" : "(担当：" %><%= link_to @user.name, leads_path(user_searchword: @user.id) %><%= "）" %>
+    <%= "：あなたの案件です。" if @lead.user_id == current_user.id %>
+    <%= link_to "：担当者を変更する", edit_user_id_lead_path(@lead) if current_user.superior? %>
+    <%= link_to '編集', edit_lead_path(@lead) if @lead.user_id == current_user.id %>
+  </h5>
+  
+  <% if @lead.status?("template") %>
+    <h3>※本案件はテンプレートとして作成されています。実案件ではありません。</h3>
+  <% else %>
+    <h2 style="display:inline;"><%= "進捗率：#{@lead.steps_rate}%" %></h2>
+    <h4 style="display:inline;"><%= " (現在：<STEP#{working_step_in(@lead).order}> #{@lead.status?("in_progress") ? working_step_in(@lead).name : @lead.status_i18n})" %></h4>
+    <% if @lead.status?("in_progress") %>
+      <%= render 'leads/leads_statuses/cancel', lead: @lead, button_name: "凍結する" if @lead.steps.inactive.present? %>
+    <% else %>
+      <%= render 'leads/leads_statuses/start', lead: @lead, button_name: "再開する" %>
+    <% end %>
+  <% end %>
+</div>

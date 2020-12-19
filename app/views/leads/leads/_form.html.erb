@@ -27,16 +27,18 @@
     <%= form.text_area :memo, size: "50x3" %>
   </div>
 
-----------------------------------------------------------------
+  <hr>
 
   <% if @lead.new_record? %>
     <div class="field">ステータス：進捗中</div>
   <% else %>
     <div class="field">ステータス：<%= lead.status_i18n %></div>
     <div class="field">
-      <%= form.label :completed_date %>
-      <%= form.date_field :completed_date, value: @lead.completed_date %><br>
-       ↑ 終了済の案件の場合、入力必須
+      <% if lead.status?("completed") %>
+        <%= form.label :completed_date %>
+        <%= form.date_field :completed_date, value: @lead.completed_date %><br>
+         ↑ 終了済の案件の場合、入力必須
+      <% end %>
     </div>
   <% end %>
   
@@ -61,7 +63,7 @@
     <%= form.date_field :created_date, value: value_created_date %>
   </div>
 
-----------------------------------------------------------------
+  <hr>
 
   <div class="field">
     <%= form.check_box :template %>ここにチェックを入れると、今後テンプレートとして使用できます。
