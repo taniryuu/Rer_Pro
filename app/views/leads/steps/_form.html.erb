@@ -49,7 +49,7 @@ $(function(){
 
     <div class="field" id="selector">
       <%= form.label :status %>
-      <%= form.select :status, Step.statuses.keys.map { |k| [I18n.t("enums.step.status.#{k}"), k]} %>
+      <%= form.select :status, Step.statuses.keys.map { |k| [I18n.t("enums.step.status.#{k}"), k]}, {selected: "in_progress"}%>
     </div>
   
     <div class="field">
