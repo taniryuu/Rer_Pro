@@ -34,7 +34,8 @@ class Leads::TasksController < Leads::ApplicationController
       update_completed_tasks_rate(@step)
       check_status_and_redirect_to(@step, @step, nil)
     else
-      render :new 
+      flash[:danger] = "#{@task.errors.full_messages.first}"
+      redirect_to @step
     end
   end
 
