@@ -171,8 +171,7 @@ class Leads::StepsController < Leads::ApplicationController
         end
         if step.status?("completed")
           flash[:danger] = "「完了」タスクが無い、進捗は「完了」ステータスで新規作成しようとしています。「完了」タスクを自動で生成しました。"
-          scheduled_complete_date = present_value([params[:step][:scheduled_complete_date], "#{Date.current}"])
-          @task = step.tasks.new(name: "completed_task", status: "completed", scheduled_complete_date: scheduled_complete_date, completed_date: params[:step][:completed_date])
+          @task = step.tasks.new(name: "completed_task", status: "completed", scheduled_complete_date: "#{Date.current}", completed_date: "#{Date.current}")
           update_completed_tasks_rate(step)
         end
 
