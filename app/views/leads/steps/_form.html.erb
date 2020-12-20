@@ -1,11 +1,3 @@
-<script type="text/javascript">
-$(function(){
-  $('#selector select[name="step[status]"]').on('change', function() {
-    if ($('select[name="step[status]"]').val()=='in_progress' || $('select[name="step[status]"]').val()=='inactive') $('#new_task').css('display','block');
-    else $('#new_task').css('display','none');
-  });
-});
-</script>
 <%= form_with(model: [lead, step], local: true) do |form| %>
   <%= render 'devise/shared/error_messages', resource: @step %>
 
