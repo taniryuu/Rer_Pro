@@ -39,9 +39,9 @@
     
   <% elsif step.new_record? || step.status?("in_progress") %>
 
-    <div class="field">
+    <div class="field" id="selector">
       <%= form.label :status %>
-      <%= form.select :status, Step.statuses.keys.map { |k| [I18n.t("enums.step.status.#{k}"), k]} %>
+      <%= form.select :status, Step.statuses.keys.map { |k| [I18n.t("enums.step.status.#{k}"), k]}, {selected: "in_progress"}%>
     </div>
   
     <div class="field">
@@ -75,48 +75,49 @@
     </div>
     
   <% end %>
-  
-  
-  <% if @step.tasks.not_yet.blank? && (step.new_record? || step.status?("in_progress")) %>
+ 
+  <div id="new_task"> 
+    <% if step.tasks.not_yet.blank? && step.new_record? %>
 
-    <hr>
+      <hr>
 
-    ↓進捗ステータスで「進捗中」、または「保留」を選んだ場合、「タスク名」、「完了予定日」は入力必須<br>
-    ↓それ以外は、空欄可<br><br>
-    <%= fields_for @task do |t| %>
-      <%= render 'devise/shared/error_messages', resource: @task %>
+      ↓「タスク名」、「完了予定日」は入力必須<br>
+      ↓それ以外は、空欄可<br><br>
+      <%= fields_for @task do |t| %>
+        <%= render 'devise/shared/error_messages', resource: @task if @task.present? %>
 
-      <div class="field">
-        <%= t.label :name %>
-        <%= t.text_field :name %><br>
-        ↑ 入力必須<br>
-      </div>
-      <div class="field">
-        <%= t.label :memo %>
-        <%= t.text_area :memo, size: "50x3" %>
-      </div>
+        <div class="field">
+          <%= t.label :name %>
+          <%= t.text_field :name %><br>
+          ↑ 入力必須<br>
+        </div>
+        <div class="field">
+          <%= t.label :memo %>
+          <%= t.text_area :memo, size: "50x3" %>
+        </div>
 
-      <%= t.hidden_field :status, value: "not_yet" %>
+        <%= t.hidden_field :status, value: "not_yet" %>
 
-      <div class="field">
-        <%= t.label :scheduled_complete_date %>
-        <%= t.date_field :scheduled_complete_date %><br>
-        ↑ 入力必須<br>
-      </div>
-      <div class="field">
-        <%= t.label :completed_date %>
-        <%= t.date_field :completed_date %><br>
-      </div>
+        <div class="field">
+          <%= t.label :scheduled_complete_date %>
+          <%= t.date_field :scheduled_complete_date %><br>
+          ↑ 入力必須<br>
+        </div>
+        <div class="field">
+          <%= t.label :completed_date %>
+          <%= t.date_field :completed_date %><br>
+        </div>
 
-      <div class="field">
-        <%= t.label :canceled_date %>
-        <%= t.date_field :canceled_date %><br>
-      </div>
+        <div class="field">
+          <%= t.label :canceled_date %>
+          <%= t.date_field :canceled_date %><br>
+        </div>
+      <% end %>
+
+      <hr>
+
     <% end %>
-
-    <hr>
-
-  <% end %>
+  </div>
   <div class="actions">
     <%= form.submit %>
   </div>

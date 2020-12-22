@@ -4,6 +4,7 @@ class Leads::TasksController < Leads::ApplicationController
                                     edit_revive_from_canceled_list update_revive_from_canceled_list)
   before_action :set_step, only: %i(index new create)
   before_action :set_step_by_id, only: [:add_delete_list, :complete_all_tasks]
+  before_action :set_steps, only: :create
   # アクセス制限
   before_action :correct_user, except: %i(index show)
 
@@ -34,7 +35,10 @@ class Leads::TasksController < Leads::ApplicationController
       update_completed_tasks_rate(@step)
       check_status_and_redirect_to(@step, @step, nil)
     else
-      render :new 
+      flash[:danger] = "#{@task.errors.full_messages.first}"
+      render :template=> "leads/steps/show", :collection => @steps, :locals=> { :@tasks=> @step.tasks.not_yet.order(:scheduled_complete_date), 
+                                                                                :@completed_tasks => @step.tasks.completed.order(:completed_date),
+                                                                                :@canceled_tasks => @step.tasks.canceled.order(:canceled_date) }
     end
   end
 
